@@ -1,0 +1,52 @@
+.alice-carousel {
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.carousel-image {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  backgorund-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+  cursor: pinter;
+  display: flex;
+  align-item: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.carousel-control-prev {
+  left: 10px;
+}
+
+.carousel-control-next {
+  right: 10px;
+}
+
+alice-carousel__dots-item {
+  width: 10px;
+  height: 10px;
+  background-color: rgba(255, 255, 255, 0.5); /* Màu trắng trong suốt */
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.alice-carousel__dots-item.__active {
+  background-color: white; /* Màu trắng khi active */
+}
