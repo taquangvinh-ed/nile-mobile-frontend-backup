@@ -1,6 +1,7 @@
 import React from "react";
 
 const Login = () => {
+  const handleSubmit = () => {};
   return (
     <div>
       <section className="bg-gray-50">
@@ -17,7 +18,11 @@ const Login = () => {
               <h1 className=" flex justify-center text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl">
                 Đăng nhập
               </h1>
-              <form className="space-y-4 md:space-y-6" action="#">
+              <form
+                className="space-y-4 md:space-y-6"
+                action="#"
+                onSubmit={handleSubmit}
+              >
                 <div>
                   <label
                     htmlFor="email"
