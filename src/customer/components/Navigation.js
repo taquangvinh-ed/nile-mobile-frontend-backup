@@ -23,6 +23,7 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { Link, useNavigate } from "react-router-dom";
+import AuthModal from "../../AuthModal/AuthModal";
 
 const navigation = {
   categories: [
@@ -154,9 +155,12 @@ const navigation = {
 export default function Navigation() {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
+
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
   return (
     <div className="bg-white" style={{ zIndex: 1000, position: "relative" }}>
-      {/* Mobile menu */}
+      {/* Mobile meanu */}
       <Dialog open={open} onClose={setOpen} className="relative z-40 lg:hidden">
         <DialogBackdrop
           transition
@@ -476,7 +480,7 @@ export default function Navigation() {
                   </a>
                 </div>
                 <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-6">
-                  <a
+                  {/* <a
                     href=""
                     className="text-sm font-medium text-gray-700 hover:text-gray-800"
                     onClick={() => navigate("/login")}
@@ -487,10 +491,21 @@ export default function Navigation() {
                   <a
                     href="#"
                     className="text-sm font-medium text-gray-700 hover:text-gray-800"
-                    onClick={() => navigate("/register")}
+                    onClick={() => setIsAuthModalOpen(true)}
                   >
                     Đăng ký tài khoản
-                  </a>
+                  </a> */}
+                  <button
+                    onClick={() => setIsAuthModalOpen(true)}
+                    className="text-sm font-medium text-gray-700 hover:text-gray-800"
+                  >
+                    Đăng nhập / Đăng ký
+                  </button>
+
+                  <AuthModal
+                    isOpen={isAuthModalOpen}
+                    onClose={() => setIsAuthModalOpen(false)}
+                  />
                 </div>
 
                 <div className="border-t border-gray-200 px-4 py-6">
