@@ -32,6 +32,7 @@ export const register = (registerData) => async (dispatch) => {
       localStorage.setItem("jwt", user.jwt);
     }
     dispatch(registerSuccess(user.jwt));
+    return { payload: { success: true, user } };
   } catch (error) {
     dispatch(registerFailure(error.message));
   }
@@ -60,21 +61,22 @@ const getUserRequest = () => ({ type: GET_USER_REQUEST });
 const getUserSuccess = (user) => ({ type: GET_USER_SUCCESS, payload: user });
 const getUserFailure = (error) => ({ type: GET_USER_FAILURE, payload: error });
 
-export const getUser = () => async (dispatch) => {
-  dispatch(getUserRequest());
-  try {
-    const response = await axios.get(`${API_BASE_URL}/api/user`, {
-      headers: {
-        Authorization: `Bearer {token}`,
-      },
-    });
-    const user = response.data;
+// export const getUser = () => async (dispatch) => {
+//   dispatch(getUserRequest());
+//   try {
+//     const token = localStorage.getItem("jwt");
+//     const response = await axios.get(`${API_BASE_URL}/api/user`, {
+//       headers: {
+//         Authorization: `Bearer ${token}`,
+//       },
+//     });
+//     const user = response.data;
 
-    dispatch(getUserSuccess(user));
-  } catch (error) {
-    dispatch(getUserFailure(error.message));
-  }
-};
+//     dispatch(getUserSuccess(user));
+//   } catch (error) {
+//     dispatch(getUserFailure(error.message));
+//   }
+// };
 
 export const logout = () => (dispatch) => {
   dispatch({ type: LOGOUT, payload: null });

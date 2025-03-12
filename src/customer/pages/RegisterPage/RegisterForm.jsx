@@ -1,8 +1,9 @@
 import { Autocomplete, Button, TextField } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getUser, register } from "../../../State/Auth/Action";
+import { register } from "../../../State/Auth/Action";
 import { store } from "../../../State/store";
+import { toast } from "react-toastify";
 const Register = () => {
   const [password, setPassword] = useState("");
   const [repassword, setRePassword] = useState("");
@@ -35,25 +36,19 @@ const Register = () => {
     setPhoneNumber(value);
   };
 
-  useEffect(() => {
-    if (jwt) {
-      dispatch(getUser());
-    }
-  }, [jwt, auth.jwt]);
-
   useEffect(() => {}, []);
 
   const isValidPhoneNumber = /^\d{10}$/.test(phoneNumber);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     if (!isMatch) {
-      alert("Mật khẩu không khớp");
+      toast.error("Mật khẩu không khớp");
       return;
     }
     if (!isValidPhoneNumber) {
-      alert("Số điện thoại không hợp lệ");
+      toast.error("Số điện thoại không hợp lệ");
       return;
     }
 
@@ -65,7 +60,18 @@ const Register = () => {
       password: data.get("password"),
       phoneNumber: data.get("phoneNumber"),
     };
-    dispatch(register(registerData));
+    try{
+      const response = await dispatch(register(registerData));
+      if(response.payload && response.payload.success){
+        toast.success("Đăng ký tài khoản thành công");
+      }else{
+        toast.error("Đăng ký thất bại");
+      }
+    }catch(error){
+      console.error("Error:", error);
+      toast.error("Đã xảy ra lỗi khi đăng ký. Vui lòng thử lại sau.");
+    }
+
     console.log(registerData);
   };
 
