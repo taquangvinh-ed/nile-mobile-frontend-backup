@@ -11,15 +11,45 @@ import {
 } from "@mui/material";
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import dayjs from "dayjs";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { useDispatch, useSelector } from "react-redux";
+import { getUser } from "../../../State/Auth/Action";
 
 const Profile = () => {
+  const dispatch = useDispatch();
+  const { user, isLoading, error } = useSelector((state) => state.auth);
+
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    phoneNumber: "",
+    email: "",
+  });
+
   const [gender, setGender] = useState("male");
   const [isEditting, setIsEditting] = useState(false);
   const [birthDate, setBirthDate] = useState(dayjs());
+
+  useEffect(() => {
+    dispatch(getUser());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        firstName: user.firstName || "",
+        lastName: user.lastName || "",
+        phoneNumber: user.phoneNumber || "",
+        email: user.email || "",
+      });
+      //   if (user.birthDate) {
+      //     setBirthDate(dayjs(user.birthDate));
+      //   }
+    }
+  }, [user]);
 
   const handleGenderChange = (event) => {
     setGender(event.target.value);
@@ -75,28 +105,28 @@ const Profile = () => {
                   name="phoneNumber"
                   fullWidth
                   variant="outlined"
-                  defaultValue="0147862953"
+                  value={formData.phoneNumber}
                   disabled={!isEditting}
                 ></TextField>
                 <TextField
                   name="lastName"
                   fullWidth
                   variant="outlined"
-                  defaultValue="Nguyễn"
+                  value={formData.lastName}
                   disabled={!isEditting}
                 ></TextField>
                 <TextField
                   name="firstName"
                   fullWidth
                   variant="outlined"
-                  defaultValue="Văn A"
+                  value={formData.firstName}
                   disabled={!isEditting}
                 ></TextField>
                 <TextField
                   name="email"
                   fullWidth
                   variant="outlined"
-                  defaultValue="nguyenvana@gmail.com"
+                  value={formData.email}
                   disabled={!isEditting}
                 ></TextField>
                 <FormControl component="fieldset">

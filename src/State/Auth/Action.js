@@ -13,8 +13,6 @@ import {
   REGISTER_SUCCESS,
 } from "./ActionType";
 
-const token = localStorage.getItem("jwt");
-
 const registerRequest = () => ({ type: REGISTER_REQUEST });
 const registerSuccess = (user) => ({ type: REGISTER_SUCCESS, payload: user });
 const registerFailure = (error) => ({ type: REGISTER_FAILURE, payload: error });
@@ -60,6 +58,7 @@ export const login = (loginData) => async (dispatch) => {
     return { payload: { success: true, user } };
   } catch (error) {
     dispatch(loginFailure(error.message));
+    return { payload: { success: false, error: error.message } };
   }
 };
 
@@ -67,22 +66,26 @@ const getUserRequest = () => ({ type: GET_USER_REQUEST });
 const getUserSuccess = (user) => ({ type: GET_USER_SUCCESS, payload: user });
 const getUserFailure = (error) => ({ type: GET_USER_FAILURE, payload: error });
 
-// export const getUser = () => async (dispatch) => {
-//   dispatch(getUserRequest());
-//   try {
-//     const token = localStorage.getItem("jwt");
-//     const response = await axios.get(`${API_BASE_URL}/api/user`, {
-//       headers: {
-//         Authorization: `Bearer ${token}`,
-//       },
-//     });
-//     const user = response.data;
-
-//     dispatch(getUserSuccess(user));
-//   } catch (error) {
-//     dispatch(getUserFailure(error.message));
-//   }
-// };
+export const getUser = () => async (dispatch) => {
+  dispatch(getUserRequest());
+  try {
+    const token = localStorage.getItem("jwt");
+    if (!token) {
+      throw new Error("No JWT token found");
+    }
+    const response = await axios.get(`${API_BASE_URL}/api/user/me`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const user = response.data;
+    dispatch(getUserSuccess(user));
+    return { payload: { success: true, user } };
+  } catch (error) {
+    dispatch(getUserFailure(error.message));
+    return { payload: { success: false, error: error.message } };
+  }
+};
 
 export const logout = () => (dispatch) => {
   localStorage.removeItem("jwt");
