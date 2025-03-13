@@ -480,21 +480,6 @@ export default function Navigation() {
                   </a>
                 </div>
                 <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-6">
-                  {/* <a
-                    href=""
-                    className="text-sm font-medium text-gray-700 hover:text-gray-800"
-                    onClick={() => navigate("/login")}
-                  >
-                    Đăng nhập
-                  </a>
-                  <span aria-hidden="true" className="h-6 w-px bg-gray-200" />
-                  <a
-                    href="#"
-                    className="text-sm font-medium text-gray-700 hover:text-gray-800"
-                    onClick={() => setIsAuthModalOpen(true)}
-                  >
-                    Đăng ký tài khoản
-                  </a> */}
                   <button
                     onClick={() => setIsAuthModalOpen(true)}
                     className="text-sm font-medium text-gray-700 hover:text-gray-800"
@@ -526,12 +511,12 @@ export default function Navigation() {
                         >
                           Đơn hàng của tôi
                         </Link>
-                        <a
-                          href="#"
+                        <Link
+                          to="/userProfile"
                           className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                         >
                           Thông tin tài khoản
-                        </a>
+                        </Link>
                         <a
                           href="#"
                           className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
