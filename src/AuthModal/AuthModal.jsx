@@ -7,7 +7,6 @@ import { useNavigate } from "react-router-dom";
 const AuthModal = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
   const navigateRegister = () => {
-    onClose();
     navigate("/register");
   };
   return (

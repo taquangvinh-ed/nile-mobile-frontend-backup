@@ -31,10 +31,11 @@ export const register = (registerData) => async (dispatch) => {
     if (user.jwt) {
       localStorage.setItem("jwt", user.jwt);
     }
-    dispatch(registerSuccess(user.jwt));
+    dispatch(registerSuccess(user));
     return { payload: { success: true, user } };
   } catch (error) {
     dispatch(registerFailure(error.message));
+    return { payload: { success: false, error: error.message } };
   }
 };
 
@@ -48,10 +49,15 @@ export const login = (loginData) => async (dispatch) => {
     const response = await axios.post(`${API_BASE_URL}/auth/login`, loginData);
     const user = response.data;
 
+    if (!user || !user.jwt) {
+      throw new Error("Invalid response from server: No JWT token");
+    }
+
     if (user.jwt) {
       localStorage.setItem("jwt", user.jwt);
     }
-    dispatch(loginSuccess(user.jwt));
+    dispatch(loginSuccess(user));
+    return { payload: { success: true, user } };
   } catch (error) {
     dispatch(loginFailure(error.message));
   }
@@ -79,5 +85,6 @@ const getUserFailure = (error) => ({ type: GET_USER_FAILURE, payload: error });
 // };
 
 export const logout = () => (dispatch) => {
+  localStorage.removeItem("jwt");
   dispatch({ type: LOGOUT, payload: null });
 };

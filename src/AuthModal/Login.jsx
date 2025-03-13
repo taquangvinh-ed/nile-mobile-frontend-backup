@@ -1,7 +1,12 @@
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { login } from "../State/Auth/Action";
+import { toast } from "react-toastify";
 
 const Login = ({ onSuccess, navigateRegister }) => {
+  const dispatch = useDispatch();
+
   const [formData, setFormData] = useState({
     phoneNumber: "",
     password: "",
@@ -11,7 +16,27 @@ const Login = ({ onSuccess, navigateRegister }) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-  const handleSubmit = () => {};
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const loginData = {
+      phoneNumber: formData.get("phoneNumber"),
+      password: formData.get("password"),
+    };
+
+    try {
+      const response = await dispatch(login(loginData));
+      if (response.payload && response.payload.user.jwt) {
+        toast.success("Đăng nhập thành công");
+        onSuccess();
+      } else {
+        toast.error("Số điện thoại hoặc mật khẩu không đúng");
+      }
+    } catch (error) {
+      toast.error("Đã có lỗi...! Vui lòng thử lại");
+    }
+    console.log(loginData);
+  };
   return (
     <div>
       <section className="bg-gray-50 border w-[25rem]">

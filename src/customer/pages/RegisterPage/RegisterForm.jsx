@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { register } from "../../../State/Auth/Action";
 import { store } from "../../../State/store";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 const Register = () => {
   const [password, setPassword] = useState("");
   const [repassword, setRePassword] = useState("");
@@ -15,6 +16,8 @@ const Register = () => {
   const { auth } = useSelector((store) => store);
   const error = auth.error;
   const isLoading = auth.isLoading;
+
+  const navigate = useNavigate();
 
   const handlePasswordChange = (event) => {
     const value = event.target.value;
@@ -60,14 +63,16 @@ const Register = () => {
       password: data.get("password"),
       phoneNumber: data.get("phoneNumber"),
     };
-    try{
+    try {
       const response = await dispatch(register(registerData));
-      if(response.payload && response.payload.success){
+      if (response.payload && response.payload.success) {
         toast.success("Đăng ký tài khoản thành công");
-      }else{
+        navigate("/");
+        window.scrollTo(0, 0);
+      } else {
         toast.error("Đăng ký thất bại");
       }
-    }catch(error){
+    } catch (error) {
       console.error("Error:", error);
       toast.error("Đã xảy ra lỗi khi đăng ký. Vui lòng thử lại sau.");
     }
