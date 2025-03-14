@@ -485,25 +485,6 @@
 //             </div>
 //           </div>
 
-//           <div className="mt-10 flex flex-col items-start">
-//             <h1 className="text-2xl font-semibold">
-//               Hỏi đáp về {product.name}
-//             </h1>
-//             <div className="border p-5 rounded-lg shadow-2xl">
-//               <div className="grid grid-cols-12 gap-7">
-//                 <div className="col-span-7">
-//                   <InputPersionalnfor rating={false} />
-//                 </div>
-//                 <div className="col-span-7">
-//                   <div className="space-y-5">
-//                     {[1, 1, 1, 1, 1].map((index) => (
-//                       <ProductReviewCard key={index} />
-//                     ))}
-//                   </div>
-//                 </div>
-//               </div>
-//             </div>
-//           </div>
 //         </section>
 //         <section className="mx-75 my-5 pt-5">
 //           <div className="rounded-lg shadow-2xl">
@@ -536,6 +517,7 @@ import { Box, LinearProgress, Rating } from "@mui/material";
 import StarRateIcon from "@mui/icons-material/StarRate";
 import mockProductData from "../../components/Product/mockProductData";
 import ProductCard from "../../components/Product/ProductCard";
+import InputPersionalnfor from "../../components/ProductDetail/InputPersionalnfor";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -546,7 +528,6 @@ export default function ProductDetails() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // Sửa lại để truy cập state.auth thay vì state
   const { productDetails, loading, error } = useSelector((state) => state.auth);
 
   const [selectedVariation, setSelectedVariation] = useState(null);
@@ -779,6 +760,27 @@ export default function ProductDetails() {
             </div>
           </div>
         </section>
+
+        {/*Review Product */}
+        <div className="mx-75 mt-10 flex flex-col items-start">
+          <h1 className="text-2xl font-semibold">
+            Đánh giá {productDetails.name}
+          </h1>
+          <div className="border p-5 rounded-lg shadow-2xl">
+            <div className="grid grid-cols-12 gap-7">
+              <div className="col-span-7">
+                <InputPersionalnfor rating={false} />
+              </div>
+              <div className="col-span-7">
+                <div className="space-y-5">
+                  {[1, 1, 1, 1, 1].map((index) => (
+                    <ProductReviewCard key={index} />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
