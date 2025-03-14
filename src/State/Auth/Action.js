@@ -1,6 +1,12 @@
 import axios from "axios";
 import { API_BASE_URL } from "../../config/apiConfig";
 import {
+  GET_PRODUCTS_FAILURE,
+  GET_PRODUCTS_REQUEST,
+  GET_PRODUCTS_SUCCESS,
+  GET_THIRD_LEVELS_FAILURE,
+  GET_THIRD_LEVELS_REQUEST,
+  GET_THIRD_LEVELS_SUCCESS,
   GET_USER_FAILURE,
   GET_USER_REQUEST,
   GET_USER_SUCCESS,
@@ -90,4 +96,54 @@ export const getUser = () => async (dispatch) => {
 export const logout = () => (dispatch) => {
   localStorage.removeItem("jwt");
   dispatch({ type: LOGOUT, payload: null });
+};
+
+const getProductsRequest = () => ({ type: GET_PRODUCTS_REQUEST });
+const getProductsSuccess = (products) => ({
+  type: GET_PRODUCTS_SUCCESS,
+  payload: products,
+});
+const getProductsFailure = (error) => ({
+  type: GET_PRODUCTS_FAILURE,
+  payload: error,
+});
+
+export const getProductsByThirdLevel = (thirdLevel) => async (dispatch) => {
+  dispatch(getProductsRequest());
+  try {
+    const response = await axios.get(`${API_BASE_URL}/api/products/filter`, {
+      params: { thirdLevel, pageNumber: 0, pageSize: 8 },
+    });
+    const products = response.data.content;
+    dispatch(getProductsSuccess(products));
+    return { payload: { success: true, products } };
+  } catch (error) {
+    dispatch(getProductsFailure(error.message));
+    return { payload: { success: false, error: error.message } };
+  }
+};
+
+const getThirdLevelsRequest = () => ({ type: GET_THIRD_LEVELS_REQUEST });
+const getThirdLevelsSuccess = (thirdLevels) => ({
+  type: GET_THIRD_LEVELS_SUCCESS,
+  payload: thirdLevels,
+});
+const getThirdLevelsFailure = (error) => ({
+  type: GET_THIRD_LEVELS_FAILURE,
+  payload: error,
+});
+
+export const getThirdLevels = () => async (dispatch) => {
+  dispatch(getThirdLevelsRequest());
+  try {
+    const response = await axios.get(
+      `${API_BASE_URL}/api/products/third-levels`
+    );
+    const thirdLevels = response.data;
+    dispatch(getThirdLevelsSuccess(thirdLevels));
+    return { payload: { success: true, thirdLevels } };
+  } catch (error) {
+    dispatch(getThirdLevelsFailure(error.message));
+    return { payload: { success: false, error: error.message } };
+  }
 };

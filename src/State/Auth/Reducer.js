@@ -31,6 +31,12 @@
 // };
 
 import {
+  GET_PRODUCTS_FAILURE,
+  GET_PRODUCTS_REQUEST,
+  GET_PRODUCTS_SUCCESS,
+  GET_THIRD_LEVELS_FAILURE,
+  GET_THIRD_LEVELS_REQUEST,
+  GET_THIRD_LEVELS_SUCCESS,
   GET_USER_FAILURE,
   GET_USER_REQUEST,
   GET_USER_SUCCESS,
@@ -48,6 +54,12 @@ const initialState = {
   isLoading: false,
   error: null,
   jwt: null,
+  products: [],
+  productsLoading: false,
+  productsError: null,
+  thirdLevels: [],
+  thirdLevelsLoading: false,
+  thirdLevelsError: null,
 };
 
 export const authReducer = (state = initialState, action) => {
@@ -87,6 +99,18 @@ export const authReducer = (state = initialState, action) => {
       };
     case LOGOUT:
       return initialState;
+      case GET_PRODUCTS_REQUEST:
+        return { ...state, productsLoading: true, productsError: null };
+      case GET_PRODUCTS_SUCCESS:
+        return { ...state, productsLoading: false, products: action.payload, productsError: null };
+      case GET_PRODUCTS_FAILURE:
+        return { ...state, productsLoading: false, productsError: action.payload };
+      case GET_THIRD_LEVELS_REQUEST:
+        return { ...state, thirdLevelsLoading: true, thirdLevelsError: null };
+      case GET_THIRD_LEVELS_SUCCESS:
+        return { ...state, thirdLevelsLoading: false, thirdLevels: action.payload, thirdLevelsError: null };
+      case GET_THIRD_LEVELS_FAILURE:
+        return { ...state, thirdLevelsLoading: false, thirdLevelsError: action.payload };
     default:
       return state;
   }

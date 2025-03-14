@@ -3,7 +3,7 @@ import React from "react";
 import mockProductData from "../Product/mockProductData";
 import ProductCard from "../Product/ProductCard";
 
-const HomSection = ({ sectionTitle }) => {
+const HomSection = ({ sectionTitle, products }) => {
   return (
     <div className="mx-75 border rounded-lg shadow-2xl">
       <div className="flex justify-between mt-3 mx-3">
@@ -14,9 +14,13 @@ const HomSection = ({ sectionTitle }) => {
       </div>
       {/* <HomSectionCarosel /> */}
       <div className="flex flex-wrap justify-center items-center">
-        {mockProductData.products.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
+      {products.length > 0 ? (
+          products.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))
+        ) : (
+          <p>Không có sản phẩm nào</p>
+        )}
       </div>
     </div>
   );

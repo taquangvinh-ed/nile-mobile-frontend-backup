@@ -4,11 +4,10 @@ const StorageOptionButton = ({ label, onClick, isSelected }) => {
   return (
     <div>
       <button
-        variant="contained"
         style={{
           position: "relative",
           marginRight: "3px",
-          width: "62px",
+          width: "80px",
           height: "30px",
           padding: "10px 20px",
           backgroundColor: isSelected ? "transparent" : "blue",
