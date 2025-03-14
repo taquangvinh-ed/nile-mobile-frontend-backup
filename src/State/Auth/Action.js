@@ -1,6 +1,9 @@
 import axios from "axios";
 import { API_BASE_URL } from "../../config/apiConfig";
 import {
+  GET_PRODUCT_DETAILS_FAILURE,
+  GET_PRODUCT_DETAILS_REQUEST,
+  GET_PRODUCT_DETAILS_SUCCESS,
   GET_PRODUCTS_FAILURE,
   GET_PRODUCTS_REQUEST,
   GET_PRODUCTS_SUCCESS,
@@ -145,5 +148,34 @@ export const getThirdLevels = () => async (dispatch) => {
   } catch (error) {
     dispatch(getThirdLevelsFailure(error.message));
     return { payload: { success: false, error: error.message } };
+  }
+};
+
+const getProductDetailsRequest = () => ({ type: GET_PRODUCT_DETAILS_REQUEST });
+const getProductDetailsSuccess = (product) => ({
+  type: GET_PRODUCT_DETAILS_SUCCESS,
+  payload: product,
+});
+const getProductDetailsFailure = (error) => ({
+  type: GET_PRODUCT_DETAILS_FAILURE,
+  payload: error,
+});
+
+export const getProductDetails = (productId) => async (dispatch) => {
+  dispatch(getProductDetailsRequest());
+  try {
+    const response = await axios.get(
+      `${API_BASE_URL}/api/products/id/${productId}`
+    );
+    const product = response.data;
+    dispatch(getProductDetailsSuccess(product));
+    return { payload: { success: true, product } };
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message ||
+      error.message ||
+      "Failed to fetch product details";
+    dispatch(getProductDetailsFailure(errorMessage));
+    return { payload: { success: false, error: errorMessage } };
   }
 };

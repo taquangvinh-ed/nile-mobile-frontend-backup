@@ -31,6 +31,9 @@
 // };
 
 import {
+  GET_PRODUCT_DETAILS_FAILURE,
+  GET_PRODUCT_DETAILS_REQUEST,
+  GET_PRODUCT_DETAILS_SUCCESS,
   GET_PRODUCTS_FAILURE,
   GET_PRODUCTS_REQUEST,
   GET_PRODUCTS_SUCCESS,
@@ -60,6 +63,7 @@ const initialState = {
   thirdLevels: [],
   thirdLevelsLoading: false,
   thirdLevelsError: null,
+  productDetails: null,
 };
 
 export const authReducer = (state = initialState, action) => {
@@ -99,18 +103,43 @@ export const authReducer = (state = initialState, action) => {
       };
     case LOGOUT:
       return initialState;
-      case GET_PRODUCTS_REQUEST:
-        return { ...state, productsLoading: true, productsError: null };
-      case GET_PRODUCTS_SUCCESS:
-        return { ...state, productsLoading: false, products: action.payload, productsError: null };
-      case GET_PRODUCTS_FAILURE:
-        return { ...state, productsLoading: false, productsError: action.payload };
-      case GET_THIRD_LEVELS_REQUEST:
-        return { ...state, thirdLevelsLoading: true, thirdLevelsError: null };
-      case GET_THIRD_LEVELS_SUCCESS:
-        return { ...state, thirdLevelsLoading: false, thirdLevels: action.payload, thirdLevelsError: null };
-      case GET_THIRD_LEVELS_FAILURE:
-        return { ...state, thirdLevelsLoading: false, thirdLevelsError: action.payload };
+    case GET_PRODUCTS_REQUEST:
+      return { ...state, productsLoading: true, productsError: null };
+    case GET_PRODUCTS_SUCCESS:
+      return {
+        ...state,
+        productsLoading: false,
+        products: action.payload,
+        productsError: null,
+      };
+    case GET_PRODUCTS_FAILURE:
+      return {
+        ...state,
+        productsLoading: false,
+        productsError: action.payload,
+      };
+    case GET_THIRD_LEVELS_REQUEST:
+      return { ...state, thirdLevelsLoading: true, thirdLevelsError: null };
+    case GET_THIRD_LEVELS_SUCCESS:
+      return {
+        ...state,
+        thirdLevelsLoading: false,
+        thirdLevels: action.payload,
+        thirdLevelsError: null,
+      };
+    case GET_THIRD_LEVELS_FAILURE:
+      return {
+        ...state,
+        thirdLevelsLoading: false,
+        thirdLevelsError: action.payload,
+      };
+
+    case GET_PRODUCT_DETAILS_REQUEST:
+      return { ...state, loading: true, error: null };
+    case GET_PRODUCT_DETAILS_SUCCESS:
+      return { ...state, loading: false, productDetails: action.payload };
+    case GET_PRODUCT_DETAILS_FAILURE:
+      return { ...state, loading: false, error: action.payload };
     default:
       return state;
   }
