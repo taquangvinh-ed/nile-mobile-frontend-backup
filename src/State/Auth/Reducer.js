@@ -64,6 +64,9 @@ const initialState = {
   thirdLevelsLoading: false,
   thirdLevelsError: null,
   productDetails: null,
+  isAuthenticated: false,
+  productDetailsLoading: false,
+  productDetailsError: null,
 };
 
 export const authReducer = (state = initialState, action) => {
@@ -76,8 +79,10 @@ export const authReducer = (state = initialState, action) => {
       return {
         ...state,
         isLoading: false,
-        user: action.payload.user || state.user, // Đảm bảo không ghi đè nếu không có user
-        jwt: action.payload.user?.jwt || state.jwt, // Lấy jwt từ user nếu có
+        user: action.payload.user || state.user, 
+        jwt: action.payload.user?.jwt || state.jwt,
+        isAuthenticated: true,
+        error: null
       };
     case LOGIN_SUCCESS:
       return {
@@ -85,13 +90,17 @@ export const authReducer = (state = initialState, action) => {
         isLoading: false,
         user: action.payload.user || state.user,
         jwt: action.payload.user?.jwt || state.jwt,
+        isAuthenticated: true,
+        error: null,
       };
     case GET_USER_SUCCESS:
       return {
         ...state,
         isLoading: false,
         user: action.payload || state.user,
-        jwt: state.jwt, // Giữ nguyên jwt
+        jwt: state.jwt,
+        isAuthenticated: true,
+        error: null,
       };
     case REGISTER_FAILURE:
     case LOGIN_FAILURE:
@@ -100,6 +109,10 @@ export const authReducer = (state = initialState, action) => {
         ...state,
         isLoading: false,
         error: action.payload || "Unknown error",
+        isAuthenticated: false,
+        isAuthenticated: false,
+        user: null,
+        jwt: null,
       };
     case LOGOUT:
       return initialState;

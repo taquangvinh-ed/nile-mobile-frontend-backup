@@ -28,6 +28,7 @@ const Login = ({ onSuccess, navigateRegister }) => {
       const response = await dispatch(login(loginData));
       if (response.payload && response.payload.user.jwt) {
         toast.success("Đăng nhập thành công");
+        setFormData({ phoneNumber: "", password: "" });
         onSuccess();
       } else {
         toast.error("Số điện thoại hoặc mật khẩu không đúng");

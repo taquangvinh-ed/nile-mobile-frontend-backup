@@ -91,8 +91,17 @@ export const getUser = () => async (dispatch) => {
     dispatch(getUserSuccess(user));
     return { payload: { success: true, user } };
   } catch (error) {
-    dispatch(getUserFailure(error.message));
-    return { payload: { success: false, error: error.message } };
+    const status = error.response?.status;
+    let errorMessage =
+      error.response?.data?.message || error.message || "Failed to fetch user";
+
+    if (status === 401) {
+      errorMessage = "Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.";
+      dispatch(logout());
+    }
+
+    dispatch(getUserFailure(errorMessage));
+    return { payload: { success: false, error: errorMessage } };
   }
 };
 

@@ -14,6 +14,7 @@ import mockProductData from "../../components/Product/mockProductData";
 import ProductCard from "../../components/Product/ProductCard";
 import InputPersionalnfor from "../../components/ProductDetail/InputPersionalnfor";
 import ProductDetailPopup from "./ProductDetailPopup";
+import AuthModal from "../../../AuthModal/AuthModal";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -24,7 +25,11 @@ export default function ProductDetails() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { productDetails, loading, error } = useSelector((state) => state.auth);
+  const { productDetails, loading, error, isAuthenticated } = useSelector(
+    (state) => state.auth
+  );
+
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false); // State cho modal
 
   const [selectedVariation, setSelectedVariation] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -49,12 +54,16 @@ export default function ProductDetails() {
     setCurrentImageIndex(index);
   };
 
-  const handleAddToCart = () => {
-    navigate("/cart");
+  const handleAddToCart = (event) => {
+    event.preventDefault();
+    if (isAuthenticated) {
+      navigate("/cart");
+    } else {
+      setIsAuthModalOpen(true);
+    }
   };
 
   if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
   if (!productDetails) return <div>No product found</div>;
 
   const formatedPrice =
@@ -292,6 +301,10 @@ export default function ProductDetails() {
           </div>
         </div>
       </div>
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+      />
     </div>
   );
 }
