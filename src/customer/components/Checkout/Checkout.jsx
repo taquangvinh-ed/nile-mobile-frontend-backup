@@ -10,9 +10,11 @@ import ConfirmDeliverAddress from "./ConfirmDeliverAddress";
 import OrderSummary from "./OrderSummary";
 
 const steps = [
+  "Đăng nhập",
   "Chọn sản phẩm",
-  "Thông tin đặt hàng",
-  "Thanh toán",
+  "Xác nhận địa chỉ giao hàng",
+  "Phương thức thanh toán",
+  "Xác nhận đơn hàng",
   "Hoàn tất đặt hàng",
 ];
 
