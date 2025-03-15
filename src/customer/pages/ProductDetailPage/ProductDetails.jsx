@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { getProductDetails } from "../../../State/Auth/Action";
+import { getProductDetails, addToCart } from "../../../State/Auth/Action"; // Thêm addToCart
 import { StarIcon } from "@heroicons/react/20/solid";
 import { Radio, RadioGroup } from "@headlessui/react";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
@@ -25,22 +25,26 @@ export default function ProductDetails() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { productDetails, loading, error, isAuthenticated } = useSelector(
-    (state) => state.auth
-  );
+  const {
+    productDetails,
+    loading,
+    error,
+    isAuthenticated,
+    cartLoading,
+    cartError,
+  } = useSelector((state) => state.auth);
 
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false); // State cho modal
-
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [selectedVariation, setSelectedVariation] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
-    console.log("Dispatching getProductDetails with productId:", productId); // Log để debug
+    console.log("Dispatching getProductDetails with productId:", productId);
     dispatch(getProductDetails(productId));
   }, [dispatch, productId]);
 
   useEffect(() => {
-    console.log("productDetails updated:", productDetails); // Log để debug
+    console.log("productDetails updated:", productDetails);
     if (
       productDetails &&
       productDetails.variations &&
@@ -54,12 +58,28 @@ export default function ProductDetails() {
     setCurrentImageIndex(index);
   };
 
-  const handleAddToCart = (event) => {
+  const handleAddToCart = async (event) => {
     event.preventDefault();
-    if (isAuthenticated) {
-      navigate("/cart");
-    } else {
+    if (!isAuthenticated) {
       setIsAuthModalOpen(true);
+      return;
+    }
+
+    if (!selectedVariation) {
+      alert("Please select a variation before adding to cart.");
+      return;
+    }
+
+    try {
+      const result = await dispatch(addToCart(selectedVariation));
+      if (result.payload.success) {
+        alert("Thêm sản phẩm vào giỏ hàng thành công!");
+        navigate("/cart");
+      } else {
+        alert("Failed to add to cart: " + result.payload.error);
+      }
+    } catch (err) {
+      alert("An error occurred: " + cartError);
     }
   };
 
@@ -224,10 +244,12 @@ export default function ProductDetails() {
                   </button>
                   <button
                     onClick={handleAddToCart}
-                    type="submit"
-                    className="mt-2 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none"
+                    type="button" // Đổi thành type="button" để tránh submit form
+                    disabled={cartLoading} // Vô hiệu hóa khi đang gọi API
+                    className="mt-2 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none disabled:bg-gray-400"
                   >
-                    Thêm vào giỏ hàng <AddShoppingCartIcon />
+                    {cartLoading ? "Đang thêm..." : "Thêm vào giỏ hàng"}{" "}
+                    <AddShoppingCartIcon />
                   </button>
                 </div>
               </form>
@@ -265,9 +287,6 @@ export default function ProductDetails() {
                       </span>
                     </li>
                   </ul>
-                  {/* <button className=" mt-4 bg-white border rounded-lg shadow-2xl py-1 px-5 hover:bg-gray-200">
-                    Xem cấu hình chi tiết down ▼
-                  </button> */}
                   <div>
                     <ProductDetailPopup
                       product={productDetails}
@@ -280,7 +299,6 @@ export default function ProductDetails() {
           </div>
         </section>
 
-        {/*Review Product */}
         <div className="mx-75 mt-10 flex flex-col items-start">
           <h1 className="text-2xl font-semibold">
             Đánh giá {productDetails.name}

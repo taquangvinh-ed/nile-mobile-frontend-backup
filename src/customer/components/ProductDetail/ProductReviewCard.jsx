@@ -18,12 +18,12 @@ const ProductReviewCard = () => {
         <div className="col-span-10">
           <div className="space-y-2">
             <div className="flex flex-col">
-              <p className="font-semibold text-lg">Vinh</p>
+              <p className="font-semibold text-lg">Nguyễn Văn A</p>
               <p className="opacity-40">2 ngày trước</p>
             </div>
           </div>
           <Rating value={4.5} name="rating" readOnly precision={0.1} />
-          <p>Rất tuyệt vời</p>
+          <p>Sản phẩm tốt</p>
         </div>
       </div>
     </div>

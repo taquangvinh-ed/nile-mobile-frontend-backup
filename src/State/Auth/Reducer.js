@@ -1,36 +1,10 @@
-// import { GET_USER_FAILURE, GET_USER_REQUEST, GET_USER_SUCCESS, LOGIN_FAILURE, LOGIN_REQUEST, LOGIN_SUCCESS, LOGOUT, REGISTER_FAILURE, REGISTER_REQUEST, REGISTER_SUCCESS } from "./ActionType";
-
-// const initialState = {
-//     user: null,
-//     isLoading: false,
-//     error: null,
-//     jwt: null
-// };
-
-// export const authReducer = (state = initialState, action) => {
-//     switch (action.type) {
-//         case REGISTER_REQUEST:
-//         case LOGIN_REQUEST:
-//         case GET_USER_REQUEST:
-//             return { ...state, isLoading: true, error: null };
-//         case REGISTER_SUCCESS:
-//             return { ...state, isLoading: false, user: action.payload.user, jwt: action.payload.jwt };
-//         case LOGIN_SUCCESS:
-//             return { ...state, isLoading: false, user: action.payload.user, jwt: action.payload.jwt };
-//         case GET_USER_SUCCESS:
-//             return { ...state, isLoading: false, user: action.payload };
-//         case REGISTER_FAILURE:
-//         case LOGIN_FAILURE:
-//         case GET_USER_FAILURE:
-//             return { ...state, isLoading: false, error: action.payload };
-//         case LOGOUT:
-//             return {...initialState, user: null, jwt: null };
-//         default:
-//             return state;
-//     }
-// };
-
 import {
+  ADD_TO_CART_FAILURE,
+  ADD_TO_CART_REQUEST,
+  ADD_TO_CART_SUCCESS,
+  GET_CART_FAILURE,
+  GET_CART_REQUEST,
+  GET_CART_SUCCESS,
   GET_PRODUCT_DETAILS_FAILURE,
   GET_PRODUCT_DETAILS_REQUEST,
   GET_PRODUCT_DETAILS_SUCCESS,
@@ -50,6 +24,10 @@ import {
   REGISTER_FAILURE,
   REGISTER_REQUEST,
   REGISTER_SUCCESS,
+  UPDATE_CART_ITEM_SELECTION,
+  UPDATE_CART_ITEM_QUANTITY_REQUEST,
+  UPDATE_CART_ITEM_QUANTITY_SUCCESS,
+  UPDATE_CART_ITEM_QUANTITY_FAILURE,
 } from "./ActionType";
 
 const initialState = {
@@ -67,6 +45,21 @@ const initialState = {
   isAuthenticated: false,
   productDetailsLoading: false,
   productDetailsError: null,
+  cart: null, // Thay [] thành null để thống nhất với dữ liệu từ GET_CART
+  cartLoading: false,
+  cartError: null,
+  cartSummary: { subtotal: 0, totalDiscount: 0, totalItems: 0 },
+};
+
+const calculateCartSummary = (cartItems) => {
+  const selectedItems = cartItems.filter((item) => item.isSelected);
+  const subtotal = selectedItems.reduce((sum, item) => sum + item.subtotal, 0);
+  const totalDiscount = selectedItems.reduce(
+    (sum, item) => sum + (item.discountPrice || 0),
+    0
+  );
+  const totalItems = selectedItems.length;
+  return { subtotal, totalDiscount, totalItems };
 };
 
 export const authReducer = (state = initialState, action) => {
@@ -79,10 +72,10 @@ export const authReducer = (state = initialState, action) => {
       return {
         ...state,
         isLoading: false,
-        user: action.payload.user || state.user, 
+        user: action.payload.user || state.user,
         jwt: action.payload.user?.jwt || state.jwt,
         isAuthenticated: true,
-        error: null
+        error: null,
       };
     case LOGIN_SUCCESS:
       return {
@@ -110,12 +103,12 @@ export const authReducer = (state = initialState, action) => {
         isLoading: false,
         error: action.payload || "Unknown error",
         isAuthenticated: false,
-        isAuthenticated: false,
         user: null,
         jwt: null,
       };
     case LOGOUT:
       return initialState;
+
     case GET_PRODUCTS_REQUEST:
       return { ...state, productsLoading: true, productsError: null };
     case GET_PRODUCTS_SUCCESS:
@@ -131,6 +124,7 @@ export const authReducer = (state = initialState, action) => {
         productsLoading: false,
         productsError: action.payload,
       };
+
     case GET_THIRD_LEVELS_REQUEST:
       return { ...state, thirdLevelsLoading: true, thirdLevelsError: null };
     case GET_THIRD_LEVELS_SUCCESS:
@@ -148,11 +142,97 @@ export const authReducer = (state = initialState, action) => {
       };
 
     case GET_PRODUCT_DETAILS_REQUEST:
-      return { ...state, loading: true, error: null };
+      return {
+        ...state,
+        productDetailsLoading: true,
+        productDetailsError: null,
+      };
     case GET_PRODUCT_DETAILS_SUCCESS:
-      return { ...state, loading: false, productDetails: action.payload };
+      return {
+        ...state,
+        productDetailsLoading: false,
+        productDetails: action.payload,
+        productDetailsError: null,
+      };
     case GET_PRODUCT_DETAILS_FAILURE:
-      return { ...state, loading: false, error: action.payload };
+      return {
+        ...state,
+        productDetailsLoading: false,
+        productDetailsError: action.payload,
+      };
+
+    case ADD_TO_CART_REQUEST:
+      return { ...state, cartLoading: true, cartError: null };
+    case ADD_TO_CART_SUCCESS:
+      const newCartItems = state.cart
+        ? [...state.cart.cartItems, action.payload]
+        : [action.payload];
+      return {
+        ...state,
+        cartLoading: false,
+        cart: {
+          ...state.cart,
+          cartItems: newCartItems,
+        },
+        cartSummary: calculateCartSummary(newCartItems),
+        cartError: null,
+      };
+    case ADD_TO_CART_FAILURE:
+      return {
+        ...state,
+        cartLoading: false,
+        cartError: action.payload,
+      };
+
+    case GET_CART_REQUEST:
+      return { ...state, cartLoading: true, cartError: null };
+    case GET_CART_SUCCESS:
+      return {
+        ...state,
+        cartLoading: false,
+        cart: action.payload,
+        cartSummary: calculateCartSummary(action.payload.cartItems),
+        cartError: null,
+      };
+    case GET_CART_FAILURE:
+      return {
+        ...state,
+        cartLoading: false,
+        cartError: action.payload,
+      };
+
+    case UPDATE_CART_ITEM_SELECTION:
+      const updatedCartItemsSelection = state.cart.cartItems.map((item) =>
+        item.id === action.payload.cartItemId
+          ? { ...item, isSelected: action.payload.isSelected }
+          : item
+      );
+      return {
+        ...state,
+        cart: { ...state.cart, cartItems: updatedCartItemsSelection },
+        cartSummary: calculateCartSummary(updatedCartItemsSelection),
+      };
+
+    case UPDATE_CART_ITEM_QUANTITY_REQUEST:
+      return { ...state, cartLoading: true, cartError: null };
+    case UPDATE_CART_ITEM_QUANTITY_SUCCESS:
+      const updatedCartItemsQuantity = state.cart.cartItems.map((item) =>
+        item.id === action.payload.id ? { ...item, ...action.payload } : item
+      );
+      return {
+        ...state,
+        cartLoading: false,
+        cart: { ...state.cart, cartItems: updatedCartItemsQuantity },
+        cartSummary: calculateCartSummary(updatedCartItemsQuantity),
+        cartError: null,
+      };
+    case UPDATE_CART_ITEM_QUANTITY_FAILURE:
+      return {
+        ...state,
+        cartLoading: false,
+        cartError: action.payload,
+      };
+
     default:
       return state;
   }

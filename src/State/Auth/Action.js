@@ -1,6 +1,12 @@
 import axios from "axios";
 import { API_BASE_URL } from "../../config/apiConfig";
 import {
+  ADD_TO_CART_FAILURE,
+  ADD_TO_CART_REQUEST,
+  ADD_TO_CART_SUCCESS,
+  GET_CART_FAILURE,
+  GET_CART_REQUEST,
+  GET_CART_SUCCESS,
   GET_PRODUCT_DETAILS_FAILURE,
   GET_PRODUCT_DETAILS_REQUEST,
   GET_PRODUCT_DETAILS_SUCCESS,
@@ -20,6 +26,10 @@ import {
   REGISTER_FAILURE,
   REGISTER_REQUEST,
   REGISTER_SUCCESS,
+  UPDATE_CART_ITEM_QUANTITY_FAILURE,
+  UPDATE_CART_ITEM_QUANTITY_REQUEST,
+  UPDATE_CART_ITEM_QUANTITY_SUCCESS,
+  UPDATE_CART_ITEM_SELECTION,
 } from "./ActionType";
 
 const registerRequest = () => ({ type: REGISTER_REQUEST });
@@ -188,3 +198,128 @@ export const getProductDetails = (productId) => async (dispatch) => {
     return { payload: { success: false, error: errorMessage } };
   }
 };
+
+const addToCartRequest = () => ({ type: ADD_TO_CART_REQUEST });
+const addToCartSuccess = (cartItem) => ({
+  type: ADD_TO_CART_SUCCESS,
+  payload: cartItem,
+});
+const addToCartFailure = (error) => ({
+  type: ADD_TO_CART_FAILURE,
+  payload: error,
+});
+
+export const addToCart = (variation) => async (dispatch) => {
+  dispatch(addToCartRequest());
+  try {
+    const token = localStorage.getItem("jwt");
+    if (!token) {
+      throw new Error("No JWT token found. Please log in.");
+    }
+
+    const response = await axios.post(
+      `${API_BASE_URL}/api/cart/items`,
+      { variation },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    const cartItem = { ...response.data, isSelected: false };
+    dispatch(addToCartSuccess(cartItem));
+    return { payload: { success: true, cartItem } };
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message || error.message || "Failed to add to cart";
+    dispatch(addToCartFailure(errorMessage));
+    return { payload: { success: false, error: errorMessage } };
+  }
+};
+
+const getCartRequest = () => ({ type: GET_CART_REQUEST });
+const getCartSuccess = (cart) => ({ type: GET_CART_SUCCESS, payload: cart });
+const getCartFailure = (error) => ({ type: GET_CART_FAILURE, payload: error });
+
+export const getCart = () => async (dispatch) => {
+  dispatch(getCartRequest());
+  try {
+    const token = localStorage.getItem("jwt");
+    if (!token) {
+      throw new Error("No JWT token found. Please log in.");
+    }
+
+    const response = await axios.get(`${API_BASE_URL}/api/user/cart`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const cartData = response.data;
+    // Thêm thuộc tính isSelected mặc định là false cho từng CartItem
+    const cartWithSelection = {
+      ...cartData,
+      cartItems: cartData.cartItems.map((item) => ({
+        ...item,
+        isSelected: false,
+      })),
+    };
+    dispatch(getCartSuccess(cartWithSelection));
+    return { payload: { success: true, cart: cartWithSelection } };
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message || error.message || "Failed to fetch cart";
+    dispatch(getCartFailure(errorMessage));
+    return { payload: { success: false, error: errorMessage } };
+  }
+};
+
+export const updateCartItemSelection = (cartItemId, isSelected) => ({
+  type: UPDATE_CART_ITEM_SELECTION,
+  payload: { cartItemId, isSelected },
+});
+
+const updateCartItemQuantityRequest = () => ({
+  type: UPDATE_CART_ITEM_QUANTITY_REQUEST,
+});
+const updateCartItemQuantitySuccess = (cartItem) => ({
+  type: UPDATE_CART_ITEM_QUANTITY_SUCCESS,
+  payload: cartItem,
+});
+const updateCartItemQuantityFailure = (error) => ({
+  type: UPDATE_CART_ITEM_QUANTITY_FAILURE,
+  payload: error,
+});
+
+export const updateCartItemQuantity =
+  (cartItemId, quantity) => async (dispatch) => {
+    dispatch(updateCartItemQuantityRequest());
+    try {
+      const token = localStorage.getItem("jwt");
+      if (!token) {
+        throw new Error("No JWT token found. Please log in.");
+      }
+
+      const response = await axios.put(
+        `${API_BASE_URL}/api/cart/items/${cartItemId}`,
+        null, // Không cần body vì quantity nằm trong query param
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          params: {
+            quantity: quantity,
+          },
+        }
+      );
+      const updatedCartItem = response.data;
+      dispatch(updateCartItemQuantitySuccess(updatedCartItem));
+      return { payload: { success: true, cartItem: updatedCartItem } };
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to update cart item quantity";
+      dispatch(updateCartItemQuantityFailure(errorMessage));
+      return { payload: { success: false, error: errorMessage } };
+    }
+  };
