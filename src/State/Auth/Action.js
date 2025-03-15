@@ -16,6 +16,9 @@ import {
   GET_THIRD_LEVELS_FAILURE,
   GET_THIRD_LEVELS_REQUEST,
   GET_THIRD_LEVELS_SUCCESS,
+  GET_USER_ADDRESSES_FAILURE,
+  GET_USER_ADDRESSES_REQUEST,
+  GET_USER_ADDRESSES_SUCCESS,
   GET_USER_FAILURE,
   GET_USER_REQUEST,
   GET_USER_SUCCESS,
@@ -26,6 +29,9 @@ import {
   REGISTER_FAILURE,
   REGISTER_REQUEST,
   REGISTER_SUCCESS,
+  UPDATE_ADDRESS_FAILURE,
+  UPDATE_ADDRESS_REQUEST,
+  UPDATE_ADDRESS_SUCCESS,
   UPDATE_CART_ITEM_QUANTITY_FAILURE,
   UPDATE_CART_ITEM_QUANTITY_REQUEST,
   UPDATE_CART_ITEM_QUANTITY_SUCCESS,
@@ -321,5 +327,39 @@ export const updateCartItemQuantity =
         "Failed to update cart item quantity";
       dispatch(updateCartItemQuantityFailure(errorMessage));
       return { payload: { success: false, error: errorMessage } };
+    }
+  };
+
+  export const getUserAddresses = () => async (dispatch, getState) => {
+    dispatch({ type: GET_USER_ADDRESSES_REQUEST });
+    try {
+      const token = localStorage.getItem("jwt");
+      const response = await axios.get(`${API_BASE_URL}/api/user/addresses`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      dispatch({ type: GET_USER_ADDRESSES_SUCCESS, payload: response.data });
+    } catch (error) {
+      dispatch({
+        type: GET_USER_ADDRESSES_FAILURE,
+        payload: error.response?.data?.message || "Failed to fetch addresses",
+      });
+    }
+  };
+
+  export const updateAddress = (addressData) => async (dispatch) => {
+    dispatch({ type: UPDATE_ADDRESS_REQUEST });
+    try {
+      const token = localStorage.getItem("jwt");
+      const response = await axios.post(`${API_BASE_URL}/api/user/addresses`, addressData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      dispatch({ type: UPDATE_ADDRESS_SUCCESS, payload: response.data });
+      // Sau khi thêm thành công, gọi lại getUserAddresses để cập nhật danh sách
+      dispatch(getUserAddresses());
+    } catch (error) {
+      dispatch({
+        type: UPDATE_ADDRESS_FAILURE,
+        payload: error.response?.data?.message || "Failed to update address",
+      });
     }
   };

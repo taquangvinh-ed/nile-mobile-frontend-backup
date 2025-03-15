@@ -28,6 +28,12 @@ import {
   UPDATE_CART_ITEM_QUANTITY_REQUEST,
   UPDATE_CART_ITEM_QUANTITY_SUCCESS,
   UPDATE_CART_ITEM_QUANTITY_FAILURE,
+  GET_USER_ADDRESSES_FAILURE,
+  GET_USER_ADDRESSES_SUCCESS,
+  GET_USER_ADDRESSES_REQUEST,
+  UPDATE_ADDRESS_FAILURE,
+  UPDATE_ADDRESS_SUCCESS,
+  UPDATE_ADDRESS_REQUEST,
 } from "./ActionType";
 
 const initialState = {
@@ -49,6 +55,9 @@ const initialState = {
   cartLoading: false,
   cartError: null,
   cartSummary: { subtotal: 0, totalDiscount: 0, totalItems: 0 },
+  addresses: [], // Thêm state để lưu danh sách địa chỉ
+  addressesLoading: false,
+  addressesError: null,
 };
 
 const calculateCartSummary = (cartItems) => {
@@ -232,7 +241,36 @@ export const authReducer = (state = initialState, action) => {
         cartLoading: false,
         cartError: action.payload,
       };
-
+    case GET_USER_ADDRESSES_REQUEST:
+      return { ...state, addressesLoading: true, addressesError: null };
+    case GET_USER_ADDRESSES_SUCCESS:
+      return {
+        ...state,
+        addressesLoading: false,
+        addresses: action.payload,
+        addressesError: null,
+      };
+    case GET_USER_ADDRESSES_FAILURE:
+      return {
+        ...state,
+        addressesLoading: false,
+        addressesError: action.payload,
+      };
+    case UPDATE_ADDRESS_REQUEST:
+      return { ...state, addressesLoading: true, addressesError: null };
+    case UPDATE_ADDRESS_SUCCESS:
+      return {
+        ...state,
+        addressesLoading: false,
+        addresses: [...state.addresses, action.payload], // Thêm địa chỉ mới vào danh sách
+        addressesError: null,
+      };
+    case UPDATE_ADDRESS_FAILURE:
+      return {
+        ...state,
+        addressesLoading: false,
+        addressesError: action.payload,
+      };
     default:
       return state;
   }

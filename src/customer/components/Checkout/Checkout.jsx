@@ -12,7 +12,6 @@ import OrderSummary from "./OrderSummary";
 const steps = [
   "Chọn sản phẩm",
   "Thông tin đặt hàng",
-  "Phiếu giảm giá",
   "Thanh toán",
   "Hoàn tất đặt hàng",
 ];
