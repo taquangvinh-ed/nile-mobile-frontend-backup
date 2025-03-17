@@ -4,6 +4,9 @@ import {
   ADD_TO_CART_FAILURE,
   ADD_TO_CART_REQUEST,
   ADD_TO_CART_SUCCESS,
+  CREATE_ORDER_FAILURE,
+  CREATE_ORDER_REQUEST,
+  CREATE_ORDER_SUCCESS,
   GET_CART_FAILURE,
   GET_CART_REQUEST,
   GET_CART_SUCCESS,
@@ -80,6 +83,11 @@ export const login = (loginData) => async (dispatch) => {
       localStorage.setItem("jwt", user.jwt);
     }
     dispatch(loginSuccess(user));
+    const userDetails = await dispatch(getUser());
+
+    if (!userDetails.payload.success) {
+      throw new Error(userDetails.payload.error);
+    }
     return { payload: { success: true, user } };
   } catch (error) {
     dispatch(loginFailure(error.message));
@@ -104,6 +112,15 @@ export const getUser = () => async (dispatch) => {
       },
     });
     const user = response.data;
+
+    // Đảm bảo user có id (hoặc userId, tùy backend)
+    if (!user.id && user.userId) {
+      user.id = user.userId; // Ánh xạ userId thành id nếu backend trả về userId
+    }
+
+    if (!user.id) {
+      throw new Error("User ID not found in response");
+    }
     dispatch(getUserSuccess(user));
     return { payload: { success: true, user } };
   } catch (error) {
@@ -330,19 +347,47 @@ export const updateCartItemQuantity =
     }
   };
 
-  export const getUserAddresses = () => async (dispatch, getState) => {
+  export const getUserAddresses = () => async (dispatch) => {
     dispatch({ type: GET_USER_ADDRESSES_REQUEST });
     try {
       const token = localStorage.getItem("jwt");
+      if (!token) {
+        throw new Error("No JWT token found. Please log in.");
+      }
+  
       const response = await axios.get(`${API_BASE_URL}/api/user/addresses`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      dispatch({ type: GET_USER_ADDRESSES_SUCCESS, payload: response.data });
+  
+      const addresses = response.data;
+      console.log("Addresses from API:", addresses); // Debug dữ liệu trả về
+  
+      // Kiểm tra dữ liệu trả về
+      if (!Array.isArray(addresses)) {
+        throw new Error("Invalid response: Addresses must be an array");
+      }
+  
+      // Lọc các địa chỉ không hợp lệ (nếu có)
+      const validAddresses = addresses.filter(
+        (address) =>
+          address &&
+          address.addressId &&
+          address.lastName &&
+          address.firstName &&
+          address.addressLine &&
+          address.ward &&
+          address.district &&
+          address.province &&
+          address.phoneNumber
+      );
+  
+      dispatch({ type: GET_USER_ADDRESSES_SUCCESS, payload: validAddresses });
+      return { payload: { success: true, addresses: validAddresses } };
     } catch (error) {
-      dispatch({
-        type: GET_USER_ADDRESSES_FAILURE,
-        payload: error.response?.data?.message || "Failed to fetch addresses",
-      });
+      const errorMessage =
+        error.response?.data?.message || error.message || "Failed to fetch addresses";
+      dispatch({ type: GET_USER_ADDRESSES_FAILURE, payload: errorMessage });
+      return { payload: { success: false, error: errorMessage } };
     }
   };
 
@@ -350,16 +395,169 @@ export const updateCartItemQuantity =
     dispatch({ type: UPDATE_ADDRESS_REQUEST });
     try {
       const token = localStorage.getItem("jwt");
-      const response = await axios.post(`${API_BASE_URL}/api/user/addresses`, addressData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      dispatch({ type: UPDATE_ADDRESS_SUCCESS, payload: response.data });
-      // Sau khi thêm thành công, gọi lại getUserAddresses để cập nhật danh sách
-      dispatch(getUserAddresses());
+      if (!token) {
+        throw new Error("No JWT token found. Please log in.");
+      }
+  
+      const response = await axios.post(
+        `${API_BASE_URL}/api/user/addresses`,
+        addressData,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+  
+      const newAddress = response.data;
+      dispatch({ type: UPDATE_ADDRESS_SUCCESS, payload: newAddress });
+  
+      // Gọi lại getUserAddresses để cập nhật danh sách
+      const result = await dispatch(getUserAddresses());
+      if (!result.payload.success) {
+        throw new Error("Failed to refresh addresses after updating");
+      }
+  
+      return { payload: { success: true, address: newAddress } };
     } catch (error) {
-      dispatch({
-        type: UPDATE_ADDRESS_FAILURE,
-        payload: error.response?.data?.message || "Failed to update address",
-      });
+      const errorMessage =
+        error.response?.data?.message || error.message || "Failed to update address";
+      dispatch({ type: UPDATE_ADDRESS_FAILURE, payload: errorMessage });
+      return { payload: { success: false, error: errorMessage } };
     }
   };
+
+const createOrderRequest = () => ({ type: CREATE_ORDER_REQUEST });
+const createOrderSuccess = (order) => ({
+  type: CREATE_ORDER_SUCCESS,
+  payload: order,
+});
+const createOrderFailure = (error) => ({
+  type: CREATE_ORDER_FAILURE,
+  payload: error,
+});
+
+export const createOrder = (userId, shippingAddress) => async (dispatch) => {
+  dispatch(createOrderRequest());
+  try {
+    const token = localStorage.getItem("jwt");
+    if (!token) {
+      throw new Error("No JWT token found, Please log in");
+    }
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    };
+
+    const response = await axios.post(
+      `${API_BASE_URL}/api/orders/user/create?userId=${userId}`,
+      shippingAddress,
+      config
+    );
+
+    const order = response.data;
+    dispatch(createOrderSuccess(order));
+    return { payload: { success: true, order } };
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message ||
+      error.message ||
+      "Failed to create order";
+    dispatch(createOrderFailure(errorMessage));
+    return { payload: { success: false, error: errorMessage } };
+  }
+};
+
+const updateShippingAddressRequest = () => ({
+  type: "UPDATE_SHIPPING_ADDRESS_REQUEST",
+});
+const updateShippingAddressSuccess = (order) => ({
+  type: "UPDATE_SHIPPING_ADDRESS_SUCCESS",
+  payload: order,
+});
+const updateShippingAddressFailure = (error) => ({
+  type: "UPDATE_SHIPPING_ADDRESS_FAILURE",
+  payload: error,
+});
+
+export const updateShippingAddress = (orderId, address) => async (dispatch) => {
+  dispatch(updateShippingAddressRequest());
+  try {
+    const token = localStorage.getItem("jwt");
+    if (!token) {
+      throw new Error("No JWT token found. Please log in.");
+    }
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    };
+
+    const response = await axios.put(
+      `${API_BASE_URL}/api/orders/${orderId}/update-shipping-address`,
+      address,
+      config
+    );
+
+    const order = response.data;
+    dispatch(updateShippingAddressSuccess(order));
+    return { payload: { success: true, order } };
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message ||
+      error.message ||
+      "Failed to update shipping address";
+    dispatch(updateShippingAddressFailure(errorMessage));
+    return { payload: { success: false, error: errorMessage } };
+  }
+};
+
+export const getOrderById = (orderId) => async (dispatch) => {
+  dispatch({ type: "GET_ORDER_REQUEST" });
+  try {
+    const token = localStorage.getItem("jwt");
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    };
+    const response = await axios.get(
+      `${API_BASE_URL}/api/orders/${orderId}`,
+      config
+    );
+    dispatch({ type: "GET_ORDER_SUCCESS", payload: response.data });
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message || error.message || "Failed to fetch order";
+    dispatch({ type: "GET_ORDER_FAILURE", payload: errorMessage });
+  }
+};
+
+export const updatePaymentMethod = (orderId, paymentMethod) => async (dispatch) => {
+  dispatch({ type: "UPDATE_PAYMENT_METHOD_REQUEST" });
+  try {
+    const token = localStorage.getItem("jwt");
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    };
+    const response = await axios.put(
+      `${API_BASE_URL}/api/orders/${orderId}/update-payment-method`,
+      { paymentMethod },
+      config
+    );
+    dispatch({ type: "UPDATE_PAYMENT_METHOD_SUCCESS", payload: response.data });
+    return { payload: { success: true, order: response.data } };
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message || error.message || "Failed to update payment method";
+    dispatch({ type: "UPDATE_PAYMENT_METHOD_FAILURE", payload: errorMessage });
+    return { payload: { success: false, error: errorMessage } };
+  }
+};

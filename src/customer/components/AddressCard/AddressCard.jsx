@@ -3,7 +3,14 @@ import { Checkbox } from "@mui/material";
 
 const AddressCard = ({ address, isSelected, onSelect }) => {
   const handleSelect = () => {
-    onSelect(address.addressId); // Gọi hàm onSelect khi địa chỉ được chọn
+    if (address && address.addressId) {
+      onSelect(address.addressId); // Chỉ gọi onSelect nếu address hợp lệ
+    }
+  };
+
+  // Nếu address là undefined, hiển thị thông báo hoặc không render
+  if (!address || !address.addressId) {
+    return <div>Địa chỉ không hợp lệ</div>; // Gọi hàm onSelect khi địa chỉ được chọn
   };
 
   return (

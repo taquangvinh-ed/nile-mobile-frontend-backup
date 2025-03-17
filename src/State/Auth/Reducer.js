@@ -34,6 +34,9 @@ import {
   UPDATE_ADDRESS_FAILURE,
   UPDATE_ADDRESS_SUCCESS,
   UPDATE_ADDRESS_REQUEST,
+  CREATE_ORDER_SUCCESS,
+  CREATE_ORDER_REQUEST,
+  CREATE_ORDER_FAILURE,
 } from "./ActionType";
 
 const initialState = {
@@ -58,6 +61,9 @@ const initialState = {
   addresses: [], // Thêm state để lưu danh sách địa chỉ
   addressesLoading: false,
   addressesError: null,
+  order: null,
+  orderLoading: false,
+  orderError: null,
 };
 
 const calculateCartSummary = (cartItems) => {
@@ -271,6 +277,25 @@ export const authReducer = (state = initialState, action) => {
         addressesLoading: false,
         addressesError: action.payload,
       };
+
+    case CREATE_ORDER_REQUEST:
+      return { ...state, orderLoading: true, orderError: null };
+    case CREATE_ORDER_SUCCESS:
+      return {
+        ...state,
+        orderLoading: false,
+        order: action.payload,
+        cart: null, // Xóa giỏ hàng sau khi tạo order (tùy yêu cầu)
+      };
+    case CREATE_ORDER_FAILURE:
+      return { ...state, orderLoading: false, orderError: action.payload };
+
+    case "UPDATE_SHIPPING_ADDRESS_REQUEST":
+      return { ...state, orderLoading: true, orderError: null };
+    case "UPDATE_SHIPPING_ADDRESS_SUCCESS":
+      return { ...state, orderLoading: false, order: action.payload };
+    case "UPDATE_SHIPPING_ADDRESS_FAILURE":
+      return { ...state, orderLoading: false, orderError: action.payload };
     default:
       return state;
   }

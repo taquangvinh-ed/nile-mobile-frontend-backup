@@ -12,6 +12,7 @@ import Product from "../customer/pages/ProductPage/Product";
 import LoginForm from "../customer/pages/LoginPage/Login";
 import RegisterForm from "../customer/pages/RegisterPage/RegisterForm";
 import UserProfile from "../customer/pages/UserProfilePage/UserProfile";
+import OrderSummary from "../customer/components/Checkout/OrderSummary";
 const CustomerRouters = () => {
   return (
     <div>

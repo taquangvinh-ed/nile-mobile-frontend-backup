@@ -13,7 +13,6 @@ const steps = [
   "Đăng nhập",
   "Chọn sản phẩm",
   "Xác nhận địa chỉ giao hàng",
-  "Phương thức thanh toán",
   "Xác nhận đơn hàng",
   "Hoàn tất đặt hàng",
 ];
@@ -71,7 +70,7 @@ export default function HorizontalLinearStepper() {
               <Box sx={{ flex: "1 1 auto" }} />
             </Box>
             <div>
-              {step == 2 ? <ConfirmDeliverAddress /> : <OrderSummary />}
+              {step == 3 ? <ConfirmDeliverAddress /> : <OrderSummary />}
             </div>
           </React.Fragment>
         )}
