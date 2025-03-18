@@ -37,6 +37,12 @@ import {
   CREATE_ORDER_SUCCESS,
   CREATE_ORDER_REQUEST,
   CREATE_ORDER_FAILURE,
+  GET_ORDER_FAILURE,
+  GET_ORDER_SUCCESS,
+  GET_ORDER_REQUEST,
+  DELETE_ORDER_FAILURE,
+  DELETE_ORDER_SUCCESS,
+  DELETE_ORDER_REQUEST,
 } from "./ActionType";
 
 const initialState = {
@@ -296,6 +302,37 @@ export const authReducer = (state = initialState, action) => {
       return { ...state, orderLoading: false, order: action.payload };
     case "UPDATE_SHIPPING_ADDRESS_FAILURE":
       return { ...state, orderLoading: false, orderError: action.payload };
+    case GET_ORDER_REQUEST:
+      return { ...state, orderLoading: true, orderError: null };
+    case GET_ORDER_SUCCESS:
+      return {
+        ...state,
+        orderLoading: false,
+        order: action.payload, // Cập nhật order với dữ liệu từ API
+        orderError: null,
+      };
+    case GET_ORDER_FAILURE:
+      return {
+        ...state,
+        orderLoading: false,
+        orderError: action.payload,
+        order: null, // Đặt lại order khi có lỗi
+      };
+    case DELETE_ORDER_REQUEST:
+      return { ...state, orderLoading: true, orderError: null };
+    case DELETE_ORDER_SUCCESS:
+      return {
+        ...state,
+        orderLoading: false,
+        order: null, // Đặt lại order về null sau khi xóa
+        orderError: null,
+      };
+    case DELETE_ORDER_FAILURE:
+      return {
+        ...state,
+        orderLoading: false,
+        orderError: action.payload,
+      };
     default:
       return state;
   }

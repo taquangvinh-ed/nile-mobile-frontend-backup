@@ -347,83 +347,87 @@ export const updateCartItemQuantity =
     }
   };
 
-  export const getUserAddresses = () => async (dispatch) => {
-    dispatch({ type: GET_USER_ADDRESSES_REQUEST });
-    try {
-      const token = localStorage.getItem("jwt");
-      if (!token) {
-        throw new Error("No JWT token found. Please log in.");
-      }
-  
-      const response = await axios.get(`${API_BASE_URL}/api/user/addresses`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-  
-      const addresses = response.data;
-      console.log("Addresses from API:", addresses); // Debug dữ liệu trả về
-  
-      // Kiểm tra dữ liệu trả về
-      if (!Array.isArray(addresses)) {
-        throw new Error("Invalid response: Addresses must be an array");
-      }
-  
-      // Lọc các địa chỉ không hợp lệ (nếu có)
-      const validAddresses = addresses.filter(
-        (address) =>
-          address &&
-          address.addressId &&
-          address.lastName &&
-          address.firstName &&
-          address.addressLine &&
-          address.ward &&
-          address.district &&
-          address.province &&
-          address.phoneNumber
-      );
-  
-      dispatch({ type: GET_USER_ADDRESSES_SUCCESS, payload: validAddresses });
-      return { payload: { success: true, addresses: validAddresses } };
-    } catch (error) {
-      const errorMessage =
-        error.response?.data?.message || error.message || "Failed to fetch addresses";
-      dispatch({ type: GET_USER_ADDRESSES_FAILURE, payload: errorMessage });
-      return { payload: { success: false, error: errorMessage } };
+export const getUserAddresses = () => async (dispatch) => {
+  dispatch({ type: GET_USER_ADDRESSES_REQUEST });
+  try {
+    const token = localStorage.getItem("jwt");
+    if (!token) {
+      throw new Error("No JWT token found. Please log in.");
     }
-  };
 
-  export const updateAddress = (addressData) => async (dispatch) => {
-    dispatch({ type: UPDATE_ADDRESS_REQUEST });
-    try {
-      const token = localStorage.getItem("jwt");
-      if (!token) {
-        throw new Error("No JWT token found. Please log in.");
-      }
-  
-      const response = await axios.post(
-        `${API_BASE_URL}/api/user/addresses`,
-        addressData,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-  
-      const newAddress = response.data;
-      dispatch({ type: UPDATE_ADDRESS_SUCCESS, payload: newAddress });
-  
-      // Gọi lại getUserAddresses để cập nhật danh sách
-      const result = await dispatch(getUserAddresses());
-      if (!result.payload.success) {
-        throw new Error("Failed to refresh addresses after updating");
-      }
-  
-      return { payload: { success: true, address: newAddress } };
-    } catch (error) {
-      const errorMessage =
-        error.response?.data?.message || error.message || "Failed to update address";
-      dispatch({ type: UPDATE_ADDRESS_FAILURE, payload: errorMessage });
-      return { payload: { success: false, error: errorMessage } };
+    const response = await axios.get(`${API_BASE_URL}/api/user/addresses`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    const addresses = response.data;
+    console.log("Addresses from API:", addresses); // Debug dữ liệu trả về
+
+    // Kiểm tra dữ liệu trả về
+    if (!Array.isArray(addresses)) {
+      throw new Error("Invalid response: Addresses must be an array");
     }
-  };
+
+    // Lọc các địa chỉ không hợp lệ (nếu có)
+    const validAddresses = addresses.filter(
+      (address) =>
+        address &&
+        address.addressId &&
+        address.lastName &&
+        address.firstName &&
+        address.addressLine &&
+        address.ward &&
+        address.district &&
+        address.province &&
+        address.phoneNumber
+    );
+
+    dispatch({ type: GET_USER_ADDRESSES_SUCCESS, payload: validAddresses });
+    return { payload: { success: true, addresses: validAddresses } };
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message ||
+      error.message ||
+      "Failed to fetch addresses";
+    dispatch({ type: GET_USER_ADDRESSES_FAILURE, payload: errorMessage });
+    return { payload: { success: false, error: errorMessage } };
+  }
+};
+
+export const updateAddress = (addressData) => async (dispatch) => {
+  dispatch({ type: UPDATE_ADDRESS_REQUEST });
+  try {
+    const token = localStorage.getItem("jwt");
+    if (!token) {
+      throw new Error("No JWT token found. Please log in.");
+    }
+
+    const response = await axios.post(
+      `${API_BASE_URL}/api/user/addresses`,
+      addressData,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    const newAddress = response.data;
+    dispatch({ type: UPDATE_ADDRESS_SUCCESS, payload: newAddress });
+
+    // Gọi lại getUserAddresses để cập nhật danh sách
+    const result = await dispatch(getUserAddresses());
+    if (!result.payload.success) {
+      throw new Error("Failed to refresh addresses after updating");
+    }
+
+    return { payload: { success: true, address: newAddress } };
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message ||
+      error.message ||
+      "Failed to update address";
+    dispatch({ type: UPDATE_ADDRESS_FAILURE, payload: errorMessage });
+    return { payload: { success: false, error: errorMessage } };
+  }
+};
 
 const createOrderRequest = () => ({ type: CREATE_ORDER_REQUEST });
 const createOrderSuccess = (order) => ({
@@ -537,8 +541,42 @@ export const getOrderById = (orderId) => async (dispatch) => {
   }
 };
 
-export const updatePaymentMethod = (orderId, paymentMethod) => async (dispatch) => {
-  dispatch({ type: "UPDATE_PAYMENT_METHOD_REQUEST" });
+export const updatePaymentMethod =
+  (orderId, paymentMethod) => async (dispatch) => {
+    dispatch({ type: "UPDATE_PAYMENT_METHOD_REQUEST" });
+    try {
+      const token = localStorage.getItem("jwt");
+      const config = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      };
+      const response = await axios.put(
+        `${API_BASE_URL}/api/orders/${orderId}/update-payment-method`,
+        { paymentMethod },
+        config
+      );
+      dispatch({
+        type: "UPDATE_PAYMENT_METHOD_SUCCESS",
+        payload: response.data,
+      });
+      return { payload: { success: true, order: response.data } };
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to update payment method";
+      dispatch({
+        type: "UPDATE_PAYMENT_METHOD_FAILURE",
+        payload: errorMessage,
+      });
+      return { payload: { success: false, error: errorMessage } };
+    }
+  };
+
+export const deleteOrder = (orderId) => async (dispatch) => {
+  dispatch({ type: "DELETE_ORDER_REQUEST" });
   try {
     const token = localStorage.getItem("jwt");
     const config = {
@@ -547,17 +585,15 @@ export const updatePaymentMethod = (orderId, paymentMethod) => async (dispatch) 
         "Content-Type": "application/json",
       },
     };
-    const response = await axios.put(
-      `${API_BASE_URL}/api/orders/${orderId}/update-payment-method`,
-      { paymentMethod },
-      config
-    );
-    dispatch({ type: "UPDATE_PAYMENT_METHOD_SUCCESS", payload: response.data });
-    return { payload: { success: true, order: response.data } };
+    await axios.delete(`${API_BASE_URL}/api/orders/${orderId}`, config);
+    dispatch({ type: "DELETE_ORDER_SUCCESS", payload: orderId });
+    return { success: true, orderId }; // Trả về kết quả thành công
   } catch (error) {
     const errorMessage =
-      error.response?.data?.message || error.message || "Failed to update payment method";
-    dispatch({ type: "UPDATE_PAYMENT_METHOD_FAILURE", payload: errorMessage });
-    return { payload: { success: false, error: errorMessage } };
+      error.response?.data?.message ||
+      error.message ||
+      "Failed to delete order";
+    dispatch({ type: "DELETE_ORDER_FAILURE", payload: errorMessage });
+    return { success: false, error: errorMessage }; // Trả về lỗi nếu thất bại
   }
 };

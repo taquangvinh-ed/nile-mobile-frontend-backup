@@ -2,8 +2,21 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import AddressCard from "../AddressCard/AddressCard";
-import { Box, Button, Typography, Radio, RadioGroup, FormControlLabel, FormControl, FormLabel } from "@mui/material";
-import { getOrderById, updatePaymentMethod } from "../../../State/Auth/Action"; // Giả định bạn có action để lấy đơn hàng
+import {
+  Box,
+  Button,
+  Typography,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
+  FormControl,
+  FormLabel,
+} from "@mui/material";
+import {
+  getOrderById,
+  updatePaymentMethod,
+  deleteOrder,
+} from "../../../State/Auth/Action"; // Giả định bạn có action để lấy đơn hàng
 
 const OrderSummary = () => {
   const dispatch = useDispatch();
@@ -12,7 +25,9 @@ const OrderSummary = () => {
   const queryParams = new URLSearchParams(search);
   const orderId = queryParams.get("orderId");
 
-  const { order, orderLoading, orderError } = useSelector((state) => state.auth);
+  const { order, orderLoading, orderError } = useSelector(
+    (state) => state.auth
+  );
 
   const [paymentMethod, setPaymentMethod] = React.useState("COD"); // Mặc định là thanh toán khi nhận hàng
 
@@ -25,6 +40,18 @@ const OrderSummary = () => {
 
   const handlePaymentMethodChange = (event) => {
     setPaymentMethod(event.target.value);
+  };
+
+  const handleCancelOrder = async () => {
+    if (window.confirm("Bạn có chắc chắn muốn hủy đơn hàng này?")) {
+      const result = await dispatch(deleteOrder(orderId));
+      if (result && result.success) {
+        alert("Đơn hàng đã được hủy thành công!");
+        navigate("/"); // Chuyển hướng về trang chính sau khi hủy
+      } else {
+        alert("Lỗi khi hủy đơn hàng: " + (result?.error || "Không xác định"));
+      }
+    }
   };
 
   const handleConfirmOrder = async () => {
@@ -52,10 +79,10 @@ const OrderSummary = () => {
     return <Typography>Không tìm thấy đơn hàng!</Typography>;
   }
 
-  const shippingAddress = order.address || null; // Địa chỉ giao hàng từ đơn hàng
-  const orderItems = order.orderItems || []; // Danh sách sản phẩm trong đơn hàng
-  const totalPrice = order.total_price || 0;
-  const totalDiscountPrice = order.total_discount_price || 0;
+  const shippingAddress = order.shippingAddress || null; // Địa chỉ giao hàng từ đơn hàng
+  const orderItems = order.orderDetails || []; // Danh sách sản phẩm trong đơn hàng
+  const totalPrice = order.totalPrice || 0;
+  const totalDiscountPrice = order.totalDiscountPrice || 0;
 
   return (
     <div className="p-5">
@@ -75,7 +102,9 @@ const OrderSummary = () => {
             onSelect={() => {}} // Không cần chọn lại
           />
         ) : (
-          <Typography className="p-4">Chưa có địa chỉ giao hàng được chọn.</Typography>
+          <Typography className="p-4">
+            Chưa có địa chỉ giao hàng được chọn.
+          </Typography>
         )}
       </div>
 
@@ -85,12 +114,19 @@ const OrderSummary = () => {
           Sản phẩm trong đơn hàng
         </Typography>
         {orderItems.length === 0 ? (
-          <Typography className="p-4">Không có sản phẩm trong đơn hàng.</Typography>
+          <Typography className="p-4">
+            Không có sản phẩm trong đơn hàng.
+          </Typography>
         ) : (
           orderItems.map((item, index) => (
-            <Box key={index} display="flex" alignItems="center" className="p-4 border-b">
+            <Box
+              key={index}
+              display="flex"
+              alignItems="center"
+              className="p-4 border-b"
+            >
               <img
-                src={item.product?.imageUrl || "https://via.placeholder.com/100"}
+                src={item.imageURL || "https://via.placeholder.com/100"}
                 alt={item.product?.title}
                 className="w-20 h-20 object-cover mr-4"
               />
@@ -100,11 +136,11 @@ const OrderSummary = () => {
                   Số lượng: {item.quantity}
                 </Typography>
                 <Typography variant="body2" color="textSecondary">
-                  Giá: {(item.price || 0).toLocaleString()} VNĐ
+                  Giá: {(item.subtotal || 0).toLocaleString()} VNĐ
                 </Typography>
               </Box>
               <Typography variant="body1">
-                {(item.price * item.quantity).toLocaleString()} VNĐ
+                {(item.subtotal * item.quantity).toLocaleString()} VNĐ
               </Typography>
             </Box>
           ))
@@ -158,6 +194,15 @@ const OrderSummary = () => {
         <Button
           variant="contained"
           color="primary"
+          onClick={handleCancelOrder}
+          disabled={orderItems.length === 0 || !shippingAddress}
+          style={{ marginRight: "3px" }}
+        >
+          hủy đơn hàng
+        </Button>
+        <Button
+          variant="contained"
+          color="success"
           onClick={handleConfirmOrder}
           disabled={orderItems.length === 0 || !shippingAddress}
         >

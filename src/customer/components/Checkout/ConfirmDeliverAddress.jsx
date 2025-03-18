@@ -348,7 +348,7 @@ const ConfirmDeliverAddress = () => {
           dispatch(updateShippingAddress(orderId, newAddress)).then(
             (updateResult) => {
               if (updateResult.payload.success) {
-                navigate("/checkout?step=4");
+                navigate(`/checkout?step=4&orderId=${orderId}`); //lưu ý chỗ này
               } else {
                 alert(
                   "Lỗi khi cập nhật địa chỉ cho đơn hàng: " +
