@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import {
   Dialog,
   DialogBackdrop,
@@ -24,7 +24,11 @@ import {
 } from "@heroicons/react/24/outline";
 import { Link, useNavigate } from "react-router-dom";
 import AuthModal from "../../AuthModal/AuthModal";
-
+import { useDispatch, useSelector } from "react-redux";
+import { getUser, logout } from "../../State/Auth/Action";
+import { TextField } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
+import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 const navigation = {
   categories: [
     {
@@ -155,8 +159,35 @@ const navigation = {
 export default function Navigation() {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
+  const [searchValue, setSearchValue] = useState("");
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  const handleAvatarClick = () => {
+    if (!isAuthenticated) {
+      setIsAuthModalOpen(true);
+    }
+  };
+
+  const dispatch = useDispatch();
+
+  const { isAuthenticated, user, isLoading } = useSelector(
+    (state) => state.auth
+  );
+
+  useEffect(() => {
+    const token = localStorage.getItem("jwt");
+    if (token && !isAuthenticated && !user) {
+    }
+  }, [dispatch, isAuthenticated, user]);
+
+  const handleLogout = () => {
+    dispatch(logout());
+  };
+
+  const handleLoginSuccess = (userData) => {
+    setIsAuthModalOpen(false);
+  };
 
   return (
     <div className="bg-white" style={{ zIndex: 1000, position: "relative" }}>
@@ -304,29 +335,31 @@ export default function Navigation() {
                 </PopoverButton>
 
                 {/* Menu xổ xuống */}
-                <PopoverPanel className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                  <div className="py-1">
-                    {/* Các tùy chọn trong menu */}
-                    <a
-                      href="#"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      Đơn hàng của tôi
-                    </a>
-                    <a
-                      href="#"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      Thông tin tài khoản
-                    </a>
-                    <a
-                      href="#"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      Đăng xuất
-                    </a>
-                  </div>
-                </PopoverPanel>
+                {isAuthenticated && (
+                  <PopoverPanel className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                    <div className="py-1">
+                      {/* Các tùy chọn trong menu */}
+                      <a
+                        href="#"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        Đơn hàng của tôi
+                      </a>
+                      <a
+                        href="#"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        Thông tin tài khoản
+                      </a>
+                      <a
+                        href="#"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        Đăng xuất
+                      </a>
+                    </div>
+                  </PopoverPanel>
+                )}
               </Popover>
             </div>
           </DialogPanel>
@@ -343,10 +376,10 @@ export default function Navigation() {
 
         <nav
           aria-label="Top"
-          className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"
+          className="flex mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"
         >
-          <div className="border-b border-gray-200">
-            <div className="flex h-16 items-center">
+          <div className=" border-gray-200">
+            <div className="flex items-center justify-between h-16">
               <button
                 type="button"
                 onClick={() => setOpen(true)}
@@ -357,20 +390,19 @@ export default function Navigation() {
                 <Bars3Icon aria-hidden="true" className="size-6" />
               </button>
 
-              <div className="ml-4 flex lg:ml-0 ">
-                <a href="#">
-                  <span className="sr-only">Your Company</span>
-                  <img
-                    alt=""
-                    src="https://res.cloudinary.com/dwif85oqc/image/upload/v1739246144/ecommerce/images/Logo/hvqpxo32q2njeq0uwph9.png"
-                    className="h-14 w-auto object-cover cursor-pointer"
-                    onClick={() => navigate("/")}
-                  />
-                </a>
+              {/*Logo */}
+              <div className="  ml-4 flex lg:ml-0 ">
+                <span className="sr-only">Your Company</span>
+                <img
+                  alt=""
+                  src="https://res.cloudinary.com/dwif85oqc/image/upload/v1739246144/ecommerce/images/Logo/hvqpxo32q2njeq0uwph9.png"
+                  className="h-14 w-auto object-cover cursor-pointer"
+                  onClick={() => navigate("/")}
+                />
               </div>
 
               {/* Flyout menus */}
-              <PopoverGroup className="hidden lg:ml-8 lg:block lg:self-stretch">
+              <PopoverGroup className=" hidden lg:ml-8 lg:block lg:self-stretch">
                 <div className="flex h-full space-x-8">
                   {navigation.categories.map((category) => (
                     <Popover key={category.name} className="flex">
@@ -468,72 +500,81 @@ export default function Navigation() {
                 </div>
               </PopoverGroup>
 
-              <div className="ml-auto flex items-center">
-                {/* Search */}
-                <div className="flex lg:ml-6">
-                  <a href="#" className="p-2 text-gray-400 hover:text-gray-500">
-                    <span className="sr-only">Search</span>
-                    <MagnifyingGlassIcon
-                      aria-hidden="true"
-                      className="size-6"
-                    />
-                  </a>
-                </div>
-                <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-6">
-                  <button
-                    onClick={() => setIsAuthModalOpen(true)}
-                    className="text-sm font-medium text-gray-700 hover:text-gray-800"
-                  >
-                    Đăng nhập / Đăng ký
-                  </button>
+              {/* Search */}
+              <div className=" mx-5 hidden lg:flex flex-1 justify-centerx">
+                <TextField
+                  id="filled-basic"
+                  placeholder="Tìm kiếm"
+                  variant="filled"
+                  size="small"
+                  value={searchValue}
+                  onChange={(e) => setSearchValue(e.target.value)}
+                  slotProps={{
+                    input: {
+                      endAdornment: (
+                        <SearchIcon sx={{ color: "gray", mr: 1 }} />
+                      ),
+                    },
+                  }}
+                  sx={{
+                    width: "40rem",
+                    maxWidth: "600px",
+                    backgroundColor: "#f5f5f5",
+                    "& .MuiFilledInput-root": {
+                      borderRadius: "4px",
+                    },
+                  }}
+                />
+              </div>
 
-                  <AuthModal
-                    isOpen={isAuthModalOpen}
-                    onClose={() => setIsAuthModalOpen(false)}
-                  />
-                </div>
-
+              {/*Right icon */}
+              <div className=" ml-auto flex items-center">
                 <div className="border-t border-gray-200 px-4 py-6">
                   <Popover className="relative">
                     {/* Nút để mở menu */}
                     <PopoverButton className="-m-2 flex items-center p-2 focus:outline-none">
-                      <UserIcon className="h-6 w-6 text-gray-900" />{" "}
+                      <UserIcon
+                        onClick={handleAvatarClick}
+                        className="h-6 w-6 text-gray-900"
+                      />{" "}
                       {/* Biểu tượng My Account */}
                     </PopoverButton>
 
                     {/* Menu xổ xuống */}
-                    <PopoverPanel className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                      <div className="py-1">
-                        {/* Các tùy chọn trong menu */}
-                        <Link
-                          to="/account/order"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        >
-                          Đơn hàng của tôi
-                        </Link>
-                        <Link
-                          to="/userProfile"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        >
-                          Thông tin tài khoản
-                        </Link>
-                        <a
-                          href="#"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        >
-                          Đăng xuất
-                        </a>
-                      </div>
-                    </PopoverPanel>
+                    {isAuthenticated && (
+                      <PopoverPanel className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                        <div className="py-1">
+                          {/* Các tùy chọn trong menu */}
+                          <Link
+                            to="/account/order"
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          >
+                            Đơn hàng của tôi
+                          </Link>
+                          <Link
+                            to="/userProfile"
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          >
+                            Thông tin tài khoản
+                          </Link>
+                          <a
+                            href="#"
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          >
+                            Đăng xuất
+                          </a>
+                        </div>
+                      </PopoverPanel>
+                    )}
                   </Popover>
                 </div>
 
                 {/* Cart */}
                 <div className="ml-4 flow-root lg:ml-6">
                   <a href="" className="group -m-2 flex items-center p-2">
-                    <ShoppingBagIcon
+                    <ShoppingCartOutlinedIcon
                       aria-hidden="true"
-                      className="size-6 shrink-0 text-gray-400 group-hover:text-gray-500"
+                      className="size-6 shrink-0 text-gray-900 group-hover:text-gray-500"
                       onClick={() => navigate("/cart")}
                     />
                     <span className="ml-2 text-sm font-medium text-gray-700 group-hover:text-gray-800">
@@ -546,6 +587,10 @@ export default function Navigation() {
             </div>
           </div>
         </nav>
+        <AuthModal
+          isOpen={isAuthModalOpen}
+          onClose={() => setIsAuthModalOpen(false)}
+        />
       </header>
     </div>
   );
