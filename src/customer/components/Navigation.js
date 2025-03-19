@@ -26,9 +26,12 @@ import { Link, useNavigate } from "react-router-dom";
 import AuthModal from "../../AuthModal/AuthModal";
 import { useDispatch, useSelector } from "react-redux";
 import { getUser, logout } from "../../State/Auth/Action";
-import { TextField } from "@mui/material";
+import { List, ListItem, ListItemText, TextField } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
+import useDebounce from "./useDebounce";
+import { API_BASE_URL } from "../../config/apiConfig";
+import axios from "axios";
 const navigation = {
   categories: [
     {
@@ -156,10 +159,68 @@ const navigation = {
   ],
 };
 
+const mockSuggestions = [
+  "Điện thoại Samsung",
+  "Điện thoại iPhone",
+  "Laptop Dell",
+  "Laptop MacBook",
+  "Tai nghe Sony",
+  "Tai nghe Apple AirPods",
+];
+
 export default function Navigation() {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
+
   const [searchValue, setSearchValue] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+  const debouncedSearchValue = useDebounce(searchValue, 300);
+
+  const fetchSuggestions = async (query) => {
+    if (!query.trim()) {
+      setSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+    try {
+      // Giả lập dữ liệu từ API bằng dữ liệu cứng
+      const filteredSuggestions = mockSuggestions.filter((suggestion) =>
+        suggestion.toLowerCase().includes(query.toLowerCase())
+      );
+
+      setSuggestions(filteredSuggestions);
+      setShowSuggestions(true);
+    } catch (error) {
+      console.error("Error fetching suggestions:", error);
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchSuggestions(debouncedSearchValue);
+  }, [debouncedSearchValue]);
+
+  const handleSuggestionClick = (suggestion) => {
+    setSearchValue(suggestion);
+    setShowSuggestions(false);
+    handleSearch(suggestion);
+  };
+
+  const handleSearch = (query = searchValue) => {
+    console.log("Tìm kiếm:", query);
+    // Thực hiện tìm kiếm hoàn chỉnh, ví dụ: chuyển hướng hoặc gọi API tìm kiếm
+    // navigate(`/search?q=${query}`);
+  };
+
+  const handleKeyPress = (event) => {
+    if (event.key === "Enter") {
+      handleSearch();
+      setShowSuggestions(false);
+    }
+  };
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
@@ -501,7 +562,7 @@ export default function Navigation() {
               </PopoverGroup>
 
               {/* Search */}
-              <div className=" mx-5 hidden lg:flex flex-1 justify-centerx">
+              <div className=" relative w-[40rem] mx-5 hidden lg:flex flex-1 justify-centerx">
                 <TextField
                   id="filled-basic"
                   placeholder="Tìm kiếm"
@@ -509,15 +570,26 @@ export default function Navigation() {
                   size="small"
                   value={searchValue}
                   onChange={(e) => setSearchValue(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  onFocus={() => setShowSuggestions(true)}
+                  onBlur={() =>
+                    setTimeout(() => setShowSuggestions(false), 200)
+                  }
                   slotProps={{
                     input: {
                       endAdornment: (
-                        <SearchIcon sx={{ color: "gray", mr: 1 }} />
+                        <SearchIcon
+                          sx={{ color: "gray", mr: 1 }}
+                          onClick={() => {
+                            handleSearch();
+                            setShowSuggestions(false);
+                          }}
+                        />
                       ),
                     },
                   }}
                   sx={{
-                    width: "40rem",
+                    width: "100%",
                     maxWidth: "600px",
                     backgroundColor: "#f5f5f5",
                     "& .MuiFilledInput-root": {
@@ -525,6 +597,34 @@ export default function Navigation() {
                     },
                   }}
                 />
+                {showSuggestions && suggestions.length > 0 && (
+                  <List
+                    sx={{
+                      position: "absolute",
+                      top: "100%",
+                      left: 0,
+                      right: 0,
+                      zIndex: 10,
+                      width: "100%",
+                      backgroundColor: "white",
+                      border: "1px solid #ddd",
+                      borderRadius: "4px",
+                      maxHeight: "200px",
+                      overflowY: "auto",
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                    }}
+                  >
+                    {suggestions.map((suggestion, index) => (
+                      <ListItem
+                        key={index}
+                        button
+                        onClick={() => handleSuggestionClick(suggestion)}
+                      >
+                        <ListItemText primary={suggestion} />
+                      </ListItem>
+                    ))}
+                  </List>
+                )}
               </div>
 
               {/*Right icon */}
