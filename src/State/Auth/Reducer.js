@@ -70,6 +70,8 @@ const initialState = {
   order: null,
   orderLoading: false,
   orderError: null,
+  removeCartItemLoading: false,
+  removeCartItemError: null,
 };
 
 const calculateCartSummary = (cartItems) => {
@@ -261,6 +263,31 @@ export const authReducer = (state = initialState, action) => {
         addressesLoading: false,
         addresses: action.payload,
         addressesError: null,
+      };
+
+    case "REMOVE_CART_ITEM_REQUEST":
+      return {
+        ...state,
+        removeCartItemLoading: true,
+        removeCartItemError: null,
+      };
+    case "REMOVE_CART_ITEM_SUCCESS":
+      return {
+        ...state,
+        removeCartItemLoading: false,
+        removeCartItemError: null,
+        cart: {
+          ...state.cart,
+          cartItems: state.cart.cartItems.filter(
+            (item) => item.id !== action.payload
+          ),
+        },
+      };
+    case "REMOVE_CART_ITEM_FAILURE":
+      return {
+        ...state,
+        removeCartItemLoading: false,
+        removeCartItemError: action.payload,
       };
     case GET_USER_ADDRESSES_FAILURE:
       return {

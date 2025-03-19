@@ -32,6 +32,9 @@ import {
   REGISTER_FAILURE,
   REGISTER_REQUEST,
   REGISTER_SUCCESS,
+  REMOVE_CART_ITEM_FAILURE,
+  REMOVE_CART_ITEM_REQUEST,
+  REMOVE_CART_ITEM_SUCCESS,
   UPDATE_ADDRESS_FAILURE,
   UPDATE_ADDRESS_REQUEST,
   UPDATE_ADDRESS_SUCCESS,
@@ -346,6 +349,44 @@ export const updateCartItemQuantity =
       return { payload: { success: false, error: errorMessage } };
     }
   };
+
+const removeCartItemRequest = () => ({ type: REMOVE_CART_ITEM_REQUEST });
+const removeCartItemSuccess = (cartItemId) => ({
+  type: REMOVE_CART_ITEM_SUCCESS,
+  payload: cartItemId,
+});
+const removeCartItemFailure = (error) => ({
+  type: REMOVE_CART_ITEM_FAILURE,
+  payload: error,
+});
+
+export const removeCartItem = (cartItemId) => async (dispatch) => {
+  dispatch(removeCartItemRequest());
+  try {
+    const token = localStorage.getItem("jwt");
+    if (!token) {
+      throw new Error("No JWT token found. Please log in.");
+    }
+
+    await axios.delete(`${API_BASE_URL}/api/cart/items/${cartItemId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    dispatch(removeCartItemSuccess(cartItemId));
+    // Sau khi xóa thành công, gọi lại getCart để cập nhật giỏ hàng
+    dispatch(getCart());
+    return { payload: { success: true } };
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message ||
+      error.message ||
+      "Failed to remove cart item";
+    dispatch(removeCartItemFailure(errorMessage));
+    return { payload: { success: false, error: errorMessage } };
+  }
+};
 
 export const getUserAddresses = () => async (dispatch) => {
   dispatch({ type: GET_USER_ADDRESSES_REQUEST });
