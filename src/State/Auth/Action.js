@@ -16,6 +16,9 @@ import {
   GET_PRODUCTS_FAILURE,
   GET_PRODUCTS_REQUEST,
   GET_PRODUCTS_SUCCESS,
+  GET_SECOND_LEVELS_FAILURE,
+  GET_SECOND_LEVELS_REQUEST,
+  GET_SECOND_LEVELS_SUCCESS,
   GET_THIRD_LEVELS_FAILURE,
   GET_THIRD_LEVELS_REQUEST,
   GET_THIRD_LEVELS_SUCCESS,
@@ -167,6 +170,48 @@ export const getProductsByThirdLevel = (thirdLevel) => async (dispatch) => {
     return { payload: { success: true, products } };
   } catch (error) {
     dispatch(getProductsFailure(error.message));
+    return { payload: { success: false, error: error.message } };
+  }
+};
+
+
+export const getProductsBySecondLevel = (secondLevel) => async (dispatch) => {
+  dispatch(getProductsRequest());
+  try {
+    const response = await axios.get(`${API_BASE_URL}/api/products/filter`, {
+      params: { secondLevel, pageNumber: 0, pageSize: 8 },
+    });
+    const products = response.data.content;
+    dispatch(getProductsSuccess(products));
+    return { payload: { success: true, products } };
+  } catch (error) {
+    dispatch(getProductsFailure(error.message));
+    return { payload: { success: false, error: error.message } };
+  }
+};
+
+
+const getSecondLevelsRequest = () => ({ type: GET_SECOND_LEVELS_REQUEST });
+const getSecondLevelsSuccess = (secondLevels) => ({
+  type: GET_SECOND_LEVELS_SUCCESS,
+  payload: secondLevels,
+});
+const getSecondLevelsFailure = (error) => ({
+  type: GET_SECOND_LEVELS_FAILURE,
+  payload: error,
+});
+
+export const getSecondLevels = () => async (dispatch) => {
+  dispatch(getSecondLevelsRequest());
+  try {
+    const response = await axios.get(
+      `${API_BASE_URL}/api/products/second-levels`
+    );
+    const secondLevels = response.data;
+    dispatch(getSecondLevelsSuccess(secondLevels));
+    return { payload: { success: true, secondLevels } };
+  } catch (error) {
+    dispatch(getSecondLevelsFailure(error.message));
     return { payload: { success: false, error: error.message } };
   }
 };

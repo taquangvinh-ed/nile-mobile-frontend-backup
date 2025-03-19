@@ -530,7 +530,7 @@ export default function Navigation() {
                                       {section.items.map((item) => (
                                         <li key={item.id} className="flow-root">
                                           <Link
-                                            to={`/products?thirdLevel=${item.name}`}
+                                            to={`/products?secondLevel=${item.name}`}
                                             className="-m-2 block p-2 text-gray-500"
                                             onClick={() => setOpen(false)}
                                           >

@@ -43,6 +43,9 @@ import {
   DELETE_ORDER_FAILURE,
   DELETE_ORDER_SUCCESS,
   DELETE_ORDER_REQUEST,
+  GET_SECOND_LEVELS_REQUEST,
+  GET_SECOND_LEVELS_SUCCESS,
+  GET_SECOND_LEVELS_FAILURE,
 } from "./ActionType";
 
 const initialState = {
@@ -53,6 +56,9 @@ const initialState = {
   products: [],
   productsLoading: false,
   productsError: null,
+  secondLevels: [],
+  secondLevelsLoading: false,
+  secondLevelsError: null,
   thirdLevels: [],
   thirdLevelsLoading: false,
   thirdLevelsError: null,
@@ -148,7 +154,22 @@ export const authReducer = (state = initialState, action) => {
         productsError: action.payload,
       };
 
-    case GET_THIRD_LEVELS_REQUEST:
+    case GET_SECOND_LEVELS_REQUEST:
+      return { ...state, secondLevelsLoading: true, secondLevelsError: null };
+    case GET_SECOND_LEVELS_SUCCESS:
+      return {
+        ...state,
+        secondLevelsLoading: false,
+        secondLevels: action.payload,
+        secondLevelsError: null,
+      };
+    case GET_SECOND_LEVELS_FAILURE:
+      return {
+        ...state,
+        secondLevelsLoading: false,
+        secondLevelsError: action.payload,
+      };
+      case GET_THIRD_LEVELS_REQUEST:
       return { ...state, thirdLevelsLoading: true, thirdLevelsError: null };
     case GET_THIRD_LEVELS_SUCCESS:
       return {
