@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import mockProductData from "../../components/Product/mockProductData";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import { useLocation } from "react-router-dom";
@@ -34,6 +34,8 @@ import {
   RadioGroup,
 } from "@mui/material";
 import { Navigate, useNavigate } from "react-router-dom";
+import { getProductsByThirdLevel } from "../../../State/Auth/Action";
+import { useDispatch, useSelector } from "react-redux";
 
 const sortOptions = [
   { name: "Giá: Từ thấp đến cao", href: "#", current: false },
@@ -48,6 +50,11 @@ export default function Product({ title }) {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [products, setProducts] = useState([]);
+  const { productsByThirdLevel, productsLoading, productsError } = useSelector(
+    (state) => state.auth
+  ); // Lấy dữ liệu từ Redux
 
   const handleFilter = (value, sectionId) => {
     const searchParams = new URLSearchParams(location.search);
@@ -76,6 +83,23 @@ export default function Product({ title }) {
     const query = searchParams.toString();
     navigate({ search: `?${query}` });
   };
+
+  const searchParams = new URLSearchParams(location.search);
+  const thirdLevel = searchParams.get("thirdLevel") || "";
+
+  useEffect(() => {
+    if (thirdLevel) {
+      dispatch(getProductsByThirdLevel(thirdLevel)).then((response) => {
+        if (response.payload.success) {
+          setProducts(response.payload.products);
+        }
+      });
+    }
+  }, [thirdLevel, dispatch]);
+
+  if (productsLoading) return <div>Đang tải sản phẩm...</div>;
+  if (productsError) return <div>Lỗi: {productsError}</div>;
+
   return (
     <div className="bg-white">
       <div>
@@ -460,9 +484,13 @@ export default function Product({ title }) {
               {/* Product grid */}
               <div className="lg:col-span-4 w-full border border-black">
                 <div className="flex flex-wrap justify-center bg-white py-1">
-                  {mockProductData.products.map((product) => (
-                    <ProductCard key={product.id} product={product} />
-                  ))}
+                  {products.length > 0 ? (
+                    products.map((product) => (
+                      <ProductCard key={product.id} product={product} />
+                    ))
+                  ) : (
+                    <p>Không có sản phẩm nào cho {thirdLevel}</p>
+                  )}
                 </div>
               </div>
             </div>
