@@ -1,17 +1,17 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { getProductDetails, addToCart } from "../../../State/Auth/Action"; // Thêm addToCart
-import { StarIcon } from "@heroicons/react/20/solid";
+import {
+  getProductDetails,
+  addToCart,
+  getReviewsByVariation,
+} from "../../../State/Auth/Action";
 import { Radio, RadioGroup } from "@headlessui/react";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import StarRating from "../../components/Product/StarRating";
 import ProductPrice from "../../components/Product/ProductPrice";
 import ProductReviewCard from "../../components/ProductDetail/ProductReviewCard";
-import { Box, LinearProgress, Rating } from "@mui/material";
-import StarRateIcon from "@mui/icons-material/StarRate";
-import mockProductData from "../../components/Product/mockProductData";
-import ProductCard from "../../components/Product/ProductCard";
+import { Typography } from "@mui/material";
 import InputPersionalnfor from "../../components/ProductDetail/InputPersionalnfor";
 import ProductDetailPopup from "./ProductDetailPopup";
 import AuthModal from "../../../AuthModal/AuthModal";
@@ -32,6 +32,9 @@ export default function ProductDetails() {
     isAuthenticated,
     cartLoading,
     cartError,
+    reviews,
+    reviewLoading,
+    reviewError,
   } = useSelector((state) => state.auth);
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -53,6 +56,16 @@ export default function ProductDetails() {
       setSelectedVariation(productDetails.variations[0]);
     }
   }, [productDetails]);
+
+  useEffect(() => {
+    if (selectedVariation) {
+      console.log(
+        "Dispatching getReviewsByVariation with variationId:",
+        selectedVariation.id
+      );
+      dispatch(getReviewsByVariation(selectedVariation.id));
+    }
+  }, [dispatch, selectedVariation]);
 
   const handleThumbnailClick = (index) => {
     setCurrentImageIndex(index);
@@ -306,13 +319,34 @@ export default function ProductDetails() {
           <div className="border p-5 rounded-lg shadow-2xl">
             <div className="grid grid-cols-12 gap-7">
               <div className="col-span-7">
-                <InputPersionalnfor rating={false} />
+                {selectedVariation ? (
+                  <InputPersionalnfor
+                    rating={true}
+                    variationId={selectedVariation.id}
+                  />
+                ) : (
+                  <div>Đang tải thông tin biến thể...</div>
+                )}
               </div>
               <div className="col-span-7">
                 <div className="space-y-5">
-                  {[1, 1, 1, 1, 1].map((index) => (
-                    <ProductReviewCard key={index} />
-                  ))}
+                  {reviewLoading ? (
+                    <div>Đang tải đánh giá...</div>
+                  ) : reviewError ? (
+                    <div>Lỗi khi tải đánh giá: {reviewError}</div>
+                  ) : reviews.length > 0 ? (
+                    <div className="space-y-5">
+                      {reviews.map((review) => (
+                        <ProductReviewCard key={review.id} review={review} />
+                      ))}
+                    </div>
+                  ) : (
+                    <div>
+                      <Typography>
+                        Hiện tại không có review cho sản phẩm này !!!
+                      </Typography>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

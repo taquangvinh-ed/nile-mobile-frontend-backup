@@ -46,6 +46,15 @@ import {
   GET_SECOND_LEVELS_REQUEST,
   GET_SECOND_LEVELS_SUCCESS,
   GET_SECOND_LEVELS_FAILURE,
+  CREATE_REVIEW_FAILURE,
+  DELETE_REVIEW_FAILURE,
+  GET_REVIEWS_FAILURE,
+  GET_REVIEWS_SUCCESS,
+  DELETE_REVIEW_SUCCESS,
+  CREATE_REVIEW_SUCCESS,
+  GET_REVIEWS_REQUEST,
+  DELETE_REVIEW_REQUEST,
+  CREATE_REVIEW_REQUEST,
 } from "./ActionType";
 
 const initialState = {
@@ -78,6 +87,9 @@ const initialState = {
   orderError: null,
   removeCartItemLoading: false,
   removeCartItemError: null,
+  reviews: [],
+  reviewLoading: false,
+  reviewError: null,
 };
 
 const calculateCartSummary = (cartItems) => {
@@ -169,7 +181,7 @@ export const authReducer = (state = initialState, action) => {
         secondLevelsLoading: false,
         secondLevelsError: action.payload,
       };
-      case GET_THIRD_LEVELS_REQUEST:
+    case GET_THIRD_LEVELS_REQUEST:
       return { ...state, thirdLevelsLoading: true, thirdLevelsError: null };
     case GET_THIRD_LEVELS_SUCCESS:
       return {
@@ -381,6 +393,36 @@ export const authReducer = (state = initialState, action) => {
         orderLoading: false,
         orderError: action.payload,
       };
+    case CREATE_REVIEW_REQUEST:
+    case DELETE_REVIEW_REQUEST:
+    case GET_REVIEWS_REQUEST:
+      return { ...state, reviewLoading: true, reviewError: null };
+
+    case CREATE_REVIEW_SUCCESS:
+      return {
+        ...state,
+        reviewLoading: false,
+        reviews: [...state.reviews, action.payload],
+      };
+
+    case DELETE_REVIEW_SUCCESS:
+      return {
+        ...state,
+        reviewLoading: false,
+        reviews: state.reviews.filter((review) => review.id !== action.payload),
+      };
+
+    case GET_REVIEWS_SUCCESS:
+      return {
+        ...state,
+        reviewLoading: false,
+        reviews: action.payload,
+      };
+
+    case CREATE_REVIEW_FAILURE:
+    case DELETE_REVIEW_FAILURE:
+    case GET_REVIEWS_FAILURE:
+      return { ...state, reviewLoading: false, reviewError: action.payload };
     default:
       return state;
   }
