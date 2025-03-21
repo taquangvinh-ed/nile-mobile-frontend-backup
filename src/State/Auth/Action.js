@@ -294,10 +294,11 @@ export const addToCart = (variation) => async (dispatch) => {
     if (!token) {
       throw new Error("No JWT token found. Please log in.");
     }
+    
 
     const response = await axios.post(
       `${API_BASE_URL}/api/cart/items`,
-      { variation },
+      { variation},
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -314,6 +315,56 @@ export const addToCart = (variation) => async (dispatch) => {
     return { payload: { success: false, error: errorMessage } };
   }
 };
+
+// export const addToCart = (variation) => async (dispatch) => {
+//   dispatch(addToCartRequest());
+//   try {
+//     const token = localStorage.getItem("jwt");
+//     if (!token) {
+//       throw new Error("Không tìm thấy token JWT. Vui lòng đăng nhập.");
+//     }
+
+//     if (!variation || !variation.variationId) {
+//       throw new Error("Biến thể hoặc Variation ID không được để trống");
+//     }
+
+//     // Đổi tên variationId thành id
+//     const requestData = {
+//       variation: {
+//         id: variation.variationId, // Sử dụng variationId làm id
+//         color: variation.color,
+//         discountPercent: variation.discountPercent,
+//         imageURL: variation.imageURL,
+//         name: variation.name,
+//         price: variation.price,
+//         ram: variation.ram,
+//         rom: variation.rom,
+//         stockQuantity: variation.stockQuantity,
+//       },
+//     };
+
+//     const response = await axios.post(
+//       `${API_BASE_URL}/api/cart/items`,
+//       requestData,
+//       {
+//         headers: {
+//           Authorization: `Bearer ${token}`,
+//         },
+//       }
+//     );
+
+//     const cartItem = { ...response.data, isSelected: false };
+//     dispatch(addToCartSuccess(cartItem));
+//     return { payload: { success: true, cartItem } };
+//   } catch (error) {
+//     const errorMessage =
+//       error.response?.data?.message ||
+//       error.message ||
+//       "Không thể thêm vào giỏ hàng";
+//     dispatch(addToCartFailure(errorMessage));
+//     return { payload: { success: false, error: errorMessage } };
+//   }
+// };
 
 const getCartRequest = () => ({ type: GET_CART_REQUEST });
 const getCartSuccess = (cart) => ({ type: GET_CART_SUCCESS, payload: cart });

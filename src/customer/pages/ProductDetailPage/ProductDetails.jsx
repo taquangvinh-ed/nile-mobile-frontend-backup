@@ -46,29 +46,52 @@ export default function ProductDetails() {
     dispatch(getProductDetails(productId));
   }, [dispatch, productId]);
 
+  // Khởi tạo selectedVariation khi productDetails thay đổi
   useEffect(() => {
     console.log("productDetails updated:", productDetails);
     if (
       productDetails &&
       productDetails.variations &&
-      productDetails.variations.length > 0
+      productDetails.variations.length > 0 &&
+      !selectedVariation // Chỉ khởi tạo nếu chưa có selectedVariation
     ) {
-      setSelectedVariation(productDetails.variations[0]);
+      const firstValidVariation = productDetails.variations[0]; // Lấy variation đầu tiên vì tất cả đều hợp lệ
+      setSelectedVariation({
+        ...firstValidVariation,
+        variationId: Number(firstValidVariation.variationId), // Ép kiểu thành số
+      });
+      setCurrentImageIndex(0);
     }
-  }, [productDetails]);
+  }, [productDetails, selectedVariation]);
 
+  // Gọi getReviewsByVariation khi selectedVariation thay đổi
   useEffect(() => {
-    if (selectedVariation) {
+    if (selectedVariation && selectedVariation.variationId) {
+      const variationId = Number(selectedVariation.variationId); // Ép kiểu thành số
       console.log(
         "Dispatching getReviewsByVariation with variationId:",
-        selectedVariation.id
+        variationId
       );
-      dispatch(getReviewsByVariation(selectedVariation.id));
+      dispatch(getReviewsByVariation(variationId));
+    } else {
+      console.warn(
+        "No valid selectedVariation for reviews:",
+        selectedVariation
+      );
     }
   }, [dispatch, selectedVariation]);
 
   const handleThumbnailClick = (index) => {
-    setCurrentImageIndex(index);
+    const newVariation = productDetails.variations[index];
+    if (newVariation && newVariation.variationId) {
+      setSelectedVariation({
+        ...newVariation,
+        variationId: Number(newVariation.variationId), // Ép kiểu thành số
+      });
+      setCurrentImageIndex(index);
+    } else {
+      console.error("Invalid variation selected:", newVariation);
+    }
   };
 
   const handleAddToCart = async (event) => {
@@ -78,21 +101,27 @@ export default function ProductDetails() {
       return;
     }
 
-    if (!selectedVariation) {
-      alert("Please select a variation before adding to cart.");
+    if (!selectedVariation || !selectedVariation.variationId) {
+      alert("Vui lòng chọn một biến thể hợp lệ trước khi thêm vào giỏ hàng.");
       return;
     }
 
     try {
-      const result = await dispatch(addToCart(selectedVariation));
+      const variationWithNumberId = {
+        ...selectedVariation,
+        id: Number(selectedVariation.variationId), // Ép kiểu thành số
+      };
+      delete variationWithNumberId.variationId;
+      console.log("Adding to cart with variation:", variationWithNumberId);
+      const result = await dispatch(addToCart(variationWithNumberId));
       if (result.payload.success) {
         alert("Thêm sản phẩm vào giỏ hàng thành công!");
-        navigate("/cart");
+        // navigate("/cart"); // Uncomment nếu muốn chuyển hướng
       } else {
-        alert("Failed to add to cart: " + result.payload.error);
+        alert("Không thể thêm vào giỏ hàng: " + result.payload.error);
       }
     } catch (err) {
-      alert("An error occurred: " + cartError);
+      alert("Đã xảy ra lỗi: " + (cartError || "Không xác định"));
     }
   };
 
@@ -152,28 +181,27 @@ export default function ProductDetails() {
           <div className="flex flex-col items-center w-[40rem] h-[30rem]">
             <div className="overflow-hidden rounded-lg max-w-[40rem] max-h-[25rem] mb-4">
               <img
-                alt={selectedVariation?.imageURL ? "Product Image" : ""}
-                src={selectedVariation?.imageURL || productDetails.imageURL}
+                alt={selectedVariation?.imageURL ? "Product Image" : "No Image"}
+                src={
+                  selectedVariation?.imageURL || productDetails.imageURL || ""
+                }
                 className="w-full h-full object-cover"
               />
             </div>
             <div className="flex space-x-2 justify-center overflow-x-auto">
               {productDetails.variations.map((variation, index) => (
                 <div
-                  key={index}
+                  key={variation.variationId}
                   className={`aspect-h-1 aspect-w-1 overflow-hidden rounded-lg max-w-[4rem] max-h-[4rem] cursor-pointer ${
                     index === currentImageIndex
                       ? "border-2 border-blue-500"
                       : ""
                   }`}
-                  onClick={() => {
-                    setSelectedVariation(variation);
-                    handleThumbnailClick(index);
-                  }}
+                  onClick={() => handleThumbnailClick(index)}
                 >
                   <img
-                    alt={variation.imageURL ? "Variation Image" : ""}
-                    src={variation.imageURL}
+                    alt={variation.imageURL ? "Variation Image" : "No Image"}
+                    src={variation.imageURL || ""}
                     className="w-full h-full object-cover"
                   />
                 </div>
@@ -217,12 +245,17 @@ export default function ProductDetails() {
                   <fieldset aria-label="Choose a color" className="mt-4">
                     <RadioGroup
                       value={selectedVariation}
-                      onChange={setSelectedVariation}
+                      onChange={(variation) =>
+                        setSelectedVariation({
+                          ...variation,
+                          variationId: Number(variation.variationId),
+                        })
+                      }
                       className="flex items-center gap-x-3"
                     >
                       {productDetails.variations.map((variation) => (
                         <Radio
-                          key={variation.id}
+                          key={variation.variationId}
                           value={variation}
                           aria-label={variation.color}
                           className={classNames(
@@ -257,8 +290,8 @@ export default function ProductDetails() {
                   </button>
                   <button
                     onClick={handleAddToCart}
-                    type="button" // Đổi thành type="button" để tránh submit form
-                    disabled={cartLoading} // Vô hiệu hóa khi đang gọi API
+                    type="button"
+                    disabled={cartLoading}
                     className="mt-2 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-none disabled:bg-gray-400"
                   >
                     {cartLoading ? "Đang thêm..." : "Thêm vào giỏ hàng"}{" "}
@@ -319,13 +352,13 @@ export default function ProductDetails() {
           <div className="border p-5 rounded-lg shadow-2xl">
             <div className="grid grid-cols-12 gap-7">
               <div className="col-span-7">
-                {selectedVariation ? (
+                {selectedVariation && selectedVariation.variationId ? (
                   <InputPersionalnfor
                     rating={true}
-                    variationId={selectedVariation.id}
+                    variationId={selectedVariation.variationId}
                   />
                 ) : (
-                  <div>Đang tải thông tin biến thể...</div>
+                  <div>Chưa chọn biến thể hợp lệ để đánh giá.</div>
                 )}
               </div>
               <div className="col-span-7">
