@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import AddressCard from "../AddressCard/AddressCard";
@@ -11,6 +11,8 @@ import {
   FormControlLabel,
   FormControl,
   FormLabel,
+  Alert,
+  Snackbar,
 } from "@mui/material";
 import {
   getOrderById,
@@ -29,25 +31,51 @@ const OrderSummary = () => {
     (state) => state.auth
   );
 
-  const [paymentMethod, setPaymentMethod] = React.useState("COD"); // Mặc định là thanh toán khi nhận hàng
+  const [paymentMethod, setPaymentMethod] = React.useState(null);
 
-  // Lấy thông tin đơn hàng khi component mount
+  const [isConfirming, setIsconfirming] = useState(false);
+  const [isCancelling, setIscancelling] = useState(false);
+
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+
   useEffect(() => {
     if (orderId) {
       dispatch(getOrderById(orderId));
     }
   }, [dispatch, orderId]);
 
+  useEffect(() => {
+    if (order && order.paymentDetails) {
+      const lastestPayment = order.paymentDetails;
+      setPaymentMethod(lastestPayment.paymentMethod);
+    } else {
+      setPaymentMethod("CASH_ON_DELIVERY");
+    }
+  }, [order]);
+
   const handlePaymentMethodChange = (event) => {
     setPaymentMethod(event.target.value);
   };
 
   const handleCancelOrder = async () => {
+    if (order.status !== "PLACED") {
+      setSnackbar({
+        open: true,
+        message: "Chỉ có thể có hủy đơn hàng ở trạng thái đặt hàng!",
+        severity: "error",
+      });
+      return;
+    }
     if (window.confirm("Bạn có chắc chắn muốn hủy đơn hàng này?")) {
+      setIscancelling(true);
       const result = await dispatch(deleteOrder(orderId));
       if (result && result.success) {
         alert("Đơn hàng đã được hủy thành công!");
-        navigate("/"); // Chuyển hướng về trang chính sau khi hủy
+        setTimeout(() => navigate("/"), 2000);
       } else {
         alert("Lỗi khi hủy đơn hàng: " + (result?.error || "Không xác định"));
       }
@@ -55,12 +83,58 @@ const OrderSummary = () => {
   };
 
   const handleConfirmOrder = async () => {
-    const result = await dispatch(updatePaymentMethod(orderId, paymentMethod));
-    if (result.payload.success) {
-      navigate(`/checkout?step=5&orderId=${orderId}`);
-    } else {
-      alert("Lỗi khi cập nhật phương thức thanh toán: " + result.payload.error);
+    if (order.status !== "PLACED") {
+      setSnackbar({
+        open: true,
+        message: "Đơn hàng đã được xác nhận hoặc đang xử lý",
+        severity: "error",
+      });
+      return;
     }
+    setIsconfirming(true);
+    try {
+      const result = await dispatch(
+        updatePaymentMethod(orderId, paymentMethod)
+      );
+      if (result.payload.success) {
+        const updatedOrder = result.payload.order;
+        const lastestPayment = updatedOrder.paymentDetails;
+
+        if (
+          ["VNPAY", "MOMO"].includes(paymentMethod) &&
+          lastestPayment.paymentUrl
+        ) {
+          window.location.href = lastestPayment.paymentUrl;
+        } else {
+          setSnackbar({
+            open: true,
+            message: "Xác nhận đơn hàng thành công!",
+            severity: "success",
+          });
+          setTimeout(() => navigate(`/checkout?step=5&orderId=${orderId}`));
+        }
+      } else {
+        setSnackbar({
+          open: true,
+          message:
+            "Lỗi khi cập nhật phương thức thanh toán: " + result.payload.error,
+          severity: "error",
+        });
+      }
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: "Lỗi khi xác nhận đơn hàng: " + error.message,
+        severity: "error",
+      });
+    }finally{
+      setIsconfirming(false);
+    }
+  };
+
+
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
   };
 
   if (!orderId) {
@@ -176,7 +250,7 @@ const OrderSummary = () => {
             name="payment-method"
           >
             <FormControlLabel
-              value="COD"
+              value="CASH_ON_DELIVERY"
               control={<Radio />}
               label="Thanh toán khi nhận hàng (COD)"
             />
@@ -209,6 +283,19 @@ const OrderSummary = () => {
           Xác nhận đơn hàng
         </Button>
       </Box>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };
