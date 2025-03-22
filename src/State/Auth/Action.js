@@ -7,6 +7,12 @@ import {
   CREATE_ORDER_FAILURE,
   CREATE_ORDER_REQUEST,
   CREATE_ORDER_SUCCESS,
+  CREATE_REVIEW_FAILURE,
+  CREATE_REVIEW_REQUEST,
+  CREATE_REVIEW_SUCCESS,
+  DELETE_REVIEW_FAILURE,
+  DELETE_REVIEW_REQUEST,
+  DELETE_REVIEW_SUCCESS,
   GET_CART_FAILURE,
   GET_CART_REQUEST,
   GET_CART_SUCCESS,
@@ -16,6 +22,12 @@ import {
   GET_PRODUCTS_FAILURE,
   GET_PRODUCTS_REQUEST,
   GET_PRODUCTS_SUCCESS,
+  GET_REVIEWS_FAILURE,
+  GET_REVIEWS_REQUEST,
+  GET_REVIEWS_SUCCESS,
+  GET_SECOND_LEVELS_FAILURE,
+  GET_SECOND_LEVELS_REQUEST,
+  GET_SECOND_LEVELS_SUCCESS,
   GET_THIRD_LEVELS_FAILURE,
   GET_THIRD_LEVELS_REQUEST,
   GET_THIRD_LEVELS_SUCCESS,
@@ -171,6 +183,46 @@ export const getProductsByThirdLevel = (thirdLevel) => async (dispatch) => {
   }
 };
 
+export const getProductsBySecondLevel = (secondLevel) => async (dispatch) => {
+  dispatch(getProductsRequest());
+  try {
+    const response = await axios.get(`${API_BASE_URL}/api/products/filter`, {
+      params: { secondLevel, pageNumber: 0, pageSize: 8 },
+    });
+    const products = response.data.content;
+    dispatch(getProductsSuccess(products));
+    return { payload: { success: true, products } };
+  } catch (error) {
+    dispatch(getProductsFailure(error.message));
+    return { payload: { success: false, error: error.message } };
+  }
+};
+
+const getSecondLevelsRequest = () => ({ type: GET_SECOND_LEVELS_REQUEST });
+const getSecondLevelsSuccess = (secondLevels) => ({
+  type: GET_SECOND_LEVELS_SUCCESS,
+  payload: secondLevels,
+});
+const getSecondLevelsFailure = (error) => ({
+  type: GET_SECOND_LEVELS_FAILURE,
+  payload: error,
+});
+
+export const getSecondLevels = () => async (dispatch) => {
+  dispatch(getSecondLevelsRequest());
+  try {
+    const response = await axios.get(
+      `${API_BASE_URL}/api/products/second-levels`
+    );
+    const secondLevels = response.data;
+    dispatch(getSecondLevelsSuccess(secondLevels));
+    return { payload: { success: true, secondLevels } };
+  } catch (error) {
+    dispatch(getSecondLevelsFailure(error.message));
+    return { payload: { success: false, error: error.message } };
+  }
+};
+
 const getThirdLevelsRequest = () => ({ type: GET_THIRD_LEVELS_REQUEST });
 const getThirdLevelsSuccess = (thirdLevels) => ({
   type: GET_THIRD_LEVELS_SUCCESS,
@@ -242,10 +294,11 @@ export const addToCart = (variation) => async (dispatch) => {
     if (!token) {
       throw new Error("No JWT token found. Please log in.");
     }
+    
 
     const response = await axios.post(
       `${API_BASE_URL}/api/cart/items`,
-      { variation },
+      { variation},
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -262,6 +315,56 @@ export const addToCart = (variation) => async (dispatch) => {
     return { payload: { success: false, error: errorMessage } };
   }
 };
+
+// export const addToCart = (variation) => async (dispatch) => {
+//   dispatch(addToCartRequest());
+//   try {
+//     const token = localStorage.getItem("jwt");
+//     if (!token) {
+//       throw new Error("Không tìm thấy token JWT. Vui lòng đăng nhập.");
+//     }
+
+//     if (!variation || !variation.variationId) {
+//       throw new Error("Biến thể hoặc Variation ID không được để trống");
+//     }
+
+//     // Đổi tên variationId thành id
+//     const requestData = {
+//       variation: {
+//         id: variation.variationId, // Sử dụng variationId làm id
+//         color: variation.color,
+//         discountPercent: variation.discountPercent,
+//         imageURL: variation.imageURL,
+//         name: variation.name,
+//         price: variation.price,
+//         ram: variation.ram,
+//         rom: variation.rom,
+//         stockQuantity: variation.stockQuantity,
+//       },
+//     };
+
+//     const response = await axios.post(
+//       `${API_BASE_URL}/api/cart/items`,
+//       requestData,
+//       {
+//         headers: {
+//           Authorization: `Bearer ${token}`,
+//         },
+//       }
+//     );
+
+//     const cartItem = { ...response.data, isSelected: false };
+//     dispatch(addToCartSuccess(cartItem));
+//     return { payload: { success: true, cartItem } };
+//   } catch (error) {
+//     const errorMessage =
+//       error.response?.data?.message ||
+//       error.message ||
+//       "Không thể thêm vào giỏ hàng";
+//     dispatch(addToCartFailure(errorMessage));
+//     return { payload: { success: false, error: errorMessage } };
+//   }
+// };
 
 const getCartRequest = () => ({ type: GET_CART_REQUEST });
 const getCartSuccess = (cart) => ({ type: GET_CART_SUCCESS, payload: cart });
@@ -636,5 +739,86 @@ export const deleteOrder = (orderId) => async (dispatch) => {
       "Failed to delete order";
     dispatch({ type: "DELETE_ORDER_FAILURE", payload: errorMessage });
     return { success: false, error: errorMessage }; // Trả về lỗi nếu thất bại
+  }
+};
+
+export const createReview = (reviewData) => async (dispatch, getState) => {
+  try {
+    dispatch({ type: CREATE_REVIEW_REQUEST });
+    const token = localStorage.getItem("jwt");
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    };
+
+    const { data } = await axios.post(
+      `${API_BASE_URL}/api/reviews`,
+      reviewData,
+      config
+    );
+
+    dispatch({
+      type: CREATE_REVIEW_SUCCESS,
+      payload: data,
+    });
+
+    return { success: true, payload: data };
+  } catch (error) {
+    dispatch({
+      type: CREATE_REVIEW_FAILURE,
+      payload: error.response?.data?.message || error.message,
+    });
+    return { success: false, error: error.message };
+  }
+};
+
+export const deleteReview = (reviewId) => async (dispatch, getState) => {
+  try {
+    dispatch({ type: DELETE_REVIEW_REQUEST });
+
+    const {
+      auth: { jwt },
+    } = getState();
+    const config = { headers: { Authorization: `${jwt}` } };
+
+    await axios.delete(`${API_BASE_URL}/api/reviews/${reviewId}`, config);
+
+    dispatch({
+      type: DELETE_REVIEW_SUCCESS,
+      payload: reviewId,
+    });
+
+    return { success: true };
+  } catch (error) {
+    dispatch({
+      type: DELETE_REVIEW_FAILURE,
+      payload: error.response?.data?.message || error.message,
+    });
+    return { success: false, error: error.message };
+  }
+};
+
+export const getReviewsByVariation = (variationId) => async (dispatch) => {
+  try {
+    dispatch({ type: GET_REVIEWS_REQUEST });
+
+    const { data } = await axios.get(
+      `${API_BASE_URL}/api/reviews/variation/${variationId}`
+    );
+
+    dispatch({
+      type: GET_REVIEWS_SUCCESS,
+      payload: data,
+    });
+
+    return { success: true, payload: data };
+  } catch (error) {
+    dispatch({
+      type: GET_REVIEWS_FAILURE,
+      payload: error.response?.data?.message || error.message,
+    });
+    return { success: false, error: error.message };
   }
 };

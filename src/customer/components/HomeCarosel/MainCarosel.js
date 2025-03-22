@@ -37,8 +37,8 @@ const MainCarousel = () => {
   };
 
   return (
-    <div className="relative flex border border-black mx-75 justify-end">
-      <div className="relative al  h-[300px] w-[690px] overflow-hidden">
+    <div className="relative flex justify-start">
+      <div className="relative  h-[300px] w-[690px] overflow-hidden">
         <AliceCarousel
           items={items}
           responsive={responsive}

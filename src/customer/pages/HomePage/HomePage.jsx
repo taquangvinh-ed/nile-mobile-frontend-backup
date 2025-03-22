@@ -5,48 +5,54 @@ import HomSection from "../../components/HomeSection/HomSection";
 import {
   getThirdLevels,
   getProductsByThirdLevel,
+  getSecondLevels,
+  getProductsBySecondLevel,
 } from "../../../State/Auth/Action";
 
 const HomePage = () => {
   const dispatch = useDispatch();
-  const { thirdLevels, thirdLevelsLoading, thirdLevelsError } = useSelector(
+  const { secondLevels, secondLevelsLoading, secondLevelsError } = useSelector(
     (state) => state.auth
   );
-  const [productsByThirdLevel, setProductsByThirdLevel] = useState({});
+  const [productsBySecondLevel, setProductsBySecondLevel] = useState({});
 
   useEffect(() => {
-    dispatch(getThirdLevels()); // Lấy danh sách thirdLevel
+    dispatch(getSecondLevels()); // Lấy danh sách thirdLevel
   }, [dispatch]);
 
   useEffect(() => {
-    if (thirdLevels.length > 0) {
-      thirdLevels.forEach((thirdLevel) => {
-        dispatch(getProductsByThirdLevel(thirdLevel)).then((response) => {
+    if (secondLevels.length > 0) {
+      secondLevels.forEach((secondLevel) => {
+        dispatch(getProductsBySecondLevel(secondLevel)).then((response) => {
           if (response.payload.success) {
-            setProductsByThirdLevel((prev) => ({
+            setProductsBySecondLevel((prev) => ({
               ...prev,
-              [thirdLevel]: response.payload.products,
+              [secondLevel]: response.payload.products,
             }));
           }
         });
       });
     }
-  }, [thirdLevels, dispatch]);
+  }, [secondLevels, dispatch]);
 
-  if (thirdLevelsLoading) return <div>Đang tải...</div>;
-  if (thirdLevelsError) return <div>Lỗi: {thirdLevelsError}</div>;
+  if (secondLevelsLoading) return <div>Đang tải...</div>;
+  if (secondLevelsError) return <div>Lỗi: {secondLevelsError}</div>;
 
   return (
-    <div className="bg-white bg-opacity-80">
-      <div>
+    <div className="bg-white bg-opacity-80 border">
+      <div className="border border-red mx-75 flex flex-row-reverses">
         <MainCarousel />
+        <img
+          src="https://res.cloudinary.com/dwif85oqc/image/upload/v1742606660/ecommerce/images/home/poster/hiforpergljjychfb5ug.jpg"
+          alt="ad"
+        />
       </div>
       <div className="space-y-10 py-20 flex flex-col justify-center">
-        {thirdLevels.map((thirdLevel) => (
+        {secondLevels.map((secondLevel) => (
           <HomSection
-            key={thirdLevel}
-            sectionTitle={thirdLevel}
-            products={productsByThirdLevel[thirdLevel] || []}
+            key={secondLevel}
+            sectionTitle={secondLevel}
+            products={productsBySecondLevel[secondLevel] || []}
           />
         ))}
       </div>

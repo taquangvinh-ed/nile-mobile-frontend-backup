@@ -8,6 +8,7 @@ import Typography from "@mui/material/Typography";
 import { useLocation } from "react-router-dom";
 import ConfirmDeliverAddress from "./ConfirmDeliverAddress";
 import OrderSummary from "./OrderSummary";
+import Complete from "./Complete";
 
 const steps = [
   "Đăng nhập",
@@ -24,6 +25,11 @@ export default function HorizontalLinearStepper() {
 
   const query = new URLSearchParams(location.search);
   const step = query.get("step");
+
+  switch (step) {
+    case "5":
+      return <Complete />;
+  }
 
   const isStepSkipped = (step) => {
     return skipped.has(step);

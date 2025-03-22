@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import mockProductData from "../../components/Product/mockProductData";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import { useLocation } from "react-router-dom";
 import {
@@ -34,7 +33,7 @@ import {
   RadioGroup,
 } from "@mui/material";
 import { Navigate, useNavigate } from "react-router-dom";
-import { getProductsByThirdLevel } from "../../../State/Auth/Action";
+import { getProductsBySecondLevel } from "../../../State/Auth/Action";
 import { useDispatch, useSelector } from "react-redux";
 
 const sortOptions = [
@@ -52,7 +51,7 @@ export default function Product({ title }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [products, setProducts] = useState([]);
-  const { productsByThirdLevel, productsLoading, productsError } = useSelector(
+  const { productsBySecondLevel, productsLoading, productsError } = useSelector(
     (state) => state.auth
   ); // Lấy dữ liệu từ Redux
 
@@ -85,17 +84,17 @@ export default function Product({ title }) {
   };
 
   const searchParams = new URLSearchParams(location.search);
-  const thirdLevel = searchParams.get("thirdLevel") || "";
+  const secondLevel = searchParams.get("secondLevel") || "";
 
   useEffect(() => {
-    if (thirdLevel) {
-      dispatch(getProductsByThirdLevel(thirdLevel)).then((response) => {
+    if (secondLevel) {
+      dispatch(getProductsBySecondLevel(secondLevel)).then((response) => {
         if (response.payload.success) {
           setProducts(response.payload.products);
         }
       });
     }
-  }, [thirdLevel, dispatch]);
+  }, [secondLevel, dispatch]);
 
   if (productsLoading) return <div>Đang tải sản phẩm...</div>;
   if (productsError) return <div>Lỗi: {productsError}</div>;
@@ -489,7 +488,7 @@ export default function Product({ title }) {
                       <ProductCard key={product.id} product={product} />
                     ))
                   ) : (
-                    <p>Không có sản phẩm nào cho {thirdLevel}</p>
+                    <p>Không có sản phẩm nào cho {secondLevel}</p>
                   )}
                 </div>
               </div>
