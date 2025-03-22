@@ -53,7 +53,7 @@ export default function ProductDetails() {
       productDetails &&
       productDetails.variations &&
       productDetails.variations.length > 0 &&
-      !selectedVariation // Chỉ khởi tạo nếu chưa có selectedVariation
+      !selectedVariation
     ) {
       const firstValidVariation = productDetails.variations[0]; // Lấy variation đầu tiên vì tất cả đều hợp lệ
       setSelectedVariation({

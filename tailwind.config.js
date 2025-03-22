@@ -4,7 +4,7 @@ module.exports = {
   theme: {
     extend: {
       margin: {
-        75: "75px",
+        75: "68px",
       },
       gridTemplateRows: {
         "[auto,auto,1fr]": "auto auto 1fr",

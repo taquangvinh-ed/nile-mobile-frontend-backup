@@ -39,9 +39,13 @@ const HomePage = () => {
   if (secondLevelsError) return <div>Lỗi: {secondLevelsError}</div>;
 
   return (
-    <div className="bg-white bg-opacity-80">
-      <div>
+    <div className="bg-white bg-opacity-80 border">
+      <div className="border border-red mx-75 flex flex-row-reverses">
         <MainCarousel />
+        <img
+          src="https://res.cloudinary.com/dwif85oqc/image/upload/v1742606660/ecommerce/images/home/poster/hiforpergljjychfb5ug.jpg"
+          alt="ad"
+        />
       </div>
       <div className="space-y-10 py-20 flex flex-col justify-center">
         {secondLevels.map((secondLevel) => (
