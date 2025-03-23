@@ -35,7 +35,6 @@ const Admin = () => {
           left: 0,
           width: '15%',
           height: '100vh',
-          bgcolor: '#0f1530',
           overflowY: 'auto',
         }}
       >
@@ -52,7 +51,7 @@ const Admin = () => {
         sx={{
           marginLeft: '15%',
           width: '85%',
-          background: 'linear-gradient(to bottom right, #001a40, #004488, #001a40)',
+          background: '#181c1f',
           height: '100vh',
           overflowY: 'auto',
           padding: '16px',

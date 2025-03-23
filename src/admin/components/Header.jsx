@@ -14,7 +14,7 @@ const Header = () => {
         position: 'sticky',
         top: 0,
         zIndex: 1000,
-        backgroundColor: 'rgba(15, 21, 48, 0.6)',
+        backgroundColor: 'rgba(33, 37, 41, 0.7)',
         padding: '8px 16px',
         borderRadius: '20px',
       }}

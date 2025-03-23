@@ -6,8 +6,8 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const OrderStatus = () => {
-  const [percentage, setPercentage] = useState(68);
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const  setPercentage = useState(68);
+  const setSelectedIndex = useState(0);
 
   const data = {
     labels: ["Sales", "Product", "Income"],
@@ -44,7 +44,7 @@ const OrderStatus = () => {
   };
 
   return (
-    <Card sx={{ bgcolor: "#0f1539", color: "white", padding: 2, height: '100%', borderRadius:5}}>
+    <Card sx={{ bgcolor: "#282f36", color: "white", padding: 2, height: '100%', borderRadius:5}}>
       <Typography variant="h6" gutterBottom>
         Order Status
       </Typography>

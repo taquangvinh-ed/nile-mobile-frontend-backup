@@ -59,7 +59,7 @@ const renderStats = () => {
 
 const MonthlyOverview = () => {
     return (
-        <Card sx={{bgcolor:"#0f1539", color:"white", borderRadius:5}}>
+        <Card sx={{bgcolor:"#282f36", color:"white", borderRadius:5}}>
             <CardHeader title="Monthly Overview"
             action={
                 <IconButton size="small">

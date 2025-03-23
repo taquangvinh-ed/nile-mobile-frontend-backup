@@ -77,7 +77,7 @@ const FilterProducts = ({ onFilterChange }) => {
       alignItems="center"
       sx={{
         marginBottom: 2,
-        bgcolor: "#1e293b",
+        bgcolor: "#293038",
         padding: 2,
         borderRadius: 3,
         boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.3)",

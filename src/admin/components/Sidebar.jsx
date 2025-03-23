@@ -52,7 +52,7 @@ const Sidebar = ({ navigate }) => {
         overflow: "auto",
         display: "flex",
         flexDirection: "column",
-        bgcolor: "#0f1530",
+        bgcolor: "#262d34",
         borderRight: "1px solid black",
         color: "gray",
         height: "100%",
@@ -63,10 +63,10 @@ const Sidebar = ({ navigate }) => {
         sx={{
           display: "flex",
           alignItems: "center",
+          justifyContent: "center",
           padding: "16px",
-          bgcolor: "#0f1530",
-          color: "white",
-          borderBottom: "1px solid black",
+          bgcolor: "#262d34",
+          color: "white"
         }}
       >
         <img

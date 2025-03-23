@@ -36,7 +36,7 @@ const options = {
 
 const SalesAndViews = () => {
     return (
-        <Card sx={{ bgcolor: "#0f1539", color: "white", borderRadius:5 }}>
+        <Card sx={{ bgcolor: "#282f36", color: "white", borderRadius:5 }}>
             <CardContent>
                 <Typography variant="h6" gutterBottom>
                     Sales & Views

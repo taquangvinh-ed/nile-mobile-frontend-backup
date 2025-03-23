@@ -16,7 +16,7 @@ const TrophyImg = styled("img")({
 
 const Achivement = () => {
     return (
-        <Card sx={{position:"relative", bgcolor:"#0f1539", color:"white", borderRadius:5}}>
+        <Card sx={{position:"relative", bgcolor:"#282f36", color:"white", borderRadius:5}}>
             <CardContent>
                 <Typography variant="h6" sx={{letterSpacing:".25px"}}>
                     Nile Mobile Store

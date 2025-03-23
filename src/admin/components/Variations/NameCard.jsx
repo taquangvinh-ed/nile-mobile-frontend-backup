@@ -8,9 +8,8 @@ const NameCard = ({ variations, setSelectedVariationIndex }) => {
     setLocalSelectedVariationIndex(index);
     setSelectedVariationIndex(index);
   };
-
   return (
-    <Card sx={{ padding: "16px", borderRadius: "15px", backgroundColor: "#1e293b", color: "#e2e8f0" }}>
+    <Card sx={{ padding: "16px", borderRadius: "15px", backgroundColor: "#282f36", color: "#e2e8f0" }}>
       <Typography variant="h5" sx={{ marginBottom: "16px", textAlign: "center" }}>
         {variations[selectedVariationIndex]
           ? `${variations[selectedVariationIndex].name} ${variations[selectedVariationIndex].color} ${variations[selectedVariationIndex].ram}/${variations[selectedVariationIndex].rom}`
@@ -38,7 +37,6 @@ const NameCard = ({ variations, setSelectedVariationIndex }) => {
           </Button>
         ))}
       </Box>
-
       {/* Display Price, Discount Percent, and Discount Price */}
       <Box
         sx={{

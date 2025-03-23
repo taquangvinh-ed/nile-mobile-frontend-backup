@@ -76,8 +76,8 @@ const ListProducts = () => {
       <FilterProducts onFilterChange={handleFilterChange} />
 
       {/* Products Table */}
-      <TableContainer component={Paper} sx={{ backgroundColor: "#1e293b" }}>
-        <Table sx={{ minWidth: 650, bgcolor: "#1e293b" }} size="small" aria-label="a dense table">
+      <TableContainer component={Paper} sx={{bgcolor: "#293038", borderRadius: "10px"}}>
+        <Table sx={{ minWidth: 650, bgcolor: "#293038" }} size="small" aria-label="a dense table">
           <TableHead>
             <TableRow>
               <TableCell sx={{ color: "#94a3b8", width: "5%" }}>ID</TableCell>
