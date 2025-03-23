@@ -26,7 +26,10 @@ const UpdateVariation = ({ variationId, currentVariation, onUpdateSuccess }) => 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setVariation((prev) => {
-      const updated = { ...prev, [name]: value };
+      const updated = {
+        ...prev,
+        [name]: name === "discountPercent" || name === "discountPrice" ? Number(value) : value,
+      };
       setIsChanged(Object.keys(updated).some((key) => updated[key] !== currentVariation[key]));
       return updated;
     });
@@ -141,13 +144,17 @@ const UpdateVariation = ({ variationId, currentVariation, onUpdateSuccess }) => 
 
   return (
     <Card sx={{ bgcolor: "#282f36", borderRadius: "10px" }}>
-      <Button
-        sx={{ bgcolor: "#ff6c2f", borderRadius: "10px", "&:hover": { bgcolor: "#e84118" } }}
-        variant="contained"
-        color="primary"
-        onClick={() => setOpen(true)}
-        disabled={!variationId}
-      >
+      <style>
+        {`
+          input:-webkit-autofill,
+          input:-webkit-autofill:hover,
+          input:-webkit-autofill:focus {
+            -webkit-box-shadow: 0 0 0px 1000px #2f3640 inset !important;
+            -webkit-text-fill-color: #fff !important;
+          }
+        `}
+      </style>
+      <Button sx={{ bgcolor: "#ff6c2f", borderRadius: "10px", "&:hover": { bgcolor: "#e84118" } }} variant="contained" color="primary" onClick={() => setOpen(true)} disabled={!variationId}>
         Update Variation
       </Button>
 
@@ -180,7 +187,7 @@ const UpdateVariation = ({ variationId, currentVariation, onUpdateSuccess }) => 
               margin="dense"
               label={field.charAt(0).toUpperCase() + field.slice(1)}
               name={field}
-              type={field.includes("price") || field.includes("Quantity") ? "number" : "text"}
+              type={field === "discountPercent" || field === "discountPrice" || field.includes("price") || field.includes("Quantity") ? "number" : "text"}
               fullWidth
               value={variation[field] || ""}
               onChange={handleInputChange}
@@ -194,12 +201,7 @@ const UpdateVariation = ({ variationId, currentVariation, onUpdateSuccess }) => 
               helperText={errors[field] && "This field is required."}
             />
           ))}
-          <RadioGroup
-            row
-            value={uploadMethod}
-            onChange={(e) => setUploadMethod(e.target.value)}
-            sx={{ mt: 2 }}
-          >
+          <RadioGroup row value={uploadMethod} onChange={(e) => setUploadMethod(e.target.value)} sx={{ mt: 2 }}>
             <FormControlLabel value="upload" control={<Radio />} label="Upload Image" />
             <FormControlLabel value="url" control={<Radio />} label="Enter Image URL" />
           </RadioGroup>
@@ -271,12 +273,7 @@ const UpdateVariation = ({ variationId, currentVariation, onUpdateSuccess }) => 
         </DialogActions>
       </Dialog>
 
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={3000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
+      <Snackbar open={snackbar.open} autoHideDuration={3000} onClose={handleCloseSnackbar} anchorOrigin={{ vertical: "top", horizontal: "center" }}>
         <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: "100%" }}>
           {snackbar.message}
         </Alert>

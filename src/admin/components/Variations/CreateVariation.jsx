@@ -24,6 +24,7 @@ const CreateVariation = ({ productId, onCreateSuccess }) => {
   const [image, setImage] = useState(null);
   const [imageUrl, setImageUrl] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [errors, setErrors] = useState({});
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -65,7 +66,30 @@ const CreateVariation = ({ productId, onCreateSuccess }) => {
     }
   };
 
+  const validateFields = () => {
+    const requiredFields = ["color", "ram", "rom", "price", "discountPercent", "discountPrice", "stockQuantity"];
+    const newErrors = {};
+
+    requiredFields.forEach((field) => {
+      if (!variation[field] || variation[field].toString().trim() === "") {
+        newErrors[field] = true; // Đánh dấu lỗi nếu trường bị để trống
+      }
+    });
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0; // Trả về true nếu không có lỗi
+  };
+
   const handleSubmit = async () => {
+    if (!validateFields()) {
+      setSnackbar({
+        open: true,
+        message: "Please fill in all required fields.",
+        severity: "error",
+      });
+      return;
+    }
+
     try {
       let finalImageUrl = null;
 
@@ -142,8 +166,23 @@ const CreateVariation = ({ productId, onCreateSuccess }) => {
     setSnackbar({ ...snackbar, open: false });
   };
 
+  const handleCloseForm = () => {
+    setOpen(false);
+    setErrors({}); // Đặt lại trạng thái lỗi
+  };
+
   return (
     <Card sx={{ bgcolor: "#282f36", borderRadius: "10px" }}>
+      <style>
+        {`
+          input:-webkit-autofill,
+          input:-webkit-autofill:hover,
+          input:-webkit-autofill:focus {
+            -webkit-box-shadow: 0 0 0px 1000px #2f3640 inset !important;
+            -webkit-text-fill-color: #fff !important;
+          }
+        `}
+      </style>
       <Button
         sx={{
           bgcolor: "#ff6c2f",
@@ -159,7 +198,7 @@ const CreateVariation = ({ productId, onCreateSuccess }) => {
 
       <Dialog
         open={open}
-        onClose={() => setOpen(false)}
+        onClose={handleCloseForm}
         fullWidth
         maxWidth="sm"
         PaperProps={{
@@ -181,29 +220,31 @@ const CreateVariation = ({ productId, onCreateSuccess }) => {
         </DialogTitle>
         <DialogContent sx={{ bgcolor: "#2f3640" }}>
           {["color", "ram", "rom", "price", "discountPercent", "discountPrice", "stockQuantity"].map((field) => (
-            <TextField
-              key={field}
-              margin="dense"
-              label={field.charAt(0).toUpperCase() + field.slice(1)}
-              name={field}
-              type={field === "discountPercent" || field === "discountPrice" || field.includes("price") || field.includes("Quantity") ? "number" : "text"}
-              fullWidth
-              value={variation[field]}
-              onChange={handleInputChange}
-              InputProps={{
-                sx: { color: "#fff" },
-              }}
-              InputLabelProps={{
-                sx: { color: "#dcdde1" },
-              }}
-            />
+            <div key={field}>
+              <TextField
+                margin="dense"
+                label={field.charAt(0).toUpperCase() + field.slice(1)}
+                name={field}
+                type={field === "discountPercent" || field === "discountPrice" || field.includes("price") || field.includes("Quantity") ? "number" : "text"}
+                fullWidth
+                value={variation[field]}
+                onChange={handleInputChange}
+                InputProps={{
+                  sx: { color: "#fff" },
+                }}
+                InputLabelProps={{
+                  sx: { color: "#dcdde1" },
+                }}
+                error={!!errors[field]} // Đánh dấu lỗi nếu có
+              />
+              {errors[field] && (
+                <Typography variant="caption" color="error">
+                  This field is required.
+                </Typography>
+              )}
+            </div>
           ))}
-          <RadioGroup
-            row
-            value={uploadMethod}
-            onChange={(e) => setUploadMethod(e.target.value)}
-            sx={{ mt: 2 }}
-          >
+          <RadioGroup row value={uploadMethod} onChange={(e) => setUploadMethod(e.target.value)} sx={{ mt: 2 }}>
             <FormControlLabel value="upload" control={<Radio />} label="Upload Image" />
             <FormControlLabel value="url" control={<Radio />} label="Enter Image URL" />
           </RadioGroup>
@@ -252,7 +293,7 @@ const CreateVariation = ({ productId, onCreateSuccess }) => {
         </DialogContent>
         <DialogActions sx={{ bgcolor: "#2f3640" }}>
           <Button
-            onClick={() => setOpen(false)}
+            onClick={handleCloseForm}
             sx={{
               color: "#fff",
               bgcolor: "#7f8fa6",
@@ -274,12 +315,7 @@ const CreateVariation = ({ productId, onCreateSuccess }) => {
         </DialogActions>
       </Dialog>
 
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={3000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
+      <Snackbar open={snackbar.open} autoHideDuration={3000} onClose={handleCloseSnackbar} anchorOrigin={{ vertical: "top", horizontal: "center" }}>
         <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: "100%" }}>
           {snackbar.message}
         </Alert>

@@ -31,7 +31,7 @@ const Toolbar = ({ productId, variations, setVariations, selectedVariationIndex 
       container
       sx={{
         bgcolor: "#282f36",
-        padding: "16px 50px",
+        padding: "16px 75px",
         borderRadius: "15px",
         justifyContent: "space-between",
       }}
