@@ -28,9 +28,11 @@ const CreateVariation = ({ productId, onCreateSuccess }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    const numericFields = ["discountPercent", "discountPrice", "price", "stockQuantity"];
+
     setVariation((prev) => ({
       ...prev,
-      [name]: name === "discountPercent" || name === "discountPrice" ? Number(value) : value,
+      [name]: numericFields.includes(name) && (value === "" || Number(value) < 0) ? "" : value, // Chuyển thành rỗng nếu giá trị âm hoặc rỗng
     }));
   };
 
@@ -231,6 +233,7 @@ const CreateVariation = ({ productId, onCreateSuccess }) => {
                 onChange={handleInputChange}
                 InputProps={{
                   sx: { color: "#fff" },
+                  inputProps: field === "discountPercent" || field === "discountPrice" || field.includes("price") || field.includes("Quantity") ? { min: 0 } : {}, // Giới hạn giá trị >= 0
                 }}
                 InputLabelProps={{
                   sx: { color: "#dcdde1" },

@@ -47,13 +47,16 @@ const NameCard = ({ variations, setSelectedVariationIndex }) => {
         }}
       >
         <Typography variant="body1" sx={{ color: "#e2e8f0" }}>
-          Price: {variations[selectedVariationIndex]?.price || "N/A"}
+          Stock: {variations[selectedVariationIndex]?.stockQuantity || "N/A"}
+        </Typography>
+        <Typography variant="body1" sx={{ color: "#e2e8f0" }}>
+          Price: {variations[selectedVariationIndex]?.price || "N/A"}&#8363;
         </Typography>
         <Typography variant="body1" sx={{ color: "#e2e8f0" }}>
           Discount Percent: {variations[selectedVariationIndex]?.discountPercent || "N/A"}%
         </Typography>
         <Typography variant="body1" sx={{ color: "#e2e8f0" }}>
-          Discount Price: {variations[selectedVariationIndex]?.discountPrice || "N/A"}
+          Discount Price: {variations[selectedVariationIndex]?.discountPrice || "N/A"}&#8363;
         </Typography>
       </Box>
     </Card>

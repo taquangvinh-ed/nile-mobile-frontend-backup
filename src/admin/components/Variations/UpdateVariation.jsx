@@ -25,14 +25,17 @@ const UpdateVariation = ({ variationId, currentVariation, onUpdateSuccess }) => 
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    const numericFields = ["discountPercent", "discountPrice", "price", "stockQuantity"];
+
     setVariation((prev) => {
       const updated = {
         ...prev,
-        [name]: name === "discountPercent" || name === "discountPrice" ? Number(value) : value,
+        [name]: numericFields.includes(name) ? Math.max(0, Number(value)) : value, // Đảm bảo giá trị >= 0
       };
       setIsChanged(Object.keys(updated).some((key) => updated[key] !== currentVariation[key]));
       return updated;
     });
+
     setErrors((prev) => ({ ...prev, [name]: !value }));
   };
 
@@ -193,6 +196,7 @@ const UpdateVariation = ({ variationId, currentVariation, onUpdateSuccess }) => 
               onChange={handleInputChange}
               InputProps={{
                 sx: { color: "#fff" },
+                inputProps: field === "discountPercent" || field === "discountPrice" || field.includes("price") || field.includes("Quantity") ? { min: 0 } : {}, // Giới hạn giá trị >= 0
               }}
               InputLabelProps={{
                 sx: { color: "#dcdde1" },
