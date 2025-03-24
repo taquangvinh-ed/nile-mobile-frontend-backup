@@ -34,13 +34,13 @@ const OrderStatus = () => {
         },
       },
     },
-    onClick: (event, elements) => {
-      if (elements.length > 0) {
-        const index = elements[0].index;
-        setSelectedIndex(index);
-        setPercentage(data.datasets[0].data[index]);
-      }
-    },
+    // onClick: (event, elements) => {
+    //   if (elements.length > 0) {
+    //     const index = elements[0].index;
+    //     setSelectedIndex(index);
+    //     setPercentage(data.datasets[0].data[index]);
+    //   }
+    // },
   };
 
   return (

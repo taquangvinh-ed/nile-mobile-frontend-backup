@@ -4,7 +4,8 @@ import { Grid } from "@mui/material";
 import ImageCard from "./ImageCard";
 import NameCard from "./NameCard";
 import SpecificationsCard from "./SpecificationsCard";
-import Toolbar from "./Toolbar";
+import ToolbarVariations from "./ToolbarVariations";
+import ToolbarProduct from "./ToolbarProduct";
 
 const VariationsPage = () => {
   const { productId } = useParams();
@@ -52,7 +53,7 @@ const VariationsPage = () => {
             />
           </Grid>
           <Grid item xs={12} md={12}>
-            <Toolbar
+            <ToolbarVariations
               productId={productId}
               variations={variations}
               setVariations={setVariations}
@@ -61,6 +62,9 @@ const VariationsPage = () => {
           </Grid>
           <Grid item xs={12} md={12}>
             <SpecificationsCard productId={productId} />
+          </Grid>
+          <Grid item xs={12} md={12}>
+            <ToolbarProduct/>
           </Grid>
         </Grid>
       </Grid>

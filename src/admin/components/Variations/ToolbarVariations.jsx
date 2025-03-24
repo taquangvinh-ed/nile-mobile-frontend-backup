@@ -4,7 +4,7 @@ import CreateVariation from "./CreateVariation";
 import DeleteVariation from "./DeleteVariation";
 import UpdateVariation from "./UpdateVariation";
 
-const Toolbar = ({ productId, variations, setVariations, selectedVariationIndex }) => {
+const ToolbarVariations = ({ productId, variations, setVariations, selectedVariationIndex }) => {
   const selectedVariationId = variations[selectedVariationIndex]?.variationId || null;
 
   const handleDeleteSuccess = () => {
@@ -53,4 +53,4 @@ const Toolbar = ({ productId, variations, setVariations, selectedVariationIndex 
   );
 };
 
-export default Toolbar;
+export default ToolbarVariations;
