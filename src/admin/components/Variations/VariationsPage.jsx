@@ -64,7 +64,7 @@ const VariationsPage = () => {
             <SpecificationsCard productId={productId} />
           </Grid>
           <Grid item xs={12} md={12}>
-            <ToolbarProduct/>
+            <ToolbarProduct productId={productId}/>
           </Grid>
         </Grid>
       </Grid>

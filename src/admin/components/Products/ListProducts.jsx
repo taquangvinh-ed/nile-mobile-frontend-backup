@@ -9,8 +9,8 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { Pagination, IconButton } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
+// import EditIcon from "@mui/icons-material/Edit";
+// import DeleteIcon from "@mui/icons-material/Delete";
 import FilterProducts from "./FilterProducts";
 
 const ListProducts = () => {
@@ -113,7 +113,7 @@ const ListProducts = () => {
                       >
                         <VisibilityIcon fontSize="small" />
                       </IconButton>
-                      <IconButton
+                      {/* <IconButton
                         sx={{
                           bgcolor: "#475569",
                           color: "#ff6c2f",
@@ -138,7 +138,7 @@ const ListProducts = () => {
                         }}
                       >
                         <DeleteIcon fontSize="small" />
-                      </IconButton>
+                      </IconButton> */}
                     </div>
                   </TableCell>
                 </TableRow>

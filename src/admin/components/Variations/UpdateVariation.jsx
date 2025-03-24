@@ -15,27 +15,61 @@ const UpdateVariation = ({ variationId, currentVariation, onUpdateSuccess }) => 
 
   useEffect(() => {
     if (variationId && currentVariation) {
-      setVariation({ ...currentVariation });
-      setIsChanged(false);
-      setErrors({});
-      setImage(null);
-      setImageUrl("");
+      setVariation({ ...currentVariation }); // Gán giá trị hiện tại từ currentVariation
+      setIsChanged(false); // Đặt lại trạng thái thay đổi
+      setErrors({}); // Xóa lỗi
+      setImage(null); // Xóa hình ảnh đã chọn
+      setImageUrl(""); // Xóa URL hình ảnh
     }
   }, [variationId, currentVariation]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    const numericFields = ["discountPercent", "discountPrice", "price", "stockQuantity"];
 
+    // Các trường cần kiểm tra
+    const numericFields = ["discountPercent", "discountPrice", "price", "stockQuantity"];
+    if (numericFields.includes(name)) {
+      // Loại bỏ ký tự không hợp lệ
+      const numericValue = value.replace(/[^0-9]/g, ""); // Chỉ giữ lại số
+      setVariation((prev) => {
+        const updated = { ...prev, [name]: numericValue };
+
+        // Kiểm tra sự khác biệt giữa giá trị hiện tại và giá trị ban đầu
+        const hasChanges = Object.keys(updated).some(
+          (key) => String(updated[key]) !== String(currentVariation[key] || "")
+        );
+        setIsChanged(hasChanges);
+        return updated;
+      });
+
+      // Kiểm tra lỗi
+      if (!numericValue || isNaN(parseFloat(numericValue)) || parseFloat(numericValue) <= 0) {
+        setErrors((prev) => ({ ...prev, [name]: true }));
+      } else if (
+        ["discountPercent", "discountPrice", "price", "stockQuantity"].includes(name) &&
+        !Number.isInteger(parseFloat(numericValue))
+      ) {
+        // Kiểm tra nếu không phải số nguyên
+        setErrors((prev) => ({ ...prev, [name]: true }));
+      } else {
+        setErrors((prev) => ({ ...prev, [name]: false }));
+      }
+      return;
+    }
+
+    // Các trường khác
     setVariation((prev) => {
-      const updated = {
-        ...prev,
-        [name]: numericFields.includes(name) ? Math.max(0, Number(value)) : value, // Đảm bảo giá trị >= 0
-      };
-      setIsChanged(Object.keys(updated).some((key) => updated[key] !== currentVariation[key]));
+      const updated = { ...prev, [name]: value };
+
+      // Kiểm tra sự khác biệt giữa giá trị hiện tại và giá trị ban đầu
+      const hasChanges = Object.keys(updated).some(
+        (key) => String(updated[key]) !== String(currentVariation[key] || "")
+      );
+      setIsChanged(hasChanges);
       return updated;
     });
 
+    // Kiểm tra trường bắt buộc
     setErrors((prev) => ({ ...prev, [name]: !value }));
   };
 
@@ -158,7 +192,7 @@ const UpdateVariation = ({ variationId, currentVariation, onUpdateSuccess }) => 
         `}
       </style>
       <Button sx={{ bgcolor: "#ff6c2f", borderRadius: "10px", "&:hover": { bgcolor: "#e84118" } }} variant="contained" color="primary" onClick={() => setOpen(true)} disabled={!variationId}>
-        Update Variation
+        EDIT VARIATION
       </Button>
 
       <Dialog
@@ -190,19 +224,26 @@ const UpdateVariation = ({ variationId, currentVariation, onUpdateSuccess }) => 
               margin="dense"
               label={field.charAt(0).toUpperCase() + field.slice(1)}
               name={field}
-              type={field === "discountPercent" || field === "discountPrice" || field.includes("price") || field.includes("Quantity") ? "number" : "text"}
+              type={["price", "discountPercent", "discountPrice", "stockQuantity"].includes(field) ? "number" : "text"} // Chỉ định type là "number" cho các trường số
               fullWidth
-              value={variation[field] || ""}
+              value={variation[field] || ""} // Hiển thị giá trị hiện tại
               onChange={handleInputChange}
               InputProps={{
                 sx: { color: "#fff" },
-                inputProps: field === "discountPercent" || field === "discountPrice" || field.includes("price") || field.includes("Quantity") ? { min: 0 } : {}, // Giới hạn giá trị >= 0
+                inputProps: ["price", "discountPercent", "discountPrice", "stockQuantity"].includes(field)
+                  ? { min: 0 }
+                  : {}, // Giới hạn giá trị >= 0 cho các trường số
               }}
               InputLabelProps={{
                 sx: { color: "#dcdde1" },
               }}
               error={!!errors[field]}
-              helperText={errors[field] && "This field is required."}
+              helperText={
+                errors[field] &&
+                (["discountPercent", "discountPrice", "price", "stockQuantity"].includes(field)
+                  ? "This field must be a positive integer."
+                  : "This field is required.")
+              }
             />
           ))}
           <RadioGroup row value={uploadMethod} onChange={(e) => setUploadMethod(e.target.value)} sx={{ mt: 2 }}>
@@ -270,7 +311,10 @@ const UpdateVariation = ({ variationId, currentVariation, onUpdateSuccess }) => 
               bgcolor: "#ff6c2f",
               "&:hover": { bgcolor: "#e84118" },
             }}
-            disabled={!isChanged}
+            disabled={
+              !isChanged || // Không có thay đổi
+              Object.values(errors).some((error) => error) // Có lỗi trong các trường
+            }
           >
             Submit
           </Button>
