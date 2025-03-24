@@ -160,6 +160,15 @@ const ListProducts = () => {
           onChange={handleChangePage}
           color="primary"
           shape="rounded"
+          sx={{
+            "& .MuiPaginationItem-root": {
+              color: "#94a3b8",
+            },
+            "& .Mui-selected": {
+              color: "white",
+              backgroundColor: "#1976d2",
+            },
+          }}
         />
       </div>
     </div>

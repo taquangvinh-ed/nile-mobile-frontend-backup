@@ -108,13 +108,22 @@ const CustomersTable = () => {
           </TableBody>
         </Table>
       </TableContainer>
-      <div className="flex justify-center mt-4">
+      <div className="flex justify-center mt-4" >
         <Pagination
           count={Math.ceil(users.length / rowsPerPage)}
           page={page}
           onChange={handleChangePage}
           color="primary"
           shape="rounded"
+          sx={{
+            "& .MuiPaginationItem-root": {
+              color: "#94a3b8",
+            },
+            "& .Mui-selected": {
+              color: "white",
+              backgroundColor: "#1976d2",
+            },
+          }}
         />
       </div>
     </div>
