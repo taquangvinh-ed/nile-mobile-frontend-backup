@@ -701,11 +701,24 @@ export const updatePaymentMethod =
         { paymentMethod },
         config
       );
+
+      const updatedOrder = response.data;
+
+      // Nếu là VNPAY, gọi API để lấy paymentUrl
+      let paymentUrl = "";
+      if (paymentMethod === "VNPAY") {
+        const vnpayResponse = await axios.get(
+          `${API_BASE_URL}/api/payment-vnpay?orderId=${orderId}`,
+          config
+        );
+        paymentUrl = vnpayResponse.data.paymentUrl;
+      }
+
       dispatch({
         type: "UPDATE_PAYMENT_METHOD_SUCCESS",
-        payload: response.data,
+        payload: {order: updatedOrder, paymentUrl},
       });
-      return { payload: { success: true, order: response.data } };
+      return { payload: { success: true, order: updatedOrder, paymentUrl}};
     } catch (error) {
       const errorMessage =
         error.response?.data?.message ||

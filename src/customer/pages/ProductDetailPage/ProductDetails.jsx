@@ -116,7 +116,6 @@ export default function ProductDetails() {
       const result = await dispatch(addToCart(variationWithNumberId));
       if (result.payload.success) {
         alert("Thêm sản phẩm vào giỏ hàng thành công!");
-        // navigate("/cart"); // Uncomment nếu muốn chuyển hướng
       } else {
         alert("Không thể thêm vào giỏ hàng: " + result.payload.error);
       }

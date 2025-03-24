@@ -27,11 +27,7 @@ const Cart = () => {
   }, [dispatch, user]);
 
   const handleCheckout = () => {
-    // if (!user?.id) {
-    //   alert("Vui lòng đăng nhập để thanh toán!");
-    //   navigate("/login");
-    //   return;
-    // }
+   
 
     if (!user || !user.id) {
       console.error("User is null or user.id is undefined:", user);

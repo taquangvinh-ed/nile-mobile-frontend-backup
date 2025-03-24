@@ -13,12 +13,17 @@ import {
   FormLabel,
   Alert,
   Snackbar,
+  CircularProgress,
+  IconButton,
 } from "@mui/material";
+import { ArrowBack as ArrowBackIcon } from "@mui/icons-material";
+import axios from "axios";
+import { API_BASE_URL } from "../../../config/apiConfig";
 import {
   getOrderById,
   updatePaymentMethod,
   deleteOrder,
-} from "../../../State/Auth/Action"; // Giả định bạn có action để lấy đơn hàng
+} from "../../../State/Auth/Action";
 
 const OrderSummary = () => {
   const dispatch = useDispatch();
@@ -27,15 +32,13 @@ const OrderSummary = () => {
   const queryParams = new URLSearchParams(search);
   const orderId = queryParams.get("orderId");
 
-  const { order, orderLoading, orderError } = useSelector(
+  const { order, orderLoading, orderError, paymentUrl } = useSelector(
     (state) => state.auth
   );
 
-  const [paymentMethod, setPaymentMethod] = React.useState(null);
-
-  const [isConfirming, setIsconfirming] = useState(false);
-  const [isCancelling, setIscancelling] = useState(false);
-
+  const [paymentMethod, setPaymentMethod] = useState(null);
+  const [isConfirming, setIsConfirming] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -50,8 +53,7 @@ const OrderSummary = () => {
 
   useEffect(() => {
     if (order && order.paymentDetails) {
-      const lastestPayment = order.paymentDetails;
-      setPaymentMethod(lastestPayment.paymentMethod);
+      setPaymentMethod(order.paymentDetails.paymentMethod);
     } else {
       setPaymentMethod("CASH_ON_DELIVERY");
     }
@@ -65,19 +67,38 @@ const OrderSummary = () => {
     if (order.status !== "PLACED") {
       setSnackbar({
         open: true,
-        message: "Chỉ có thể có hủy đơn hàng ở trạng thái đặt hàng!",
+        message: "Chỉ có thể hủy đơn hàng ở trạng thái đặt hàng!",
         severity: "error",
       });
       return;
     }
+
     if (window.confirm("Bạn có chắc chắn muốn hủy đơn hàng này?")) {
-      setIscancelling(true);
-      const result = await dispatch(deleteOrder(orderId));
-      if (result && result.success) {
-        alert("Đơn hàng đã được hủy thành công!");
-        setTimeout(() => navigate("/"), 2000);
-      } else {
-        alert("Lỗi khi hủy đơn hàng: " + (result?.error || "Không xác định"));
+      setIsCancelling(true);
+      try {
+        const result = await dispatch(deleteOrder(orderId));
+        if (result.success) {
+          setSnackbar({
+            open: true,
+            message: "Đơn hàng đã được hủy thành công!",
+            severity: "success",
+          });
+          setTimeout(() => navigate("/"), 2000);
+        } else {
+          setSnackbar({
+            open: true,
+            message: "Lỗi khi hủy đơn hàng: " + (result.error || "Không xác định"),
+            severity: "error",
+          });
+        }
+      } catch (error) {
+        setSnackbar({
+          open: true,
+          message: "Lỗi khi hủy đơn hàng: " + error.message,
+          severity: "error",
+        });
+      } finally {
+        setIsCancelling(false);
       }
     }
   };
@@ -91,33 +112,37 @@ const OrderSummary = () => {
       });
       return;
     }
-    setIsconfirming(true);
+
+    if (!paymentMethod) {
+      setSnackbar({
+        open: true,
+        message: "Vui lòng chọn phương thức thanh toán!",
+        severity: "error",
+      });
+      return;
+    }
+
+    setIsConfirming(true);
     try {
-      const result = await dispatch(
-        updatePaymentMethod(orderId, paymentMethod)
-      );
+      const result = await dispatch(updatePaymentMethod(orderId, paymentMethod));
       if (result.payload.success) {
         const updatedOrder = result.payload.order;
-        const lastestPayment = updatedOrder.paymentDetails;
+        const paymentUrl = result.payload.paymentUrl;
 
-        if (
-          ["VNPAY", "MOMO"].includes(paymentMethod) &&
-          lastestPayment.paymentUrl
-        ) {
-          window.location.href = lastestPayment.paymentUrl;
+        if (paymentMethod === "VNPAY" && paymentUrl) {
+          window.location.href = paymentUrl;
         } else {
           setSnackbar({
             open: true,
             message: "Xác nhận đơn hàng thành công!",
             severity: "success",
           });
-          setTimeout(() => navigate(`/checkout?step=5&orderId=${orderId}`));
+          setTimeout(() => navigate(`/checkout?step=5&orderId=${orderId}`), 2000);
         }
       } else {
         setSnackbar({
           open: true,
-          message:
-            "Lỗi khi cập nhật phương thức thanh toán: " + result.payload.error,
+          message: "Lỗi khi cập nhật phương thức thanh toán: " + result.payload.error,
           severity: "error",
         });
       }
@@ -127,14 +152,17 @@ const OrderSummary = () => {
         message: "Lỗi khi xác nhận đơn hàng: " + error.message,
         severity: "error",
       });
-    }finally{
-      setIsconfirming(false);
+    } finally {
+      setIsConfirming(false);
     }
   };
 
-
   const handleCloseSnackbar = () => {
     setSnackbar({ ...snackbar, open: false });
+  };
+
+  const handleBack = () => {
+    navigate("/checkout?step=3"); // Quay lại bước trước (ví dụ: chọn địa chỉ)
   };
 
   if (!orderId) {
@@ -142,7 +170,12 @@ const OrderSummary = () => {
   }
 
   if (orderLoading) {
-    return <Typography>Đang tải thông tin đơn hàng...</Typography>;
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="50vh">
+        <CircularProgress />
+        <Typography ml={2}>Đang tải thông tin đơn hàng...</Typography>
+      </Box>
+    );
   }
 
   if (orderError) {
@@ -153,58 +186,61 @@ const OrderSummary = () => {
     return <Typography>Không tìm thấy đơn hàng!</Typography>;
   }
 
-  const shippingAddress = order.shippingAddress || null; // Địa chỉ giao hàng từ đơn hàng
-  const orderItems = order.orderDetails || []; // Danh sách sản phẩm trong đơn hàng
+  const shippingAddress = order.shippingAddress || null;
+  const orderItems = order.orderDetails || [];
   const totalPrice = order.totalPrice || 0;
   const totalDiscountPrice = order.totalDiscountPrice || 0;
 
   return (
-    <div className="p-5">
-      <Typography variant="h5" gutterBottom>
-        Tóm tắt đơn hàng
-      </Typography>
+    <Box p={3} maxWidth="1200px" mx="auto">
+      {/* Tiêu đề và nút quay lại */}
+      <Box display="flex" alignItems="center" mb={3}>
+        <IconButton onClick={handleBack} sx={{ mr: 2 }}>
+          <ArrowBackIcon />
+        </IconButton>
+        <Typography variant="h5">
+          Tóm tắt đơn hàng (Trạng thái: {order.status})
+        </Typography>
+      </Box>
 
-      {/* Hiển thị địa chỉ giao hàng */}
-      <div className="border rounded-xl shadow-2xl mb-5">
-        <Typography variant="h6" className="p-4">
+      {/* Địa chỉ giao hàng */}
+      <Box border={1} borderRadius={4} boxShadow={3} mb={4} p={3} bgcolor="white">
+        <Typography variant="h6" mb={2}>
           Địa chỉ giao hàng
         </Typography>
         {shippingAddress ? (
           <AddressCard
             address={shippingAddress}
-            isSelected={true} // Địa chỉ đã được chọn
-            onSelect={() => {}} // Không cần chọn lại
+            isSelected={true}
+            onSelect={() => {}}
           />
         ) : (
-          <Typography className="p-4">
-            Chưa có địa chỉ giao hàng được chọn.
-          </Typography>
+          <Typography>Chưa có địa chỉ giao hàng được chọn.</Typography>
         )}
-      </div>
+      </Box>
 
-      {/* Hiển thị danh sách sản phẩm trong đơn hàng */}
-      <div className="border rounded-xl shadow-2xl mb-5">
-        <Typography variant="h6" className="p-4">
+      {/* Danh sách sản phẩm */}
+      <Box border={1} borderRadius={4} boxShadow={3} mb={4} p={3} bgcolor="white">
+        <Typography variant="h6" mb={2}>
           Sản phẩm trong đơn hàng
         </Typography>
         {orderItems.length === 0 ? (
-          <Typography className="p-4">
-            Không có sản phẩm trong đơn hàng.
-          </Typography>
+          <Typography>Không có sản phẩm trong đơn hàng.</Typography>
         ) : (
           orderItems.map((item, index) => (
             <Box
               key={index}
               display="flex"
               alignItems="center"
-              className="p-4 border-b"
+              borderBottom={index < orderItems.length - 1 ? "1px solid #e0e0e0" : "none"}
+              py={2}
             >
               <img
                 src={item.imageURL || "https://via.placeholder.com/100"}
                 alt={item.product?.title}
-                className="w-20 h-20 object-cover mr-4"
+                style={{ width: 80, height: 80, objectFit: "cover", marginRight: 16 }}
               />
-              <Box flex="1">
+              <Box flex={1}>
                 <Typography variant="body1">{item.product?.title}</Typography>
                 <Typography variant="body2" color="textSecondary">
                   Số lượng: {item.quantity}
@@ -219,29 +255,31 @@ const OrderSummary = () => {
             </Box>
           ))
         )}
-      </div>
+      </Box>
 
-      {/* Hiển thị tổng giá */}
-      <div className="border rounded-xl shadow-2xl mb-5 p-4">
-        <Typography variant="h6">Tổng cộng</Typography>
-        <Box display="flex" justifyContent="space-between" mt={2}>
+      {/* Tổng giá */}
+      <Box border={1} borderRadius={4} boxShadow={3} mb={4} p={3} bgcolor="white">
+        <Typography variant="h6" mb={2}>
+          Tổng cộng
+        </Typography>
+        <Box display="flex" justifyContent="space-between" mb={1}>
           <Typography>Tổng giá sản phẩm:</Typography>
           <Typography>{totalPrice.toLocaleString()} VNĐ</Typography>
         </Box>
-        <Box display="flex" justifyContent="space-between" mt={1}>
+        <Box display="flex" justifyContent="space-between" mb={1}>
           <Typography>Giảm giá:</Typography>
           <Typography>{totalDiscountPrice.toLocaleString()} VNĐ</Typography>
         </Box>
-        <Box display="flex" justifyContent="space-between" mt={1}>
+        <Box display="flex" justifyContent="space-between">
           <Typography variant="h6">Tổng thanh toán:</Typography>
           <Typography variant="h6">
             {(totalPrice - totalDiscountPrice).toLocaleString()} VNĐ
           </Typography>
         </Box>
-      </div>
+      </Box>
 
-      {/* Chọn phương thức thanh toán */}
-      <div className="border rounded-xl shadow-2xl p-4">
+      {/* Phương thức thanh toán */}
+      <Box border={1} borderRadius={4} boxShadow={3} p={3} bgcolor="white" mb={4}>
         <FormControl component="fieldset">
           <FormLabel component="legend">Phương thức thanh toán</FormLabel>
           <RadioGroup
@@ -257,35 +295,47 @@ const OrderSummary = () => {
             <FormControlLabel
               value="VNPAY"
               control={<Radio />}
-              label="Thanh toán qua VNPay"
+              label={
+                <Box display="flex" alignItems="center">
+                  <img
+                    src="https://vnpay.vn/assets/images/logo-icon/logo-primary.svg"
+                    alt="VNPay"
+                    style={{ width: 24, height: 24, marginRight: 8 }}
+                  />
+                  Thanh toán qua VNPay
+                </Box>
+              }
             />
           </RadioGroup>
         </FormControl>
-      </div>
+      </Box>
 
-      {/* Nút xác nhận đơn hàng */}
-      <Box mt={3} display="flex" justifyContent="flex-end">
+      {/* Nút hành động */}
+      <Box display="flex" justifyContent="flex-end" gap={2}>
         <Button
           variant="contained"
-          color="primary"
+          color="error"
           onClick={handleCancelOrder}
-          disabled={orderItems.length === 0 || !shippingAddress}
-          style={{ marginRight: "3px" }}
+          disabled={orderItems.length === 0 || !shippingAddress || isCancelling}
+          startIcon={isCancelling ? <CircularProgress size={20} /> : null}
         >
-          hủy đơn hàng
+          {isCancelling ? "Đang hủy..." : "Hủy đơn hàng"}
         </Button>
         <Button
           variant="contained"
           color="success"
           onClick={handleConfirmOrder}
-          disabled={orderItems.length === 0 || !shippingAddress}
+          disabled={orderItems.length === 0 || !shippingAddress || isConfirming}
+          startIcon={isConfirming ? <CircularProgress size={20} /> : null}
         >
-          Xác nhận đơn hàng
+          {isConfirming ? "Đang xác nhận..." : "Xác nhận đơn hàng"}
         </Button>
       </Box>
+
+      {/* Snackbar thông báo */}
       <Snackbar
         open={snackbar.open}
-        autoHideDuration={6000}
+        autoHideDuration={3000}
         onClose={handleCloseSnackbar}
       >
         <Alert
@@ -296,7 +346,7 @@ const OrderSummary = () => {
           {snackbar.message}
         </Alert>
       </Snackbar>
-    </div>
+    </Box>
   );
 };
 

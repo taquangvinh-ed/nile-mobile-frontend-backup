@@ -55,6 +55,9 @@ import {
   GET_REVIEWS_REQUEST,
   DELETE_REVIEW_REQUEST,
   CREATE_REVIEW_REQUEST,
+  REMOVE_CART_ITEM_FAILURE,
+  REMOVE_CART_ITEM_REQUEST,
+  REMOVE_CART_ITEM_SUCCESS,
 } from "./ActionType";
 
 const initialState = {
@@ -243,10 +246,17 @@ export const authReducer = (state = initialState, action) => {
     case GET_CART_REQUEST:
       return { ...state, cartLoading: true, cartError: null };
     case GET_CART_SUCCESS:
+      const cartWithSelection = {
+        ...action.payload,
+        cartItems: action.payload.cartItems.map((item) => ({
+          ...item,
+          isSelected: false, // Mặc định tất cả đều không được chọn
+        })),
+      };
       return {
         ...state,
         cartLoading: false,
-        cart: action.payload,
+        cart: cartWithSelection,
         cartSummary: calculateCartSummary(action.payload.cartItems),
         cartError: null,
       };
@@ -258,11 +268,12 @@ export const authReducer = (state = initialState, action) => {
       };
 
     case UPDATE_CART_ITEM_SELECTION:
-      const updatedCartItemsSelection = state.cart.cartItems.map((item) =>
-        item.id === action.payload.cartItemId
-          ? { ...item, isSelected: action.payload.isSelected }
-          : item
-      );
+      const updatedCartItemsSelection =
+        state.cart.cartItems.map((item) =>
+          item.id === action.payload.cartItemId
+            ? { ...item, isSelected: action.payload.isSelected }
+            : item
+        ) || [];
       return {
         ...state,
         cart: { ...state.cart, cartItems: updatedCartItemsSelection },
@@ -272,9 +283,12 @@ export const authReducer = (state = initialState, action) => {
     case UPDATE_CART_ITEM_QUANTITY_REQUEST:
       return { ...state, cartLoading: true, cartError: null };
     case UPDATE_CART_ITEM_QUANTITY_SUCCESS:
-      const updatedCartItemsQuantity = state.cart.cartItems.map((item) =>
-        item.id === action.payload.id ? { ...item, ...action.payload } : item
-      );
+      const updatedCartItemsQuantity =
+        state.cart?.cartItems?.map((item) =>
+          item.id === action.payload.id
+            ? { ...item, ...action.payload, isSelected: item.isSelected } // Giữ nguyên isSelected
+            : item
+        ) || [];
       return {
         ...state,
         cartLoading: false,
@@ -352,6 +366,7 @@ export const authReducer = (state = initialState, action) => {
         orderLoading: false,
         order: action.payload,
         cart: null, // Xóa giỏ hàng sau khi tạo order (tùy yêu cầu)
+        cartSummary: { subtotal: 0, totalDiscount: 0, totalItems: 0 },
       };
     case CREATE_ORDER_FAILURE:
       return { ...state, orderLoading: false, orderError: action.payload };
@@ -423,6 +438,23 @@ export const authReducer = (state = initialState, action) => {
     case DELETE_REVIEW_FAILURE:
     case GET_REVIEWS_FAILURE:
       return { ...state, reviewLoading: false, reviewError: action.payload };
+
+    case "UPDATE_PAYMENT_METHOD_REQUEST":
+      return { ...state, orderLoading: true, orderError: null };
+    case "UPDATE_PAYMENT_METHOD_SUCCESS":
+      return {
+        ...state,
+        orderLoading: false,
+        order: action.payload.order,
+        paymentUrl: action.payload.paymentUrl, // Lưu paymentUrl vào state
+        orderError: null,
+      };
+    case "UPDATE_PAYMENT_METHOD_FAILURE":
+      return {
+        ...state,
+        orderLoading: false,
+        orderError: action.payload,
+      };
     default:
       return state;
   }
