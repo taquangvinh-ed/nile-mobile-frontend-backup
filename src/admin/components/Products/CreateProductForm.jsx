@@ -152,7 +152,7 @@ const CreateProductForm = () => {
 
       const response = await fetch("http://localhost:8081/api/admin/product/create-model", {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("token")}` },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("jwt")}` },
         body: JSON.stringify({ ...productData, variations: variationsWithUploadedImages }),
       });
 

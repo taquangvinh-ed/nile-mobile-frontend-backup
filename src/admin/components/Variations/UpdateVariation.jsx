@@ -156,7 +156,7 @@ const UpdateVariation = ({ variationId, currentVariation, onUpdateSuccess }) => 
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
         },
         body: JSON.stringify(updatedVariation),
       });
