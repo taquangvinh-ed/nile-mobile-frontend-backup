@@ -41,6 +41,10 @@ import {
   LOGIN_REQUEST,
   LOGIN_SUCCESS,
   LOGOUT,
+  PAYMENT_RESET,
+  PAYMENT_VERIFY_FAIL,
+  PAYMENT_VERIFY_REQUEST,
+  PAYMENT_VERIFY_SUCCESS,
   REGISTER_FAILURE,
   REGISTER_REQUEST,
   REGISTER_SUCCESS,
@@ -583,7 +587,7 @@ const createOrderFailure = (error) => ({
   payload: error,
 });
 
-export const createOrder = (userId, shippingAddress) => async (dispatch) => {
+export const createOrder = (userId, shippingAddress, selectedItems) => async (dispatch) => {
   dispatch(createOrderRequest());
   try {
     const token = localStorage.getItem("jwt");
@@ -600,7 +604,7 @@ export const createOrder = (userId, shippingAddress) => async (dispatch) => {
 
     const response = await axios.post(
       `${API_BASE_URL}/api/orders/user/create?userId=${userId}`,
-      shippingAddress,
+      {shippingAddress, selectedItems},
       config
     );
 
@@ -835,3 +839,47 @@ export const getReviewsByVariation = (variationId) => async (dispatch) => {
     return { success: false, error: error.message };
   }
 };
+
+export const verifyPayment = (params) => async (dispatch) => {
+  dispatch({ type: PAYMENT_VERIFY_REQUEST });
+
+  try {
+      const queryString = new URLSearchParams(params).toString();
+      const response = await fetch(`${API_BASE_URL}/api/payment-vnpay/verify?${queryString}`);
+      const data = await response.json();
+
+      if (!response.ok) {
+          throw new Error(data.message || 'Payment verification failed');
+      }
+
+      if (data.code === '00') {
+          dispatch({
+              type: PAYMENT_VERIFY_SUCCESS,
+              payload: {
+                  code: data.code,
+                  message: data.message,
+              },
+          });
+      } else {
+          dispatch({
+              type: PAYMENT_VERIFY_FAIL,
+              payload: {
+                  code: data.code,
+                  message: data.message,
+              },
+          });
+      }
+  } catch (error) {
+      dispatch({
+          type: PAYMENT_VERIFY_FAIL,
+          payload: {
+              code: '99',
+              message: error.message || 'Error verifying payment',
+          },
+      });
+  }
+};
+
+export const resetPayment = () => ({
+  type: PAYMENT_RESET,
+});

@@ -13,6 +13,7 @@ import LoginForm from "../customer/pages/LoginPage/Login";
 import RegisterForm from "../customer/pages/RegisterPage/RegisterForm";
 import UserProfile from "../customer/pages/UserProfilePage/UserProfile";
 import OrderSummary from "../customer/components/Checkout/OrderSummary";
+import CallbackVNPay from "../customer/pages/CallbackVNPAY/CallbackVNPay";
 const CustomerRouters = () => {
   return (
     <div>
@@ -30,6 +31,7 @@ const CustomerRouters = () => {
         <Route path="/login" element={<LoginForm />}></Route>
         <Route path="/register" element={<RegisterForm />}></Route>
         <Route path="/userProfile" element={<UserProfile />}></Route>
+        <Route path="/payment-callback" element={<CallbackVNPay />}></Route>
       </Routes>
       <div>
         <Footer />
