@@ -883,3 +883,30 @@ export const verifyPayment = (params) => async (dispatch) => {
 export const resetPayment = () => ({
   type: PAYMENT_RESET,
 });
+
+const getThirdLevelsBySecondLevelRequest = () => ({ type: GET_THIRD_LEVELS_REQUEST });
+const getThirdLevelsBySecondLevelSuccess = (thirdLevels) => ({
+  type: GET_THIRD_LEVELS_SUCCESS,
+  payload: thirdLevels,
+});
+const getThirdLevelsBySecondFailure = (error) => ({
+  type: GET_THIRD_LEVELS_FAILURE,
+  payload: error,
+});
+
+export const getThirdLevelsBySecondLevel = (secondLevel) => async (dispatch) => {
+  dispatch(getThirdLevelsBySecondLevelRequest()); // Sử dụng action creator mới
+  try {
+    const response = await axios.get(
+      `${API_BASE_URL}/api/product/getThirdLevel?secondLevel=${secondLevel}`
+    );
+    const thirdLevels = response.data;
+    dispatch(getThirdLevelsBySecondLevelSuccess(thirdLevels)); // Sử dụng action creator mới
+    return { payload: { success: true, thirdLevels } };
+  } catch (error) {
+    const errorMessage =
+      error.response?.data?.message || error.message || "Failed to fetch third levels";
+    dispatch(getThirdLevelsBySecondFailure(errorMessage)); // Sử dụng action creator mới
+    return { payload: { success: false, error: errorMessage } };
+  }
+};
