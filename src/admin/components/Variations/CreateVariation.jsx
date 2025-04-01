@@ -1,6 +1,7 @@
 import { Card, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, Snackbar, Alert, RadioGroup, FormControlLabel, Radio, Typography } from "@mui/material";
 import React, { useState } from "react";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import AddIcon from '@mui/icons-material/Add';
 
 const CreateVariation = ({ productId, onCreateSuccess }) => {
   const [open, setOpen] = useState(false);
@@ -195,7 +196,8 @@ const CreateVariation = ({ productId, onCreateSuccess }) => {
         color="primary"
         onClick={() => setOpen(true)}
       >
-        Add New Variation
+        <AddIcon sx={{marginRight: "5px"}}/>
+        Add New
       </Button>
 
       <Dialog

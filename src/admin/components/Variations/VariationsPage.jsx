@@ -45,7 +45,7 @@ const VariationsPage = () => {
             selectedVariationIndex={selectedVariationIndex}
           />
         </Grid>
-        <Grid className="space-y-3" item md={9}>
+        <Grid item md={9}>
           <Grid item xs={12} md={12}>
             <NameCard
               variations={variations}
@@ -60,7 +60,7 @@ const VariationsPage = () => {
               selectedVariationIndex={selectedVariationIndex}
             />
           </Grid>
-          <Grid item xs={12} md={12}>
+          <Grid item xs={12} md={12} sx={{ marginTop: "10px" }}>
             <SpecificationsCard productId={productId} />
           </Grid>
           <Grid item xs={12} md={12}>
