@@ -13,16 +13,14 @@ import {
   ListItemText,
 } from "@mui/material";
 import Profile from "./Profile";
+import Address from "./Address";
+import ChangePassword from "./ChangePassword";
 
 const UserProfile = () => {
   const menu = [
     {
       name: "Tài khoản của tôi",
       icon: <AccountCircleIcon />,
-    },
-    {
-      name: "Ngân hàng",
-      icon: <AccountBalanceIcon />,
     },
     {
       name: "Địa chỉ",
@@ -32,20 +30,14 @@ const UserProfile = () => {
       name: "Đổi mật khẩu",
       icon: <LockIcon />,
     },
-    {
-      name: "Đơn mua",
-      icon: <ViewListIcon />,
-    },
   ];
 
   const [selectedItem, setSelectedItem] = useState(menu[0].name);
 
   const contentMap = {
     "Tài khoản của tôi": <Profile/>,
-    "Ngân hàng": <div>Nội dung Ngân hàng</div>,
-    "Địa chỉ": <div>Nội dung Địa chỉ</div>,
-    "Đổi mật khẩu": <div>Nội dung Đổi mật khẩu</div>,
-    "Đơn mua": <div>Nội dung Đơn mua</div>,
+    "Địa chỉ": <div><Address/></div>,
+    "Đổi mật khẩu": <div><ChangePassword/></div>,
   };
 
   return (

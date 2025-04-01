@@ -67,10 +67,7 @@ const registerFailure = (error) => ({ type: REGISTER_FAILURE, payload: error });
 export const register = (registerData) => async (dispatch) => {
   dispatch(registerRequest());
   try {
-    const response = await axios.post(
-      `${API_BASE_URL}/auth/signup`,
-      registerData
-    );
+    const response = await axios.post(`${API_BASE_URL}/auth/signup`, registerData);
     const user = response.data;
     console.log("user", user);
     if (user.jwt) {
@@ -144,8 +141,7 @@ export const getUser = () => async (dispatch) => {
     return { payload: { success: true, user } };
   } catch (error) {
     const status = error.response?.status;
-    let errorMessage =
-      error.response?.data?.message || error.message || "Failed to fetch user";
+    let errorMessage = error.response?.data?.message || error.message || "Failed to fetch user";
 
     if (status === 401) {
       errorMessage = "Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.";
@@ -215,9 +211,7 @@ const getSecondLevelsFailure = (error) => ({
 export const getSecondLevels = () => async (dispatch) => {
   dispatch(getSecondLevelsRequest());
   try {
-    const response = await axios.get(
-      `${API_BASE_URL}/api/products/second-levels`
-    );
+    const response = await axios.get(`${API_BASE_URL}/api/products/second-levels`);
     const secondLevels = response.data;
     dispatch(getSecondLevelsSuccess(secondLevels));
     return { payload: { success: true, secondLevels } };
@@ -240,9 +234,7 @@ const getThirdLevelsFailure = (error) => ({
 export const getThirdLevels = () => async (dispatch) => {
   dispatch(getThirdLevelsRequest());
   try {
-    const response = await axios.get(
-      `${API_BASE_URL}/api/products/third-levels`
-    );
+    const response = await axios.get(`${API_BASE_URL}/api/products/third-levels`);
     const thirdLevels = response.data;
     dispatch(getThirdLevelsSuccess(thirdLevels));
     return { payload: { success: true, thirdLevels } };
@@ -265,17 +257,12 @@ const getProductDetailsFailure = (error) => ({
 export const getProductDetails = (productId) => async (dispatch) => {
   dispatch(getProductDetailsRequest());
   try {
-    const response = await axios.get(
-      `${API_BASE_URL}/api/products/id/${productId}`
-    );
+    const response = await axios.get(`${API_BASE_URL}/api/products/id/${productId}`);
     const product = response.data;
     dispatch(getProductDetailsSuccess(product));
     return { payload: { success: true, product } };
   } catch (error) {
-    const errorMessage =
-      error.response?.data?.message ||
-      error.message ||
-      "Failed to fetch product details";
+    const errorMessage = error.response?.data?.message || error.message || "Failed to fetch product details";
     dispatch(getProductDetailsFailure(errorMessage));
     return { payload: { success: false, error: errorMessage } };
   }
@@ -298,11 +285,10 @@ export const addToCart = (variation) => async (dispatch) => {
     if (!token) {
       throw new Error("No JWT token found. Please log in.");
     }
-    
 
     const response = await axios.post(
       `${API_BASE_URL}/api/cart/items`,
-      { variation},
+      { variation },
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -313,8 +299,7 @@ export const addToCart = (variation) => async (dispatch) => {
     dispatch(addToCartSuccess(cartItem));
     return { payload: { success: true, cartItem } };
   } catch (error) {
-    const errorMessage =
-      error.response?.data?.message || error.message || "Failed to add to cart";
+    const errorMessage = error.response?.data?.message || error.message || "Failed to add to cart";
     dispatch(addToCartFailure(errorMessage));
     return { payload: { success: false, error: errorMessage } };
   }
@@ -399,8 +384,7 @@ export const getCart = () => async (dispatch) => {
     dispatch(getCartSuccess(cartWithSelection));
     return { payload: { success: true, cart: cartWithSelection } };
   } catch (error) {
-    const errorMessage =
-      error.response?.data?.message || error.message || "Failed to fetch cart";
+    const errorMessage = error.response?.data?.message || error.message || "Failed to fetch cart";
     dispatch(getCartFailure(errorMessage));
     return { payload: { success: false, error: errorMessage } };
   }
@@ -423,39 +407,35 @@ const updateCartItemQuantityFailure = (error) => ({
   payload: error,
 });
 
-export const updateCartItemQuantity =
-  (cartItemId, quantity) => async (dispatch) => {
-    dispatch(updateCartItemQuantityRequest());
-    try {
-      const token = localStorage.getItem("jwt");
-      if (!token) {
-        throw new Error("No JWT token found. Please log in.");
-      }
-
-      const response = await axios.put(
-        `${API_BASE_URL}/api/cart/items/${cartItemId}`,
-        null, // Không cần body vì quantity nằm trong query param
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          params: {
-            quantity: quantity,
-          },
-        }
-      );
-      const updatedCartItem = response.data;
-      dispatch(updateCartItemQuantitySuccess(updatedCartItem));
-      return { payload: { success: true, cartItem: updatedCartItem } };
-    } catch (error) {
-      const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        "Failed to update cart item quantity";
-      dispatch(updateCartItemQuantityFailure(errorMessage));
-      return { payload: { success: false, error: errorMessage } };
+export const updateCartItemQuantity = (cartItemId, quantity) => async (dispatch) => {
+  dispatch(updateCartItemQuantityRequest());
+  try {
+    const token = localStorage.getItem("jwt");
+    if (!token) {
+      throw new Error("No JWT token found. Please log in.");
     }
-  };
+
+    const response = await axios.put(
+      `${API_BASE_URL}/api/cart/items/${cartItemId}`,
+      null, // Không cần body vì quantity nằm trong query param
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: {
+          quantity: quantity,
+        },
+      }
+    );
+    const updatedCartItem = response.data;
+    dispatch(updateCartItemQuantitySuccess(updatedCartItem));
+    return { payload: { success: true, cartItem: updatedCartItem } };
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || error.message || "Failed to update cart item quantity";
+    dispatch(updateCartItemQuantityFailure(errorMessage));
+    return { payload: { success: false, error: errorMessage } };
+  }
+};
 
 const removeCartItemRequest = () => ({ type: REMOVE_CART_ITEM_REQUEST });
 const removeCartItemSuccess = (cartItemId) => ({
@@ -486,10 +466,7 @@ export const removeCartItem = (cartItemId) => async (dispatch) => {
     dispatch(getCart());
     return { payload: { success: true } };
   } catch (error) {
-    const errorMessage =
-      error.response?.data?.message ||
-      error.message ||
-      "Failed to remove cart item";
+    const errorMessage = error.response?.data?.message || error.message || "Failed to remove cart item";
     dispatch(removeCartItemFailure(errorMessage));
     return { payload: { success: false, error: errorMessage } };
   }
@@ -517,25 +494,13 @@ export const getUserAddresses = () => async (dispatch) => {
 
     // Lọc các địa chỉ không hợp lệ (nếu có)
     const validAddresses = addresses.filter(
-      (address) =>
-        address &&
-        address.addressId &&
-        address.lastName &&
-        address.firstName &&
-        address.addressLine &&
-        address.ward &&
-        address.district &&
-        address.province &&
-        address.phoneNumber
+      (address) => address && address.addressId && address.lastName && address.firstName && address.addressLine && address.ward && address.district && address.province && address.phoneNumber
     );
 
     dispatch({ type: GET_USER_ADDRESSES_SUCCESS, payload: validAddresses });
     return { payload: { success: true, addresses: validAddresses } };
   } catch (error) {
-    const errorMessage =
-      error.response?.data?.message ||
-      error.message ||
-      "Failed to fetch addresses";
+    const errorMessage = error.response?.data?.message || error.message || "Failed to fetch addresses";
     dispatch({ type: GET_USER_ADDRESSES_FAILURE, payload: errorMessage });
     return { payload: { success: false, error: errorMessage } };
   }
@@ -549,13 +514,9 @@ export const updateAddress = (addressData) => async (dispatch) => {
       throw new Error("No JWT token found. Please log in.");
     }
 
-    const response = await axios.post(
-      `${API_BASE_URL}/api/user/addresses`,
-      addressData,
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
+    const response = await axios.post(`${API_BASE_URL}/api/user/addresses`, addressData, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
     const newAddress = response.data;
     dispatch({ type: UPDATE_ADDRESS_SUCCESS, payload: newAddress });
@@ -568,10 +529,7 @@ export const updateAddress = (addressData) => async (dispatch) => {
 
     return { payload: { success: true, address: newAddress } };
   } catch (error) {
-    const errorMessage =
-      error.response?.data?.message ||
-      error.message ||
-      "Failed to update address";
+    const errorMessage = error.response?.data?.message || error.message || "Failed to update address";
     dispatch({ type: UPDATE_ADDRESS_FAILURE, payload: errorMessage });
     return { payload: { success: false, error: errorMessage } };
   }
@@ -602,20 +560,13 @@ export const createOrder = (userId, shippingAddress, selectedItems) => async (di
       },
     };
 
-    const response = await axios.post(
-      `${API_BASE_URL}/api/orders/user/create?userId=${userId}`,
-      {shippingAddress, selectedItems},
-      config
-    );
+    const response = await axios.post(`${API_BASE_URL}/api/orders/user/create?userId=${userId}`, { shippingAddress, selectedItems }, config);
 
     const order = response.data;
     dispatch(createOrderSuccess(order));
     return { payload: { success: true, order } };
   } catch (error) {
-    const errorMessage =
-      error.response?.data?.message ||
-      error.message ||
-      "Failed to create order";
+    const errorMessage = error.response?.data?.message || error.message || "Failed to create order";
     dispatch(createOrderFailure(errorMessage));
     return { payload: { success: false, error: errorMessage } };
   }
@@ -648,20 +599,13 @@ export const updateShippingAddress = (orderId, address) => async (dispatch) => {
       },
     };
 
-    const response = await axios.put(
-      `${API_BASE_URL}/api/orders/${orderId}/update-shipping-address`,
-      address,
-      config
-    );
+    const response = await axios.put(`${API_BASE_URL}/api/orders/${orderId}/update-shipping-address`, address, config);
 
     const order = response.data;
     dispatch(updateShippingAddressSuccess(order));
     return { payload: { success: true, order } };
   } catch (error) {
-    const errorMessage =
-      error.response?.data?.message ||
-      error.message ||
-      "Failed to update shipping address";
+    const errorMessage = error.response?.data?.message || error.message || "Failed to update shipping address";
     dispatch(updateShippingAddressFailure(errorMessage));
     return { payload: { success: false, error: errorMessage } };
   }
@@ -677,64 +621,49 @@ export const getOrderById = (orderId) => async (dispatch) => {
         "Content-Type": "application/json",
       },
     };
-    const response = await axios.get(
-      `${API_BASE_URL}/api/orders/${orderId}`,
-      config
-    );
+    const response = await axios.get(`${API_BASE_URL}/api/orders/${orderId}`, config);
     dispatch({ type: "GET_ORDER_SUCCESS", payload: response.data });
   } catch (error) {
-    const errorMessage =
-      error.response?.data?.message || error.message || "Failed to fetch order";
+    const errorMessage = error.response?.data?.message || error.message || "Failed to fetch order";
     dispatch({ type: "GET_ORDER_FAILURE", payload: errorMessage });
   }
 };
 
-export const updatePaymentMethod =
-  (orderId, paymentMethod) => async (dispatch) => {
-    dispatch({ type: "UPDATE_PAYMENT_METHOD_REQUEST" });
-    try {
-      const token = localStorage.getItem("jwt");
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      };
-      const response = await axios.put(
-        `${API_BASE_URL}/api/orders/${orderId}/update-payment-method`,
-        { paymentMethod },
-        config
-      );
+export const updatePaymentMethod = (orderId, paymentMethod) => async (dispatch) => {
+  dispatch({ type: "UPDATE_PAYMENT_METHOD_REQUEST" });
+  try {
+    const token = localStorage.getItem("jwt");
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    };
+    const response = await axios.put(`${API_BASE_URL}/api/orders/${orderId}/update-payment-method`, { paymentMethod }, config);
 
-      const updatedOrder = response.data;
+    const updatedOrder = response.data;
 
-      // Nếu là VNPAY, gọi API để lấy paymentUrl
-      let paymentUrl = "";
-      if (paymentMethod === "VNPAY") {
-        const vnpayResponse = await axios.get(
-          `${API_BASE_URL}/api/payment-vnpay?orderId=${orderId}`,
-          config
-        );
-        paymentUrl = vnpayResponse.data.paymentUrl;
-      }
-
-      dispatch({
-        type: "UPDATE_PAYMENT_METHOD_SUCCESS",
-        payload: {order: updatedOrder, paymentUrl},
-      });
-      return { payload: { success: true, order: updatedOrder, paymentUrl}};
-    } catch (error) {
-      const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        "Failed to update payment method";
-      dispatch({
-        type: "UPDATE_PAYMENT_METHOD_FAILURE",
-        payload: errorMessage,
-      });
-      return { payload: { success: false, error: errorMessage } };
+    // Nếu là VNPAY, gọi API để lấy paymentUrl
+    let paymentUrl = "";
+    if (paymentMethod === "VNPAY") {
+      const vnpayResponse = await axios.get(`${API_BASE_URL}/api/payment-vnpay?orderId=${orderId}`, config);
+      paymentUrl = vnpayResponse.data.paymentUrl;
     }
-  };
+
+    dispatch({
+      type: "UPDATE_PAYMENT_METHOD_SUCCESS",
+      payload: { order: updatedOrder, paymentUrl },
+    });
+    return { payload: { success: true, order: updatedOrder, paymentUrl } };
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || error.message || "Failed to update payment method";
+    dispatch({
+      type: "UPDATE_PAYMENT_METHOD_FAILURE",
+      payload: errorMessage,
+    });
+    return { payload: { success: false, error: errorMessage } };
+  }
+};
 
 export const deleteOrder = (orderId) => async (dispatch) => {
   dispatch({ type: "DELETE_ORDER_REQUEST" });
@@ -750,10 +679,7 @@ export const deleteOrder = (orderId) => async (dispatch) => {
     dispatch({ type: "DELETE_ORDER_SUCCESS", payload: orderId });
     return { success: true, orderId }; // Trả về kết quả thành công
   } catch (error) {
-    const errorMessage =
-      error.response?.data?.message ||
-      error.message ||
-      "Failed to delete order";
+    const errorMessage = error.response?.data?.message || error.message || "Failed to delete order";
     dispatch({ type: "DELETE_ORDER_FAILURE", payload: errorMessage });
     return { success: false, error: errorMessage }; // Trả về lỗi nếu thất bại
   }
@@ -770,11 +696,7 @@ export const createReview = (reviewData) => async (dispatch, getState) => {
       },
     };
 
-    const { data } = await axios.post(
-      `${API_BASE_URL}/api/reviews`,
-      reviewData,
-      config
-    );
+    const { data } = await axios.post(`${API_BASE_URL}/api/reviews`, reviewData, config);
 
     dispatch({
       type: CREATE_REVIEW_SUCCESS,
@@ -821,9 +743,7 @@ export const getReviewsByVariation = (variationId) => async (dispatch) => {
   try {
     dispatch({ type: GET_REVIEWS_REQUEST });
 
-    const { data } = await axios.get(
-      `${API_BASE_URL}/api/reviews/variation/${variationId}`
-    );
+    const { data } = await axios.get(`${API_BASE_URL}/api/reviews/variation/${variationId}`);
 
     dispatch({
       type: GET_REVIEWS_SUCCESS,
@@ -844,39 +764,39 @@ export const verifyPayment = (params) => async (dispatch) => {
   dispatch({ type: PAYMENT_VERIFY_REQUEST });
 
   try {
-      const queryString = new URLSearchParams(params).toString();
-      const response = await fetch(`${API_BASE_URL}/api/payment-vnpay/verify?${queryString}`);
-      const data = await response.json();
+    const queryString = new URLSearchParams(params).toString();
+    const response = await fetch(`${API_BASE_URL}/api/payment-vnpay/verify?${queryString}`);
+    const data = await response.json();
 
-      if (!response.ok) {
-          throw new Error(data.message || 'Payment verification failed');
-      }
+    if (!response.ok) {
+      throw new Error(data.message || "Payment verification failed");
+    }
 
-      if (data.code === '00') {
-          dispatch({
-              type: PAYMENT_VERIFY_SUCCESS,
-              payload: {
-                  code: data.code,
-                  message: data.message,
-              },
-          });
-      } else {
-          dispatch({
-              type: PAYMENT_VERIFY_FAIL,
-              payload: {
-                  code: data.code,
-                  message: data.message,
-              },
-          });
-      }
-  } catch (error) {
+    if (data.code === "00") {
       dispatch({
-          type: PAYMENT_VERIFY_FAIL,
-          payload: {
-              code: '99',
-              message: error.message || 'Error verifying payment',
-          },
+        type: PAYMENT_VERIFY_SUCCESS,
+        payload: {
+          code: data.code,
+          message: data.message,
+        },
       });
+    } else {
+      dispatch({
+        type: PAYMENT_VERIFY_FAIL,
+        payload: {
+          code: data.code,
+          message: data.message,
+        },
+      });
+    }
+  } catch (error) {
+    dispatch({
+      type: PAYMENT_VERIFY_FAIL,
+      payload: {
+        code: "99",
+        message: error.message || "Error verifying payment",
+      },
+    });
   }
 };
 
@@ -897,16 +817,53 @@ const getThirdLevelsBySecondFailure = (error) => ({
 export const getThirdLevelsBySecondLevel = (secondLevel) => async (dispatch) => {
   dispatch(getThirdLevelsBySecondLevelRequest()); // Sử dụng action creator mới
   try {
-    const response = await axios.get(
-      `${API_BASE_URL}/api/product/getThirdLevel?secondLevel=${secondLevel}`
-    );
+    const response = await axios.get(`${API_BASE_URL}/api/product/getThirdLevel?secondLevel=${secondLevel}`);
     const thirdLevels = response.data;
     dispatch(getThirdLevelsBySecondLevelSuccess(thirdLevels)); // Sử dụng action creator mới
     return { payload: { success: true, thirdLevels } };
   } catch (error) {
-    const errorMessage =
-      error.response?.data?.message || error.message || "Failed to fetch third levels";
+    const errorMessage = error.response?.data?.message || error.message || "Failed to fetch third levels";
     dispatch(getThirdLevelsBySecondFailure(errorMessage)); // Sử dụng action creator mới
     return { payload: { success: false, error: errorMessage } };
+  }
+};
+
+// State/Auth/Action.js
+export const changePassword = (changePasswordData) => async (dispatch) => {
+  try {
+    const jwt = localStorage.getItem("jwt"); // Sửa từ "token" thành "jwt"
+    console.log("JWT:", jwt); // Thêm log để kiểm tra
+    if (!jwt) {
+      throw new Error("No JWT found in localStorage");
+    }
+
+    const response = await axios.post(
+      "http://localhost:8081/api/user/change-password",
+      changePasswordData,
+      {
+        headers: {
+          Authorization: `Bearer ${jwt}`, // Sử dụng jwt
+        },
+      }
+    );
+    dispatch({
+      type: "CHANGE_PASSWORD_SUCCESS",
+      payload: response.data,
+    });
+    return { success: true, message: response.data };
+  } catch (error) {
+    let errorMessage = "An error occurred";
+    if (error.response?.status === 401) {
+      errorMessage = "Your session has expired. Please log in again.";
+      localStorage.removeItem("jwt"); // Xóa jwt không hợp lệ
+      window.location.href = "/login";
+    } else {
+      errorMessage = error.response?.data?.message || "An error occurred";
+    }
+    dispatch({
+      type: "CHANGE_PASSWORD_FAIL",
+      payload: errorMessage,
+    });
+    return { success: false, error: errorMessage };
   }
 };
