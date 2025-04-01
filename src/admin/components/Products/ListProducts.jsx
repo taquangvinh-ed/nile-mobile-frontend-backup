@@ -9,8 +9,7 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { Pagination, IconButton } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-// import EditIcon from "@mui/icons-material/Edit";
-// import DeleteIcon from "@mui/icons-material/Delete";
+import Tooltip from "@mui/material/Tooltip";
 import FilterProducts from "./FilterProducts";
 
 const ListProducts = () => {
@@ -76,7 +75,7 @@ const ListProducts = () => {
       <FilterProducts onFilterChange={handleFilterChange} />
 
       {/* Products Table */}
-      <TableContainer component={Paper} sx={{bgcolor: "#293038", borderRadius: "10px"}}>
+      <TableContainer component={Paper} sx={{ bgcolor: "#293038", borderRadius: "10px" }}>
         <Table sx={{ minWidth: 650, bgcolor: "#293038" }} size="small" aria-label="a dense table">
           <TableHead>
             <TableRow>
@@ -85,7 +84,9 @@ const ListProducts = () => {
               <TableCell sx={{ color: "#94a3b8", width: "15%" }}>Series</TableCell>
               <TableCell sx={{ color: "#94a3b8", width: "10%" }}>Brand</TableCell>
               <TableCell sx={{ color: "#94a3b8", width: "10%" }}>Variant Count</TableCell>
-              <TableCell align="center" sx={{ color: "#94a3b8", width: "15%" }}>Action</TableCell>
+              <TableCell align="center" sx={{ color: "#94a3b8", width: "15%" }}>
+                Action
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -96,49 +97,27 @@ const ListProducts = () => {
                   <TableCell sx={{ color: "#e2e8f0" }}>{product.name}</TableCell>
                   <TableCell sx={{ color: "#e2e8f0" }}>{product.series}</TableCell>
                   <TableCell sx={{ color: "#e2e8f0" }}>{product.brand}</TableCell>
-                  <TableCell align="center" sx={{ color: "#e2e8f0", width: "10%" }}>{product.variationsQuantity}</TableCell>
+                  <TableCell align="center" sx={{ color: "#e2e8f0", width: "10%" }}>
+                    {product.variationsQuantity}
+                  </TableCell>
                   <TableCell sx={{ color: "#e2e8f0" }}>
                     <div style={{ display: "flex", justifyContent: "center", gap: "10px" }}>
-                      <IconButton
-                        sx={{
-                          bgcolor: "#475569",
-                          color: "#ffffff",
-                          borderRadius: "6px",
-                          padding: "6px 12px",
-                          width: "44px",
-                          height: "30px",
-                          "&:hover": { bgcolor: "#64748b" },
-                        }}
-                        onClick={() => handleViewVariations(product.productId)}
-                      >
-                        <VisibilityIcon fontSize="small" />
-                      </IconButton>
-                      {/* <IconButton
-                        sx={{
-                          bgcolor: "#475569",
-                          color: "#ff6c2f",
-                          borderRadius: "6px",
-                          padding: "6px 12px",
-                          width: "44px",
-                          height: "30px",
-                          "&:hover": { bgcolor: "#ff6c2f", color: "white" },
-                        }}
-                      >
-                        <EditIcon fontSize="small" />
-                      </IconButton>
-                      <IconButton
-                        sx={{
-                          bgcolor: "#475569",
-                          color: "#ff6c2f",
-                          borderRadius: "6px",
-                          padding: "6px 12px",
-                          width: "44px",
-                          height: "30px",
-                          "&:hover": { bgcolor: "#ff6c2f", color: "white" },
-                        }}
-                      >
-                        <DeleteIcon fontSize="small" />
-                      </IconButton> */}
+                      <Tooltip title="View Details" arrow>
+                        <IconButton
+                          sx={{
+                            bgcolor: "#475569",
+                            color: "#ffffff",
+                            borderRadius: "6px",
+                            padding: "6px 12px",
+                            width: "44px",
+                            height: "30px",
+                            "&:hover": { bgcolor: "#64748b" },
+                          }}
+                          onClick={() => handleViewVariations(product.productId)}
+                        >
+                          <VisibilityIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
                     </div>
                   </TableCell>
                 </TableRow>

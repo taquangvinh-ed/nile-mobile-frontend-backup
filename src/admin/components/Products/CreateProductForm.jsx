@@ -42,7 +42,7 @@ const CreateProductForm = () => {
     ],
   });
 
-  const [errors, setErrors] = useState({});
+  const [setErrors] = useState({});
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
 
   const handleChange = (e, index = null) => {
@@ -172,50 +172,78 @@ const CreateProductForm = () => {
   };
 
   return (
-    <Card sx={{ bgcolor: "#2f3640", borderRadius: "10px", color: "#dcdde1", padding: "0px 20px" }}>
-      <style>
-        {`
+    <div className="p-5">
+      <Card sx={{ bgcolor: "#282f36", borderRadius: "10px", color: "#dcdde1", padding: "0px 20px" }}>
+        <style>
+          {`
           input:-webkit-autofill,
           input:-webkit-autofill:hover,
           input:-webkit-autofill:focus {
-            -webkit-box-shadow: 0 0 0px 1000px #2f3640 inset !important;
+            -webkit-box-shadow: 0 0 0px 1000px #282f36 inset !important;
             -webkit-text-fill-color: #fff !important;
           }
         `}
-      </style>
-      <CardContent>
-        <Typography variant="h5" gutterBottom sx={{ color: "#ffffff" }}>
-          Create Product
-        </Typography>
-        <form onSubmit={handleSubmit}>
-          <Grid container spacing={2}>
-            {[
-              { label: "Name", name: "name" },
-              { label: "Screen Size", name: "screenSize", type: "number" },
-              { label: "Display Technology", name: "displayTech" },
-              { label: "Resolution", name: "resolution" },
-              { label: "Refresh Rate", name: "refreshRate" },
-              { label: "Front Camera", name: "frontCamera" },
-              { label: "Back Camera", name: "backCamera" },
-              { label: "Chipset", name: "chipset" },
-              { label: "CPU", name: "cpu" },
-              { label: "GPU", name: "gpu" },
-              { label: "Battery Capacity", name: "batteryCapacity", type: "number" },
-              { label: "Charging Port", name: "chargingPort" },
-              { label: "OS", name: "os" },
-              { label: "Product Size", name: "productSize" },
-              { label: "Product Weight", name: "productWeight", type: "number" },
-              { label: "First Level", name: "firstLevel" },
-              { label: "Second Level", name: "secondLevel" },
-              { label: "Third Level", name: "thirdLevel" },
-            ].map((field, index) => (
-              <Grid item xs={12} sm={6} key={index}>
+        </style>
+        <CardContent>
+          <Typography variant="h5" sx={{ marginBottom: "30px", color: "#ffffff" }}>
+            Create Product
+          </Typography>
+          <form onSubmit={handleSubmit}>
+            <Grid container spacing={2}>
+              {[
+                { label: "Name", name: "name" },
+                { label: "Screen Size", name: "screenSize", type: "number" },
+                { label: "Display Technology", name: "displayTech" },
+                { label: "Resolution", name: "resolution" },
+                { label: "Refresh Rate", name: "refreshRate" },
+                { label: "Front Camera", name: "frontCamera" },
+                { label: "Back Camera", name: "backCamera" },
+                { label: "Chipset", name: "chipset" },
+                { label: "CPU", name: "cpu" },
+                { label: "GPU", name: "gpu" },
+                { label: "Battery Capacity", name: "batteryCapacity", type: "number" },
+                { label: "Charging Port", name: "chargingPort" },
+                { label: "OS", name: "os" },
+                { label: "Product Size", name: "productSize" },
+                { label: "Product Weight", name: "productWeight", type: "number" },
+                { label: "First Level", name: "firstLevel" },
+                { label: "Second Level", name: "secondLevel" },
+                { label: "Third Level", name: "thirdLevel" },
+              ].map((field, index) => (
+                <Grid item xs={12} sm={6} key={index}>
+                  <TextField
+                    fullWidth
+                    label={field.label}
+                    name={field.name}
+                    type={field.type || "text"}
+                    value={productData[field.name]}
+                    onChange={handleChange}
+                    required
+                    InputProps={{
+                      sx: { color: "#ffffff" },
+                    }}
+                    InputLabelProps={{
+                      sx: { color: "#dcdde1" },
+                    }}
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        "& fieldset": { borderColor: "#7f8fa6" },
+                        "&:hover fieldset": { borderColor: "#ff6c2f" },
+                        "&.Mui-focused fieldset": { borderColor: "#ff6c2f" },
+                      },
+                    }}
+                  />
+                </Grid>
+              ))}
+
+              <Grid item xs={12}>
                 <TextField
                   fullWidth
-                  label={field.label}
-                  name={field.name}
-                  type={field.type || "text"}
-                  value={productData[field.name]}
+                  multiline
+                  rows={4}
+                  label="Description"
+                  name="description"
+                  value={productData.description}
                   onChange={handleChange}
                   required
                   InputProps={{
@@ -233,188 +261,162 @@ const CreateProductForm = () => {
                   }}
                 />
               </Grid>
-            ))}
 
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                multiline
-                rows={4}
-                label="Description"
-                name="description"
-                value={productData.description}
-                onChange={handleChange}
-                required
-                InputProps={{
-                  sx: { color: "#ffffff" },
-                }}
-                InputLabelProps={{
-                  sx: { color: "#dcdde1" },
-                }}
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    "& fieldset": { borderColor: "#7f8fa6" },
-                    "&:hover fieldset": { borderColor: "#ff6c2f" },
-                    "&.Mui-focused fieldset": { borderColor: "#ff6c2f" },
-                  },
-                }}
-              />
-            </Grid>
-
-            <Grid item xs={12}>
-              <Typography variant="h6" sx={{ color: "#ffffff" }}>
-                Variations
-              </Typography>
-            </Grid>
-            {productData.variations.map((variation, index) => (
-              <Grid container spacing={2} key={index} sx={{ pl: 2 }}>
-                {[
-                  { label: "Color", name: "color" },
-                  { label: "RAM", name: "ram" },
-                  { label: "ROM", name: "rom" },
-                  { label: "Price", name: "price", type: "number" },
-                  { label: "Discount Price", name: "discountPrice", type: "number" },
-                  { label: "Discount Percent", name: "discountPercent", type: "number" },
-                  { label: "Stock Quantity", name: "stockQuantity", type: "number" },
-                ].map((field, fieldIndex) => (
-                  <Grid item xs={12} sm={6} key={fieldIndex}>
-                    <TextField
-                      fullWidth
-                      label={field.label}
-                      name={field.name}
-                      type={field.type || "text"}
-                      value={variation[field.name]}
-                      onChange={(e) => handleChange(e, index)}
-                      required
-                      InputProps={{
-                        sx: { color: "#ffffff" },
-                      }}
-                      InputLabelProps={{
-                        sx: { color: "#dcdde1" },
-                      }}
-                      sx={{
-                        "& .MuiOutlinedInput-root": {
-                          "& fieldset": { borderColor: "#7f8fa6" },
-                          "&:hover fieldset": { borderColor: "#ff6c2f" },
-                          "&.Mui-focused fieldset": { borderColor: "#ff6c2f" },
-                        },
-                      }}
-                    />
-                  </Grid>
-                ))}
-                <Grid item xs={12}>
-                  <RadioGroup row value={variation.uploadMethod} onChange={(e) => handleUploadMethodChange(index, e.target.value)} sx={{ color: "#ffffff" }}>
-                    <FormControlLabel value="url" control={<Radio sx={{ color: "#7f8fa6", "&.Mui-checked": { color: "#ff6c2f" } }} />} label="Enter Image URL" />
-                    <FormControlLabel value="upload" control={<Radio sx={{ color: "#7f8fa6", "&.Mui-checked": { color: "#ff6c2f" } }} />} label="Upload Image" />
-                  </RadioGroup>
-                </Grid>
-                {variation.uploadMethod === "url" && (
+              <Grid item xs={12}>
+                <Typography variant="h6" sx={{ marginTop: "20px", marginBottom: "20px", color: "#ffffff" }}>
+                  Variations
+                </Typography>
+              </Grid>
+              {productData.variations.map((variation, index) => (
+                <Grid container spacing={2} key={index} sx={{ pl: 2 }}>
+                  {[
+                    { label: "Color", name: "color" },
+                    { label: "RAM", name: "ram" },
+                    { label: "ROM", name: "rom" },
+                    { label: "Price", name: "price", type: "number" },
+                    { label: "Discount Price", name: "discountPrice", type: "number" },
+                    { label: "Discount Percent", name: "discountPercent", type: "number" },
+                    { label: "Stock Quantity", name: "stockQuantity", type: "number" },
+                  ].map((field, fieldIndex) => (
+                    <Grid item xs={12} sm={6} key={fieldIndex}>
+                      <TextField
+                        fullWidth
+                        label={field.label}
+                        name={field.name}
+                        type={field.type || "text"}
+                        value={variation[field.name]}
+                        onChange={(e) => handleChange(e, index)}
+                        required
+                        InputProps={{
+                          sx: { color: "#ffffff" },
+                        }}
+                        InputLabelProps={{
+                          sx: { color: "#dcdde1" },
+                        }}
+                        sx={{
+                          "& .MuiOutlinedInput-root": {
+                            "& fieldset": { borderColor: "#7f8fa6" },
+                            "&:hover fieldset": { borderColor: "#ff6c2f" },
+                            "&.Mui-focused fieldset": { borderColor: "#ff6c2f" },
+                          },
+                        }}
+                      />
+                    </Grid>
+                  ))}
                   <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Image URL"
-                      name="imageURL"
-                      value={variation.imageURL}
-                      onChange={(e) => handleChange(e, index)}
-                      InputProps={{
-                        sx: { color: "#ffffff" },
-                      }}
-                      InputLabelProps={{
-                        sx: { color: "#dcdde1" },
-                      }}
-                      sx={{
-                        "& .MuiOutlinedInput-root": {
-                          "& fieldset": { borderColor: "#7f8fa6" },
-                          "&:hover fieldset": { borderColor: "#ff6c2f" },
-                          "&.Mui-focused fieldset": { borderColor: "#ff6c2f" },
-                        },
-                      }}
-                    />
+                    <RadioGroup row value={variation.uploadMethod} onChange={(e) => handleUploadMethodChange(index, e.target.value)} sx={{ color: "#ffffff" }}>
+                      <FormControlLabel value="url" control={<Radio sx={{ color: "#7f8fa6", "&.Mui-checked": { color: "#ff6c2f" } }} />} label="Enter Image URL" />
+                      <FormControlLabel value="upload" control={<Radio sx={{ color: "#7f8fa6", "&.Mui-checked": { color: "#ff6c2f" } }} />} label="Upload Image" />
+                    </RadioGroup>
                   </Grid>
-                )}
-                {variation.uploadMethod === "upload" && (
+                  {variation.uploadMethod === "url" && (
+                    <Grid item xs={12}>
+                      <TextField
+                        fullWidth
+                        label="Image URL"
+                        name="imageURL"
+                        value={variation.imageURL}
+                        onChange={(e) => handleChange(e, index)}
+                        InputProps={{
+                          sx: { color: "#ffffff" },
+                        }}
+                        InputLabelProps={{
+                          sx: { color: "#dcdde1" },
+                        }}
+                        sx={{
+                          "& .MuiOutlinedInput-root": {
+                            "& fieldset": { borderColor: "#7f8fa6" },
+                            "&:hover fieldset": { borderColor: "#ff6c2f" },
+                            "&.Mui-focused fieldset": { borderColor: "#ff6c2f" },
+                          },
+                        }}
+                      />
+                    </Grid>
+                  )}
+                  {variation.uploadMethod === "upload" && (
+                    <Grid item xs={12}>
+                      <Button
+                        variant="contained"
+                        component="label"
+                        startIcon={<CloudUploadIcon />}
+                        sx={{
+                          bgcolor: "#ff6c2f",
+                          color: "#ffffff",
+                          "&:hover": { bgcolor: "#e84118" },
+                        }}
+                      >
+                        Upload Image
+                        <input type="file" accept="image/*" hidden onChange={(e) => handleFileChange(index, e)} />
+                      </Button>
+                      {variation.isUploading ? (
+                        <Typography variant="caption" color="textSecondary">
+                          Uploading...
+                        </Typography>
+                      ) : (
+                        variation.imageFile && (
+                          <Typography variant="caption" color="textSecondary">
+                            {variation.imageFile.name}
+                          </Typography>
+                        )
+                      )}
+                    </Grid>
+                  )}
                   <Grid item xs={12}>
-                    <Button
-                      variant="contained"
-                      component="label"
-                      startIcon={<CloudUploadIcon />}
+                    <IconButton
+                      color="error"
+                      onClick={() => removeVariation(index)}
+                      disabled={productData.variations.length === 1}
                       sx={{
-                        bgcolor: "#ff6c2f",
-                        color: "#ffffff",
-                        "&:hover": { bgcolor: "#e84118" },
+                        color: "#ff6c2f",
+                        "&:hover": { color: "#e84118" },
                       }}
                     >
-                      Upload Image
-                      <input type="file" accept="image/*" hidden onChange={(e) => handleFileChange(index, e)} />
-                    </Button>
-                    {variation.isUploading ? (
-                      <Typography variant="caption" color="textSecondary">
-                        Uploading...
-                      </Typography>
-                    ) : (
-                      variation.imageFile && (
-                        <Typography variant="caption" color="textSecondary">
-                          {variation.imageFile.name}
-                        </Typography>
-                      )
-                    )}
+                      <RemoveCircleOutlineIcon />
+                    </IconButton>
                   </Grid>
-                )}
-                <Grid item xs={12}>
-                  <IconButton
-                    color="error"
-                    onClick={() => removeVariation(index)}
-                    disabled={productData.variations.length === 1}
-                    sx={{
-                      color: "#ff6c2f",
-                      "&:hover": { color: "#e84118" },
-                    }}
-                  >
-                    <RemoveCircleOutlineIcon />
-                  </IconButton>
                 </Grid>
+              ))}
+              <Grid item xs={12}>
+                <Button
+                  variant="outlined"
+                  startIcon={<AddCircleOutlineIcon />}
+                  onClick={addVariation}
+                  sx={{
+                    color: "#ff6c2f",
+                    borderColor: "#ff6c2f",
+                    "&:hover": { bgcolor: "#ff6c2f", color: "#ffffff" },
+                  }}
+                >
+                  Add Variation
+                </Button>
               </Grid>
-            ))}
-            <Grid item xs={12}>
-              <Button
-                variant="outlined"
-                startIcon={<AddCircleOutlineIcon />}
-                onClick={addVariation}
-                sx={{
-                  color: "#ff6c2f",
-                  borderColor: "#ff6c2f",
-                  "&:hover": { bgcolor: "#ff6c2f", color: "#ffffff" },
-                }}
-              >
-                Add Variation
-              </Button>
-            </Grid>
 
-            <Grid item xs={12}>
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                sx={{
-                  bgcolor: "#ff6c2f",
-                  color: "#ffffff",
-                  "&:hover": { bgcolor: "#e84118" },
-                }}
-              >
-                Create Product
-              </Button>
+              <Grid item xs={12}>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  sx={{
+                    bgcolor: "#ff6c2f",
+                    color: "#ffffff",
+                    "&:hover": { bgcolor: "#e84118" },
+                  }}
+                >
+                  Create Product
+                </Button>
+              </Grid>
             </Grid>
-          </Grid>
-        </form>
-      </CardContent>
+          </form>
+        </CardContent>
 
-      {/* Snackbar for notifications */}
-      <Snackbar open={snackbar.open} autoHideDuration={3000} onClose={handleCloseSnackbar} anchorOrigin={{ vertical: "top", horizontal: "center" }}>
-        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: "100%" }}>
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
-    </Card>
+        {/* Snackbar for notifications */}
+        <Snackbar open={snackbar.open} autoHideDuration={3000} onClose={handleCloseSnackbar} anchorOrigin={{ vertical: "top", horizontal: "center" }}>
+          <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: "100%" }}>
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
+      </Card>
+    </div>
   );
 };
 

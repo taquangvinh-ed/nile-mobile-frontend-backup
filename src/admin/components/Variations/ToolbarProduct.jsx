@@ -5,7 +5,7 @@ import UpdateProduct from "./UpdateProduct";
 
 const ToolbarProduct = ({ productId, productData }) => {
   return (
-    <Grid container sx={{ bgcolor: "#282f36", padding: "16px 75px", borderRadius: "15px", justifyContent: "end" }}>
+    <Grid container sx={{ bgcolor: "#282f36", padding: "16px 75px", borderRadius: "0px 0px 15px 15px", justifyContent: "end" }}>
       <Grid item sx={{ marginRight: "20px" }}>
         <UpdateProduct productId={productId} />
       </Grid>

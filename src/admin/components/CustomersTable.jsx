@@ -10,8 +10,10 @@ import {
 } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import DeleteIcon from "@mui/icons-material/Delete";
+import BlockIcon from '@mui/icons-material/Block';
+import Tooltip from "@mui/material/Tooltip";
 import React, { useEffect, useState } from "react";
+
 const CustomersTable = () => {
   const [users, setUsers] = useState([]);
   const [page, setPage] = useState(1);
@@ -50,10 +52,11 @@ const CustomersTable = () => {
         <Table sx={{ minWidth: 650, bgcolor: "#293038" }} size="small" aria-label="a dense table">
           <TableHead>
             <TableRow>
-              <TableCell align="center" sx={{color:"#94a3b8", width: "10%"}}>UID</TableCell>
+              <TableCell align="center" sx={{color:"#94a3b8", width: "5%"}}>UID</TableCell>
               <TableCell sx={{color:"#94a3b8", width: "25%"}}>Name</TableCell>
               <TableCell sx={{color:"#94a3b8", width: "25%"}}>Email</TableCell>
-              <TableCell sx={{color:"#94a3b8", width: "25%"}}>Phone Number</TableCell>
+              <TableCell sx={{color:"#94a3b8", width: "15%"}}>Phone Number</TableCell>
+              <TableCell align="center" sx={{color:"#94a3b8", width: "15%"}}>Created At</TableCell>
               <TableCell align="center" sx={{ color: "#94a3b8", width: "15%" }}>Action</TableCell>
             </TableRow>
           </TableHead>
@@ -65,42 +68,46 @@ const CustomersTable = () => {
                   <TableCell sx={{color:"#e2e8f0"}}>{`${user.lastName} ${user.firstName}`}</TableCell>
                   <TableCell sx={{color:"#e2e8f0"}}>{user.email}</TableCell>
                   <TableCell sx={{color:"#e2e8f0"}}>{user.phoneNumber}</TableCell>
+                  <TableCell align="center" sx={{color:"#e2e8f0"}}>{user.createdDateAt}</TableCell>
                   <TableCell sx={{ color: "#e2e8f0" }}>
                     <div style={{ display: "flex", justifyContent: "center", gap: "10px" }}>
-                      <IconButton
-                        sx={{
-                          bgcolor: "#475569",
-                          color: "#ffffff",
-                          borderRadius: "6px",
-                          padding: "6px 12px",
-                          width: "44px",
-                          height: "30px",
-                          "&:hover": { bgcolor: "#64748b" },
-                        }}
-                        // onClick={() => handleViewVariations(product.productId)}
-                      >
-                        <VisibilityIcon fontSize="small" />
-                      </IconButton>
-                      <IconButton
-                        sx={{
-                          bgcolor: "#475569",
-                          color: "#ff6c2f",
-                          borderRadius: "6px",
-                          padding: "6px 12px",
-                          width: "44px",
-                          height: "30px",
-                          "&:hover": { bgcolor: "#ff6c2f", color: "white" },
-                        }}
-                      >
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
+                      <Tooltip title="View Details" arrow>
+                        <IconButton
+                          sx={{
+                            bgcolor: "#475569",
+                            color: "#ffffff",
+                            borderRadius: "6px",
+                            padding: "6px 12px",
+                            width: "44px",
+                            height: "30px",
+                            "&:hover": { bgcolor: "#64748b" },
+                          }}
+                        >
+                          <VisibilityIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title="Ban Account" arrow>
+                        <IconButton
+                          sx={{
+                            bgcolor: "#475569",
+                            color: "#E44236",
+                            borderRadius: "6px",
+                            padding: "6px 12px",
+                            width: "44px",
+                            height: "30px",
+                            "&:hover": { bgcolor: "#E44236", color: "white" },
+                          }}
+                        >
+                          <BlockIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
                     </div>
                   </TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={5} align="center" sx={{color:"#e2e8f0"}}>
+                <TableCell colSpan={6} align="center" sx={{color:"#94a3b8"}}>
                   No users found
                 </TableCell>
               </TableRow>

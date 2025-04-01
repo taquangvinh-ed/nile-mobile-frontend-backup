@@ -5,12 +5,18 @@ import DashboardIcon from "@mui/icons-material/Dashboard";
 import OrdersIcon from "@mui/icons-material/ShoppingCart";
 import PeopleIcon from "@mui/icons-material/People";
 import ProductsMenu from "./Products/ProductsMenu";
+import StyleIcon from '@mui/icons-material/Style';
 
 const menu = [
   {
     name: "Dashboard",
     path: "/admin",
     icon: <DashboardIcon />,
+  },
+  {
+    name: "Brands",
+    path: "/admin/brands",
+    icon: <StyleIcon />,
   },
   {
     name: "Products",
@@ -61,7 +67,7 @@ const Sidebar = ({ navigate }) => {
       {/* Logo and Store Name */}
       <Box
         sx={{
-          display: "flex",
+          display: "fixed",
           alignItems: "center",
           justifyContent: "center",
           padding: "16px",

@@ -36,7 +36,7 @@ const UpdateProduct = ({ productId }) => {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
         },
       })
         .then((response) => response.json())
@@ -54,7 +54,7 @@ const UpdateProduct = ({ productId }) => {
     const { name, value } = e.target;
 
     // Các trường cần kiểm tra
-    const numericFields = ["screenSize", "batteryCapacity", "productWeight", "productSize"];
+    const numericFields = ["screenSize", "batteryCapacity", "productWeight"];
     if (numericFields.includes(name)) {
       // Loại bỏ ký tự không hợp lệ
       const numericValue = value.replace(/[^0-9.]/g, ""); // Chỉ giữ lại số và dấu chấm
@@ -194,8 +194,8 @@ const UpdateProduct = ({ productId }) => {
                   fullWidth
                   label={field.charAt(0).toUpperCase() + field.slice(1)}
                   name={field}
-                  type={["screenSize", "productWeight", "batteryCapacity", "productSize"].includes(field) ? "number" : "text"} // Chỉ các trường số mới có type="number"
-                  inputProps={["screenSize", "productWeight", "batteryCapacity", "productSize"].includes(field) ? { min: 0 } : {}} // Giới hạn giá trị >= 0
+                  type={["screenSize", "productWeight", "batteryCapacity"].includes(field) ? "number" : "text"} // Chỉ các trường số mới có type="number"
+                  inputProps={["screenSize", "productWeight", "batteryCapacity"].includes(field) ? { min: 0 } : {}} // Giới hạn giá trị >= 0
                   value={formData[field] || ""}
                   onChange={handleInputChange}
                   margin="normal"
@@ -208,7 +208,7 @@ const UpdateProduct = ({ productId }) => {
                   error={!!errors[field]}
                   helperText={
                     errors[field] &&
-                    (["screenSize", "productWeight", "batteryCapacity", "productSize"].includes(field)
+                    (["screenSize", "productWeight", "batteryCapacity"].includes(field)
                       ? "This field must be a positive number."
                       : "This field is required.")
                   }
@@ -223,8 +223,8 @@ const UpdateProduct = ({ productId }) => {
                   fullWidth
                   label={field.charAt(0).toUpperCase() + field.slice(1)}
                   name={field}
-                  type={["screenSize", "productWeight", "batteryCapacity", "productSize"].includes(field) ? "number" : "text"} // Chỉ các trường số mới có type="number"
-                  inputProps={["screenSize", "productWeight", "batteryCapacity", "productSize"].includes(field) ? { min: 0 } : {}} // Giới hạn giá trị >= 0
+                  type={["screenSize", "productWeight", "batteryCapacity"].includes(field) ? "number" : "text"} // Chỉ các trường số mới có type="number"
+                  inputProps={["screenSize", "productWeight", "batteryCapacity"].includes(field) ? { min: 0 } : {}} // Giới hạn giá trị >= 0
                   value={formData[field] || ""}
                   onChange={handleInputChange}
                   margin="normal"

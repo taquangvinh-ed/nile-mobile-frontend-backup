@@ -4,7 +4,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
-const Header = () => {
+const Header = ({ setIsSidebarHidden, isSidebarHidden }) => {
   return (
     <Box
       sx={{
@@ -20,7 +20,10 @@ const Header = () => {
       }}
     >
       {/* Menu Icon */}
-      <IconButton sx={{ color: 'white' }}>
+      <IconButton
+        sx={{ color: 'white' }}
+        onClick={() => setIsSidebarHidden(!isSidebarHidden)}
+      >
         <MenuIcon />
       </IconButton>
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Card, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, Snackbar, Alert, Typography, RadioGroup, FormControlLabel, Radio } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import EditIcon from '@mui/icons-material/Edit';
 
 const UpdateVariation = ({ variationId, currentVariation, onUpdateSuccess }) => {
   const [open, setOpen] = useState(false);
@@ -192,7 +193,8 @@ const UpdateVariation = ({ variationId, currentVariation, onUpdateSuccess }) => 
         `}
       </style>
       <Button sx={{ bgcolor: "#ff6c2f", borderRadius: "10px", "&:hover": { bgcolor: "#e84118" } }} variant="contained" color="primary" onClick={() => setOpen(true)} disabled={!variationId}>
-        EDIT VARIATION
+        <EditIcon sx={{marginRight: "5px"}}/>
+        Edit
       </Button>
 
       <Dialog

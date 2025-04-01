@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Button, Card, Snackbar, Alert, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const DeleteVariation = ({ variationId, onDeleteSuccess }) => {
   const [snackbar, setSnackbar] = useState({
@@ -76,7 +77,8 @@ const DeleteVariation = ({ variationId, onDeleteSuccess }) => {
         variant="contained"
         onClick={handleOpenDialog}
       >
-        Delete Variation
+        <DeleteIcon sx={{marginRight: "5px"}}/>
+        Delete
       </Button>
 
       {/* Dialog xác nhận xóa */}
