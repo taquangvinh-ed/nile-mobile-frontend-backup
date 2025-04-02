@@ -56,7 +56,7 @@ const Admin = () => {
         sx={{
           marginLeft: isSidebarHidden ? '0' : '15%',
           width: isSidebarHidden ? '100%' : '85%',
-          background: '#22282e',
+          background: '#1e1f22',
           height: '100vh',
           overflowY: 'auto',
           padding: '16px',
