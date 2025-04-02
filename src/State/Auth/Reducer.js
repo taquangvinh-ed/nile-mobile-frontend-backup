@@ -481,6 +481,19 @@ export const authReducer = (state = initialState, action) => {
             };
         case PAYMENT_RESET:
             return initialState;
+            case "FILTER_PRODUCTS_SIMPLE_SUCCESS":
+      return {
+        ...state,
+        products: action.payload.products,
+        productsLoading: false,
+        productsError: null,
+      };
+    case "FILTER_PRODUCTS_SIMPLE_FAIL":
+      return {
+        ...state,
+        productsLoading: false,
+        productsError: action.payload,
+      };
     default:
       return state;
   }

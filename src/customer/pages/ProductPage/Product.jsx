@@ -6,15 +6,16 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Dialog, DialogBackdrop, DialogPanel, Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { ChevronDownIcon, FunnelIcon, MinusIcon, PlusIcon, Squares2X2Icon } from "@heroicons/react/20/solid";
-import ProductCard from "../../components/Product/ProductCard";
-import { filters, singleFilters } from "../../components/Product/FilterData";
+import { singleFilters } from "../../components/Product/FilterData"; // Chỉ sử dụng singleFilters
 import { FormControl, FormControlLabel, FormLabel, Radio, RadioGroup } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { getProductsBySecondLevel, getThirdLevelsBySecondLevel, getProductsByThirdLevel } from "../../../State/Auth/Action";
+import { filterProductsSimple } from "../../../State/Auth/Action"; // Sử dụng action mới
+import ProductCardFilter from "../../components/Product/ProductCardFilter";
 
 const sortOptions = [
-  { name: "Giá: Từ thấp đến cao", href: "#", current: false },
-  { name: "Giá: Từ cao xuống thấp", href: "#", current: false },
+  { name: "Giá: Từ thấp đến cao", value: "price_asc", current: false },
+  { name: "Giá: Từ cao xuống thấp", value: "price_desc", current: false },
+  { name: "Mới nhất", value: "newest", current: false },
 ];
 
 function classNames(...classes) {
@@ -27,71 +28,145 @@ export default function Product({ title }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [products, setProducts] = useState([]);
-  const { products: productsBySecondLevel, productsLoading, productsError, thirdLevels, thirdLevelsLoading, thirdLevelsError } = useSelector((state) => state.auth);
+  const { products: filteredProducts, productsLoading, productsError } = useSelector((state) => state.auth);
 
-  const searchParams = new URLSearchParams(location.search);
-  const secondLevel = searchParams.get("secondLevel") || "";
-
-  // Gọi API để lấy sản phẩm và danh mục cấp 3 khi secondLevel thay đổi
-  useEffect(() => {
-    if (secondLevel) {
-      // Lấy sản phẩm theo secondLevel
-      dispatch(getProductsBySecondLevel(secondLevel)).then((response) => {
-        if (response.payload.success) {
-          setProducts(response.payload.products);
-        }
-      });
-
-      // Lấy danh mục cấp 3 theo secondLevel
-      dispatch(getThirdLevelsBySecondLevel(secondLevel));
-    }
-  }, [secondLevel, dispatch]);
-
-  // Xử lý bộ lọc (checkbox)
-  const handleFilter = (value, sectionId) => {
+  // Hàm chuyển đổi giá trị bộ lọc thành tham số API
+  const getFilterParams = () => {
     const searchParams = new URLSearchParams(location.search);
-    let filterValue = searchParams.getAll(sectionId);
+    const price = searchParams.get("price") || "";
+    const batteryCapacity = searchParams.get("battery_capacity") || "";
+    const screenSize = searchParams.get("screen_size") || "";
+    const sort = searchParams.get("sort") || "";
+    const pageNumber = parseInt(searchParams.get("pageNumber")) || 0;
+    const pageSize = parseInt(searchParams.get("pageSize")) || 10;
 
-    // Xử lý logic chọn/bỏ chọn bộ lọc
-    if (filterValue.length > 0 && filterValue[0].split(",").includes(value)) {
-      filterValue = filterValue[0].split(",").filter((item) => item !== value);
-      if (filterValue.length === 0) {
-        searchParams.delete(sectionId);
-      }
-    } else {
-      // Chỉ cho phép chọn một danh mục cấp 3 tại một thời điểm
-      if (sectionId === "thirdLevel") {
-        filterValue = [value]; // Chỉ giữ giá trị mới nhất
-      } else {
-        filterValue.push(value);
+    const filters = {
+      minPrice: null,
+      maxPrice: null,
+      minBattery: null,
+      maxBattery: null,
+      minScreenSize: null,
+      maxScreenSize: null,
+      sort,
+      pageNumber,
+      pageSize,
+    };
+
+    // Chuyển đổi giá trị "Mức giá" thành minPrice và maxPrice
+    if (price) {
+      switch (price) {
+        case "<1":
+          filters.maxPrice = 1000000;
+          break;
+        case "1-3":
+          filters.minPrice = 1000000;
+          filters.maxPrice = 3000000;
+          break;
+        case "3-5":
+          filters.minPrice = 3000000;
+          filters.maxPrice = 5000000;
+          break;
+        case "5-10":
+          filters.minPrice = 5000000;
+          filters.maxPrice = 10000000;
+          break;
+        case "10-15":
+          filters.minPrice = 10000000;
+          filters.maxPrice = 15000000;
+          break;
+        case "15-25":
+          filters.minPrice = 15000000;
+          filters.maxPrice = 25000000;
+          break;
+        case "20-25":
+          filters.minPrice = 20000000;
+          filters.maxPrice = 25000000;
+          break;
+        case "25-30":
+          filters.minPrice = 25000000;
+          filters.maxPrice = 30000000;
+          break;
+        case "30-50":
+          filters.minPrice = 30000000;
+          filters.maxPrice = 50000000;
+          break;
+        case ">85":
+          filters.minPrice = 85000000;
+          break;
+        default:
+          break;
       }
     }
 
-    if (filterValue.length > 0) {
-      searchParams.set(sectionId, filterValue.join(","));
-    }
-
-    const query = searchParams.toString();
-    navigate({ search: `?${query}` });
-
-    // Nếu bộ lọc là thirdLevel, gọi API để lấy sản phẩm theo thirdLevel
-    if (sectionId === "thirdLevel") {
-      if (filterValue.length > 0) {
-        dispatch(getProductsByThirdLevel(filterValue[0])).then((response) => {
-          if (response.payload.success) {
-            setProducts(response.payload.products);
-          }
-        });
-      } else {
-        // Nếu không có bộ lọc thirdLevel, quay lại lấy sản phẩm theo secondLevel
-        dispatch(getProductsBySecondLevel(secondLevel)).then((response) => {
-          if (response.payload.success) {
-            setProducts(response.payload.products);
-          }
-        });
+    // Chuyển đổi giá trị "Dung lượng pin" thành minBattery và maxBattery
+    if (batteryCapacity) {
+      switch (batteryCapacity) {
+        case "1000-4000":
+          filters.minBattery = 1000;
+          filters.maxBattery = 4000;
+          break;
+        case "4000-5000":
+          filters.minBattery = 4000;
+          filters.maxBattery = 5000;
+          break;
+        case "5000-6000":
+          filters.minBattery = 5000;
+          filters.maxBattery = 6000;
+          break;
+        case "6000-7000":
+          filters.minBattery = 6000;
+          filters.maxBattery = 7000;
+          break;
+        default:
+          break;
       }
     }
+
+    // Chuyển đổi giá trị "Kích thước màn hình" thành minScreenSize và maxScreenSize
+    if (screenSize) {
+      switch (screenSize) {
+        case "3-<5":
+          filters.minScreenSize = 3;
+          filters.maxScreenSize = 5;
+          break;
+        case "5-<6":
+          filters.minScreenSize = 5;
+          filters.maxScreenSize = 6;
+          break;
+        case "6-<6.5":
+          filters.minScreenSize = 6;
+          filters.maxScreenSize = 6.5;
+          break;
+        case "6.5-<6.7":
+          filters.minScreenSize = 6.5;
+          filters.maxScreenSize = 6.7;
+          break;
+        case "6.7-<7":
+          filters.minScreenSize = 6.7;
+          filters.maxScreenSize = 7;
+          break;
+        case ">7":
+          filters.minScreenSize = 7;
+          break;
+        default:
+          break;
+      }
+    }
+
+    return filters;
   };
+
+  // Gọi API khi tham số URL thay đổi
+  useEffect(() => {
+    const filters = getFilterParams();
+    dispatch(filterProductsSimple(filters)).then((response) => {
+      if (response.success) {
+        setProducts(response.products);
+      } else {
+        console.error("Filter products failed:", response.error);
+      }
+    });
+  }, [location.search, dispatch]);
 
   // Xử lý bộ lọc radio
   const handleRadioFilter = (e, sectionId) => {
@@ -101,23 +176,24 @@ export default function Product({ title }) {
     navigate({ search: `?${query}` });
   };
 
-  // Tạo bộ lọc động cho danh mục cấp 3
-  const thirdLevelFilter = {
-    id: "thirdLevel",
-    name: "Series",
-    options: thirdLevels.map((level) => ({
-      value: level,
-      label: level,
-      checked: searchParams.get("thirdLevel")?.split(",").includes(level) || false,
-    })),
+  // Xử lý sắp xếp
+  const handleSort = (sortValue) => {
+    const searchParams = new URLSearchParams(location.search);
+    searchParams.set("sort", sortValue);
+    const query = searchParams.toString();
+    navigate({ search: `?${query}` });
   };
 
-  // Kết hợp bộ lọc động với các bộ lọc tĩnh
-  const allFilters = [...filters, thirdLevelFilter];
+  // Chuyển đổi dữ liệu sản phẩm để hiển thị
+  const flattenedProducts = products.flatMap((product) =>
+    product.variations.map((variation) => ({
+      ...product,
+      variation,
+    }))
+  );
 
-  if (productsLoading || thirdLevelsLoading) return <div>Đang tải...</div>;
+  if (productsLoading) return <div>Đang tải...</div>;
   if (productsError) return <div>Lỗi: {productsError}</div>;
-  if (thirdLevelsError) return <div>Lỗi: {thirdLevelsError}</div>;
 
   return (
     <div className="bg-white">
@@ -141,51 +217,6 @@ export default function Product({ title }) {
 
               {/* Filters for mobile */}
               <form className="mt-4 border-t border-gray-200 max-w-[200px] lg:hidden">
-                {allFilters.map((section) => (
-                  <Disclosure key={section.id} as="div" className="border-t border-gray-200 px-4 py-6">
-                    <h3 className="-mx-2 -my-3 flow-root">
-                      <DisclosureButton className="group flex w-full items-center justify-between bg-white px-2 py-3 text-gray-400 hover:text-gray-500">
-                        <span className="font-medium text-gray-900">{section.name}</span>
-                        <span className="ml-6 flex items-center">
-                          <PlusIcon aria-hidden="true" className="size-5 group-data-open:hidden" />
-                          <MinusIcon aria-hidden="true" className="size-5 group-not-data-open:hidden" />
-                        </span>
-                      </DisclosureButton>
-                    </h3>
-                    <DisclosurePanel className="pt-6">
-                      <div className="space-y-6">
-                        {section.options.map((option, optionIdx) => (
-                          <div key={option.value} className="flex gap-3">
-                            <div className="flex h-5 shrink-0 items-center">
-                              <div className="group grid size-4 grid-cols-1">
-                                <input
-                                  onChange={() => handleFilter(option.value, section.id)}
-                                  defaultValue={option.value}
-                                  defaultChecked={option.checked}
-                                  id={`filter-mobile-${section.id}-${optionIdx}`}
-                                  name={`${section.id}[]`}
-                                  type="checkbox"
-                                  className="col-start-1 row-start-1 appearance-none rounded-sm border border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto"
-                                />
-                                <svg
-                                  fill="none"
-                                  viewBox="0 0 14 14"
-                                  className="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-disabled:stroke-gray-950/25"
-                                >
-                                  <path d="M3 8L6 11L11 3.5" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="opacity-0 group-has-checked:opacity-100" />
-                                  <path d="M3 7H11" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="opacity-0 group-has-indeterminate:opacity-100" />
-                                </svg>
-                              </div>
-                            </div>
-                            <label htmlFor={`filter-mobile-${section.id}-${optionIdx}`} className="min-w-0 flex-1 text-gray-500">
-                              {option.label}
-                            </label>
-                          </div>
-                        ))}
-                      </div>
-                    </DisclosurePanel>
-                  </Disclosure>
-                ))}
                 {singleFilters.map((section) => (
                   <Disclosure key={section.id} as="div" className="border-t border-gray-200 px-4 py-6">
                     <h3 className="-mx-2 -my-3 flow-root">
@@ -199,25 +230,18 @@ export default function Product({ title }) {
                     </h3>
                     <DisclosurePanel className="pt-6">
                       <div className="space-y-6">
-                        {section.options.map((option, optionIdx) => (
-                          <div key={option.value} className="flex gap-3">
-                            <div className="flex h-5 shrink-0 items-center">
-                              <div className="group grid size-4 grid-cols-1">
-                                <input
-                                  onChange={(e) => handleRadioFilter(e, section.id)}
-                                  defaultValue={option.value}
-                                  id={`filter-mobile-${section.id}-${optionIdx}`}
-                                  name={`${section.id}[]`}
-                                  type="radio"
-                                  className="col-start-1 row-start-1 appearance-none rounded-sm border border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto"
-                                />
-                              </div>
-                            </div>
-                            <label htmlFor={`filter-mobile-${section.id}-${optionIdx}`} className="min-w-0 flex-1 text-gray-500">
-                              {option.label}
-                            </label>
-                          </div>
-                        ))}
+                        <FormControl>
+                          <RadioGroup
+                            aria-labelledby={`mobile-${section.id}-label`}
+                            name={section.id}
+                            value={new URLSearchParams(location.search).get(section.id) || ""}
+                            onChange={(e) => handleRadioFilter(e, section.id)}
+                          >
+                            {section.options.map((option, optionIdx) => (
+                              <FormControlLabel key={option.value} value={option.value} control={<Radio />} label={option.label} />
+                            ))}
+                          </RadioGroup>
+                        </FormControl>
                       </div>
                     </DisclosurePanel>
                   </Disclosure>
@@ -247,12 +271,12 @@ export default function Product({ title }) {
                   <div className="py-1">
                     {sortOptions.map((option) => (
                       <MenuItem key={option.name}>
-                        <a
-                          href={option.href}
+                        <button
+                          onClick={() => handleSort(option.value)}
                           className={classNames(option.current ? "font-medium text-gray-900" : "text-gray-500", "block px-4 py-2 text-sm data-focus:bg-gray-100 data-focus:outline-hidden")}
                         >
                           {option.name}
-                        </a>
+                        </button>
                       </MenuItem>
                     ))}
                   </div>
@@ -282,56 +306,11 @@ export default function Product({ title }) {
                   <FilterAltIcon className="opacity-50" />
                 </div>
                 <form className="hidden lg:block">
-                  {allFilters.map((section) => (
-                    <Disclosure key={section.id} as="div" className="border-b border-gray-200 py-6">
-                      <h3 className="-my-3 flow-root">
-                        <DisclosureButton className="group flex w-full items-center justify-between bg-white py-3 text-sm text-gray-400 hover:text-gray-500">
-                          <span className="font-medium text-gray-900">{section.name}</span>
-                          <span className="ml-6 flex items-center">
-                            <PlusIcon aria-hidden="true" className="size-5 group-data-open:hidden" />
-                            <MinusIcon aria-hidden="true" className="size-5 group-not-data-open:hidden" />
-                          </span>
-                        </DisclosureButton>
-                      </h3>
-                      <DisclosurePanel className="pt-6">
-                        <div className="space-y-4">
-                          {section.options.map((option, optionIdx) => (
-                            <div key={option.value} className="flex gap-3">
-                              <div className="flex h-5 shrink-0 items-center">
-                                <div className="group grid size-4 grid-cols-1">
-                                  <input
-                                    onChange={() => handleFilter(option.value, section.id)}
-                                    defaultValue={option.value}
-                                    defaultChecked={option.checked}
-                                    id={`filter-${section.id}-${optionIdx}`}
-                                    name={`${section.id}[]`}
-                                    type="checkbox"
-                                    className="col-start-1 row-start-1 appearance-none rounded-sm border border-gray-300 bg-white checked:border-indigo-600 checked:bg-indigo-600 indeterminate:border-indigo-600 indeterminate:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto"
-                                  />
-                                  <svg
-                                    fill="none"
-                                    viewBox="0 0 14 14"
-                                    className="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-disabled:stroke-gray-950/25"
-                                  >
-                                    <path d="M3 8L6 11L11 3.5" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="opacity-0 group-has-checked:opacity-100" />
-                                    <path d="M3 7H11" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="opacity-0 group-has-indeterminate:opacity-100" />
-                                  </svg>
-                                </div>
-                              </div>
-                              <label htmlFor={`filter-${section.id}-${optionIdx}`} className="text-sm text-gray-600">
-                                {option.label}
-                              </label>
-                            </div>
-                          ))}
-                        </div>
-                      </DisclosurePanel>
-                    </Disclosure>
-                  ))}
                   {singleFilters.map((section) => (
                     <Disclosure key={section.id} as="div" className="border-b border-gray-200 py-6">
                       <h3 className="-my-3 flow-root">
                         <DisclosureButton className="group flex w-full items-center justify-between bg-white py-3 text-sm text-gray-400 hover:text-gray-500">
-                          <FormLabel sx={{ color: "black" }} className="font-medium text-gray-900" id="demo-radio-buttons-group-label">
+                          <FormLabel sx={{ color: "black" }} className="font-medium text-gray-900" id={`${section.id}-label`}>
                             {section.name}
                           </FormLabel>
                           <span className="ml-6 flex items-center">
@@ -343,9 +322,14 @@ export default function Product({ title }) {
                       <DisclosurePanel className="pt-6">
                         <div className="space-y-4">
                           <FormControl>
-                            <RadioGroup aria-labelledby="demo-radio-buttons-group-label" defaultValue="female" name="radio-buttons-group">
+                            <RadioGroup
+                              aria-labelledby={`${section.id}-label`}
+                              name={section.id}
+                              value={new URLSearchParams(location.search).get(section.id) || ""}
+                              onChange={(e) => handleRadioFilter(e, section.id)}
+                            >
                               {section.options.map((option, optionIdx) => (
-                                <FormControlLabel onChange={(e) => handleRadioFilter(e, section.id)} value={option.value} control={<Radio />} label={option.label} />
+                                <FormControlLabel key={option.value} value={option.value} control={<Radio />} label={option.label} />
                               ))}
                             </RadioGroup>
                           </FormControl>
@@ -359,7 +343,11 @@ export default function Product({ title }) {
               {/* Product grid */}
               <div className="lg:col-span-4 w-full border border-black">
                 <div className="flex flex-wrap justify-center bg-white py-1">
-                  {products.length > 0 ? products.map((product) => <ProductCard key={product.id} product={product} />) : <p>Không có sản phẩm nào cho {secondLevel}</p>}
+                  {flattenedProducts.length > 0 ? (
+                    flattenedProducts.map((item) => <ProductCardFilter key={`${item.id}-${item.variation.ram}-${item.variation.rom}`} product={item} />)
+                  ) : (
+                    <p>Không có sản phẩm nào phù hợp với bộ lọc</p>
+                  )}
                 </div>
               </div>
             </div>

@@ -10,8 +10,6 @@ export const storages = [
   "1TB",
 ];
 
-export const hasNFC = ["Có", "Không"];
-
 export const filters = [
   {
     id: "phone_catogary",
@@ -60,15 +58,6 @@ export const singleFilters = [
       { value: "6.5-<6.7", label: 'Từ 6.5" đến < 6.7"' },
       { value: "6.7-<7", label: 'Từ 6.7" đến < 7"' },
       { value: ">7", label: 'Từ 7" trở lên' },
-    ],
-  },
-  {
-    id: "chip",
-    name: "Chip xử lí",
-    options: [
-      { value: "Snapdragon", label: "Snapdragon" },
-      { value: "AppleA", label: "Apple A" },
-      { value: "Exynos", label: "Exynos" },
     ],
   },
 ];

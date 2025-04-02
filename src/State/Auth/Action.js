@@ -837,15 +837,11 @@ export const changePassword = (changePasswordData) => async (dispatch) => {
       throw new Error("No JWT found in localStorage");
     }
 
-    const response = await axios.post(
-      "http://localhost:8081/api/user/change-password",
-      changePasswordData,
-      {
-        headers: {
-          Authorization: `Bearer ${jwt}`, // Sử dụng jwt
-        },
-      }
-    );
+    const response = await axios.post("http://localhost:8081/api/user/change-password", changePasswordData, {
+      headers: {
+        Authorization: `Bearer ${jwt}`, // Sử dụng jwt
+      },
+    });
     dispatch({
       type: "CHANGE_PASSWORD_SUCCESS",
       payload: response.data,
@@ -865,5 +861,47 @@ export const changePassword = (changePasswordData) => async (dispatch) => {
       payload: errorMessage,
     });
     return { success: false, error: errorMessage };
+  }
+};
+
+
+
+export const filterProductsSimple = (filters) => async (dispatch) => {
+  try {
+    const params = {
+      minBattery: filters.minBattery,
+      maxBattery: filters.maxBattery,
+      minScreenSize: filters.minScreenSize,
+      maxScreenSize: filters.maxScreenSize,
+      minPrice: filters.minPrice,
+      maxPrice: filters.maxPrice,
+      sort: filters.sort,
+      pageNumber: filters.pageNumber,
+      pageSize: filters.pageSize,
+    };
+
+    console.log("Simple filter params:", params);
+
+    const response = await axios.get(`${API_BASE_URL}/api/products/filter-simple`, {
+      params,
+    });
+
+    const result = {
+      success: true,
+      products: response.data.content || [],
+    };
+
+    dispatch({
+      type: "FILTER_PRODUCTS_SIMPLE_SUCCESS",
+      payload: result,
+    });
+
+    return result;
+  } catch (error) {
+    dispatch({
+      type: "FILTER_PRODUCTS_SIMPLE_FAIL",
+      payload: error.message,
+    });
+    return { success: false, error: error.message };
   }
 };
