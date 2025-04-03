@@ -58,6 +58,9 @@ import {
   UPDATE_CART_ITEM_QUANTITY_REQUEST,
   UPDATE_CART_ITEM_QUANTITY_SUCCESS,
   UPDATE_CART_ITEM_SELECTION,
+  UPDATE_CART_ITEM_SELECTION_FAILURE,
+  UPDATE_CART_ITEM_SELECTION_REQUEST,
+  UPDATE_CART_ITEM_SELECTION_SUCCESS,
 } from "./ActionType";
 
 const registerRequest = () => ({ type: REGISTER_REQUEST });
@@ -305,56 +308,6 @@ export const addToCart = (variation) => async (dispatch) => {
   }
 };
 
-// export const addToCart = (variation) => async (dispatch) => {
-//   dispatch(addToCartRequest());
-//   try {
-//     const token = localStorage.getItem("jwt");
-//     if (!token) {
-//       throw new Error("Không tìm thấy token JWT. Vui lòng đăng nhập.");
-//     }
-
-//     if (!variation || !variation.variationId) {
-//       throw new Error("Biến thể hoặc Variation ID không được để trống");
-//     }
-
-//     // Đổi tên variationId thành id
-//     const requestData = {
-//       variation: {
-//         id: variation.variationId, // Sử dụng variationId làm id
-//         color: variation.color,
-//         discountPercent: variation.discountPercent,
-//         imageURL: variation.imageURL,
-//         name: variation.name,
-//         price: variation.price,
-//         ram: variation.ram,
-//         rom: variation.rom,
-//         stockQuantity: variation.stockQuantity,
-//       },
-//     };
-
-//     const response = await axios.post(
-//       `${API_BASE_URL}/api/cart/items`,
-//       requestData,
-//       {
-//         headers: {
-//           Authorization: `Bearer ${token}`,
-//         },
-//       }
-//     );
-
-//     const cartItem = { ...response.data, isSelected: false };
-//     dispatch(addToCartSuccess(cartItem));
-//     return { payload: { success: true, cartItem } };
-//   } catch (error) {
-//     const errorMessage =
-//       error.response?.data?.message ||
-//       error.message ||
-//       "Không thể thêm vào giỏ hàng";
-//     dispatch(addToCartFailure(errorMessage));
-//     return { payload: { success: false, error: errorMessage } };
-//   }
-// };
-
 const getCartRequest = () => ({ type: GET_CART_REQUEST });
 const getCartSuccess = (cart) => ({ type: GET_CART_SUCCESS, payload: cart });
 const getCartFailure = (error) => ({ type: GET_CART_FAILURE, payload: error });
@@ -373,12 +326,12 @@ export const getCart = () => async (dispatch) => {
       },
     });
     const cartData = response.data;
-    // Thêm thuộc tính isSelected mặc định là false cho từng CartItem
+    console.log("Raw cart data from API:", cartData); // Log dữ liệu thô từ API
     const cartWithSelection = {
       ...cartData,
       cartItems: cartData.cartItems.map((item) => ({
         ...item,
-        isSelected: false,
+        isSelected: item.selected !== null ? item.selected : false,
       })),
     };
     dispatch(getCartSuccess(cartWithSelection));
@@ -390,9 +343,23 @@ export const getCart = () => async (dispatch) => {
   }
 };
 
-export const updateCartItemSelection = (cartItemId, isSelected) => ({
-  type: UPDATE_CART_ITEM_SELECTION,
-  payload: { cartItemId, isSelected },
+// export const updateCartItemSelection = (cartItemId, isSelected) => ({
+//   type: UPDATE_CART_ITEM_SELECTION,
+//   payload: { cartItemId, isSelected },
+// });
+
+export const updateCartItemSelectionRequest = () => ({
+  type: UPDATE_CART_ITEM_SELECTION_REQUEST,
+});
+
+export const updateCartItemSelectionSuccess = (cartItem) => ({
+  type: UPDATE_CART_ITEM_SELECTION_SUCCESS,
+  payload: cartItem,
+});
+
+export const updateCartItemSelectionFailure = (error) => ({
+  type: UPDATE_CART_ITEM_SELECTION_FAILURE,
+  payload: error,
 });
 
 const updateCartItemQuantityRequest = () => ({
@@ -864,8 +831,6 @@ export const changePassword = (changePasswordData) => async (dispatch) => {
   }
 };
 
-
-
 export const filterProductsSimple = (filters) => async (dispatch) => {
   try {
     const params = {
@@ -903,5 +868,74 @@ export const filterProductsSimple = (filters) => async (dispatch) => {
       payload: error.message,
     });
     return { success: false, error: error.message };
+  }
+};
+
+const buyNowRequest = () => ({ type: "BUY_NOW_REQUEST" });
+const buyNowSuccess = (cartItem) => ({
+  type: "BUY_NOW_SUCCESS",
+  payload: cartItem,
+});
+const buyNowFailure = (error) => ({
+  type: "BUY_NOW_FAILURE",
+  payload: error,
+});
+
+export const buyNow = (variationId) => async (dispatch) => {
+  dispatch(buyNowRequest());
+  try {
+    const token = localStorage.getItem("jwt");
+    if (!token) {
+      throw new Error("No JWT token found. Please log in.");
+    }
+
+    const response = await axios.post(
+      `${API_BASE_URL}/api/cart/items/buy-now`,
+      { variationId },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    const cartItem = response.data;
+    dispatch(buyNowSuccess(cartItem));
+    return { payload: { success: true, cartItem } };
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || error.message || "Failed to process buy now";
+    dispatch(buyNowFailure(errorMessage));
+    return { payload: { success: false, error: errorMessage } };
+  }
+};
+
+export const updateCartItemSelection = (cartItemId, selected) => async (dispatch) => {
+  dispatch(updateCartItemSelectionRequest());
+  try {
+    const token = localStorage.getItem("jwt");
+    if (!token) {
+      throw new Error("No JWT token found. Please log in.");
+    }
+
+    const response = await axios.put(
+      `${API_BASE_URL}/api/cart/items/${cartItemId}/select`, // Cập nhật endpoint
+      null,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: {
+          selected: selected,
+        },
+      }
+    );
+    const updatedCartItem = response.data;
+    dispatch(updateCartItemSelectionSuccess(updatedCartItem));
+    // Sau khi cập nhật selected, gọi lại getCart để làm mới toàn bộ giỏ hàng
+    dispatch(getCart());
+    return { payload: { success: true, cartItem: updatedCartItem } };
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || error.message || "Failed to update cart item selection";
+    dispatch(updateCartItemSelectionFailure(errorMessage));
+    return { payload: { success: false, error: errorMessage } };
   }
 };
