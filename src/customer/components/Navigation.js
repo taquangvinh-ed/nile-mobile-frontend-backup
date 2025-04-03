@@ -214,8 +214,9 @@ export default function Navigation() {
 
   const handleSearch = (query = searchValue) => {
     console.log("Tìm kiếm:", query);
-    // Thực hiện tìm kiếm hoàn chỉnh, ví dụ: chuyển hướng hoặc gọi API tìm kiếm
-    // navigate(`/search?q=${query}`);
+    if (query.trim()) {
+      navigate(`/search?q=${encodeURIComponent(query)}`);
+    }
   };
 
   const handleKeyPress = (event) => {

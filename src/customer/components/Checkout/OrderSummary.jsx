@@ -2,28 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import AddressCard from "../AddressCard/AddressCard";
-import {
-  Box,
-  Button,
-  Typography,
-  Radio,
-  RadioGroup,
-  FormControlLabel,
-  FormControl,
-  FormLabel,
-  Alert,
-  Snackbar,
-  CircularProgress,
-  IconButton,
-} from "@mui/material";
+import { Box, Button, Typography, Radio, RadioGroup, FormControlLabel, FormControl, FormLabel, Alert, Snackbar, CircularProgress, IconButton } from "@mui/material";
 import { ArrowBack as ArrowBackIcon } from "@mui/icons-material";
 import axios from "axios";
 import { API_BASE_URL } from "../../../config/apiConfig";
-import {
-  getOrderById,
-  updatePaymentMethod,
-  deleteOrder,
-} from "../../../State/Auth/Action";
+import { getOrderById, updatePaymentMethod, deleteOrder } from "../../../State/Auth/Action";
 
 const OrderSummary = () => {
   const dispatch = useDispatch();
@@ -32,9 +15,7 @@ const OrderSummary = () => {
   const queryParams = new URLSearchParams(search);
   const orderId = queryParams.get("orderId");
 
-  const { order, orderLoading, orderError, paymentUrl } = useSelector(
-    (state) => state.auth
-  );
+  const { order, orderLoading, orderError, paymentUrl } = useSelector((state) => state.auth);
 
   const [paymentMethod, setPaymentMethod] = useState(null);
   const [isConfirming, setIsConfirming] = useState(false);
@@ -198,9 +179,7 @@ const OrderSummary = () => {
         <IconButton onClick={handleBack} sx={{ mr: 2 }}>
           <ArrowBackIcon />
         </IconButton>
-        <Typography variant="h5">
-          Tóm tắt đơn hàng (Trạng thái: {order.status})
-        </Typography>
+        <Typography variant="h5">Tóm tắt đơn hàng (Trạng thái: {order.status})</Typography>
       </Box>
 
       {/* Địa chỉ giao hàng */}
@@ -208,15 +187,7 @@ const OrderSummary = () => {
         <Typography variant="h6" mb={2}>
           Địa chỉ giao hàng
         </Typography>
-        {shippingAddress ? (
-          <AddressCard
-            address={shippingAddress}
-            isSelected={true}
-            onSelect={() => {}}
-          />
-        ) : (
-          <Typography>Chưa có địa chỉ giao hàng được chọn.</Typography>
-        )}
+        {shippingAddress ? <AddressCard address={shippingAddress} isSelected={true} onSelect={() => {}} /> : <Typography>Chưa có địa chỉ giao hàng được chọn.</Typography>}
       </Box>
 
       {/* Danh sách sản phẩm */}
@@ -228,18 +199,8 @@ const OrderSummary = () => {
           <Typography>Không có sản phẩm trong đơn hàng.</Typography>
         ) : (
           orderItems.map((item, index) => (
-            <Box
-              key={index}
-              display="flex"
-              alignItems="center"
-              borderBottom={index < orderItems.length - 1 ? "1px solid #e0e0e0" : "none"}
-              py={2}
-            >
-              <img
-                src={item.imageURL || "https://via.placeholder.com/100"}
-                alt={item.product?.title}
-                style={{ width: 80, height: 80, objectFit: "cover", marginRight: 16 }}
-              />
+            <Box key={index} display="flex" alignItems="center" borderBottom={index < orderItems.length - 1 ? "1px solid #e0e0e0" : "none"} py={2}>
+              <img src={item.imageURL || "https://via.placeholder.com/100"} alt={item.product?.title} style={{ width: 80, height: 80, objectFit: "cover", marginRight: 16 }} />
               <Box flex={1}>
                 <Typography variant="body1">{item.product?.title}</Typography>
                 <Typography variant="body2" color="textSecondary">
@@ -249,9 +210,7 @@ const OrderSummary = () => {
                   Giá: {(item.subtotal || 0).toLocaleString()} VNĐ
                 </Typography>
               </Box>
-              <Typography variant="body1">
-                {(item.subtotal * item.quantity).toLocaleString()} VNĐ
-              </Typography>
+              <Typography variant="body1">{(item.subtotal * item.quantity).toLocaleString()} VNĐ</Typography>
             </Box>
           ))
         )}
@@ -268,13 +227,11 @@ const OrderSummary = () => {
         </Box>
         <Box display="flex" justifyContent="space-between" mb={1}>
           <Typography>Giảm giá:</Typography>
-          <Typography>{totalDiscountPrice.toLocaleString()} VNĐ</Typography>
+          <Typography>{(totalPrice - totalDiscountPrice).toLocaleString()} VNĐ</Typography>
         </Box>
         <Box display="flex" justifyContent="space-between">
           <Typography variant="h6">Tổng thanh toán:</Typography>
-          <Typography variant="h6">
-            {(totalPrice - totalDiscountPrice).toLocaleString()} VNĐ
-          </Typography>
+          <Typography variant="h6">{(totalPrice - (totalPrice - totalDiscountPrice)).toLocaleString()} VNĐ</Typography>
         </Box>
       </Box>
 
@@ -282,26 +239,14 @@ const OrderSummary = () => {
       <Box border={1} borderRadius={4} boxShadow={3} p={3} bgcolor="white" mb={4}>
         <FormControl component="fieldset">
           <FormLabel component="legend">Phương thức thanh toán</FormLabel>
-          <RadioGroup
-            value={paymentMethod}
-            onChange={handlePaymentMethodChange}
-            name="payment-method"
-          >
-            <FormControlLabel
-              value="CASH_ON_DELIVERY"
-              control={<Radio />}
-              label="Thanh toán khi nhận hàng (COD)"
-            />
+          <RadioGroup value={paymentMethod} onChange={handlePaymentMethodChange} name="payment-method">
+            <FormControlLabel value="CASH_ON_DELIVERY" control={<Radio />} label="Thanh toán khi nhận hàng (COD)" />
             <FormControlLabel
               value="VNPAY"
               control={<Radio />}
               label={
                 <Box display="flex" alignItems="center">
-                  <img
-                    src="https://vnpay.vn/assets/images/logo-icon/logo-primary.svg"
-                    alt="VNPay"
-                    style={{ width: 24, height: 24, marginRight: 8 }}
-                  />
+                  <img src="https://vnpay.vn/assets/images/logo-icon/logo-primary.svg" alt="VNPay" style={{ width: 24, height: 24, marginRight: 8 }} />
                   Thanh toán qua VNPay
                 </Box>
               }
@@ -333,16 +278,8 @@ const OrderSummary = () => {
       </Box>
 
       {/* Snackbar thông báo */}
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={3000}
-        onClose={handleCloseSnackbar}
-      >
-        <Alert
-          onClose={handleCloseSnackbar}
-          severity={snackbar.severity}
-          sx={{ width: "100%" }}
-        >
+      <Snackbar open={snackbar.open} autoHideDuration={3000} onClose={handleCloseSnackbar}>
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: "100%" }}>
           {snackbar.message}
         </Alert>
       </Snackbar>

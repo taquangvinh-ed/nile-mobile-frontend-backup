@@ -77,7 +77,7 @@ const Cart = () => {
               <div className="flex justify-between">
                 <span className="px-2">Chiết khấu: </span>
                 <span className="px-1 text-green-700">
-                  {cartSummary.totalDiscount.toLocaleString("vi-VN", {
+                  {(cartSummary.subtotal - cartSummary.totalDiscount).toLocaleString("vi-VN", {
                     style: "currency",
                     currency: "VND",
                   })}
@@ -91,7 +91,7 @@ const Cart = () => {
               <div className="flex justify-between">
                 <span className="px-2">Tổng ({cartSummary.totalItems} sản phẩm): </span>
                 <span className="px-1 text-green-700">
-                  {(cartSummary.subtotal - cartSummary.totalDiscount).toLocaleString("vi-VN", {
+                  {(cartSummary.subtotal - (cartSummary.subtotal - cartSummary.totalDiscount)).toLocaleString("vi-VN", {
                     style: "currency",
                     currency: "VND",
                   })}
