@@ -98,8 +98,8 @@ const initialState = {
   reviewLoading: false,
   reviewError: null,
   loading: false,
-  code: '',
-  message: '',
+  code: "",
+  message: "",
   success: false,
   error: null,
 };
@@ -254,9 +254,10 @@ export const authReducer = (state = initialState, action) => {
         ...action.payload,
         cartItems: action.payload.cartItems.map((item) => ({
           ...item,
-          isSelected: false, // Mặc định tất cả đều không được chọn
+          isSelected: item.selected !== null ? item.selected : false,
         })),
       };
+      console.log("Cart with selection after GET_CART_SUCCESS:", cartWithSelection);
       return {
         ...state,
         cartLoading: false,
@@ -454,34 +455,34 @@ export const authReducer = (state = initialState, action) => {
         orderLoading: false,
         orderError: action.payload,
       };
-      case PAYMENT_VERIFY_REQUEST:
-            return {
-                ...state,
-                loading: true,
-                success: false,
-                error: null,
-            };
-        case PAYMENT_VERIFY_SUCCESS:
-            return {
-                ...state,
-                loading: false,
-                code: action.payload.code,
-                message: action.payload.message,
-                success: true,
-                error: null,
-            };
-        case PAYMENT_VERIFY_FAIL:
-            return {
-                ...state,
-                loading: false,
-                code: action.payload.code,
-                message: action.payload.message,
-                success: false,
-                error: action.payload.message,
-            };
-        case PAYMENT_RESET:
-            return initialState;
-            case "FILTER_PRODUCTS_SIMPLE_SUCCESS":
+    case PAYMENT_VERIFY_REQUEST:
+      return {
+        ...state,
+        loading: true,
+        success: false,
+        error: null,
+      };
+    case PAYMENT_VERIFY_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        code: action.payload.code,
+        message: action.payload.message,
+        success: true,
+        error: null,
+      };
+    case PAYMENT_VERIFY_FAIL:
+      return {
+        ...state,
+        loading: false,
+        code: action.payload.code,
+        message: action.payload.message,
+        success: false,
+        error: action.payload.message,
+      };
+    case PAYMENT_RESET:
+      return initialState;
+    case "FILTER_PRODUCTS_SIMPLE_SUCCESS":
       return {
         ...state,
         products: action.payload.products,
@@ -493,6 +494,35 @@ export const authReducer = (state = initialState, action) => {
         ...state,
         productsLoading: false,
         productsError: action.payload,
+      };
+    case "BUY_NOW_REQUEST":
+      return {
+        ...state,
+        cartLoading: true,
+        cartError: null,
+      };
+    case "BUY_NOW_SUCCESS":
+      const updatedCartItem = { 
+        ...action.payload,
+        isSelected: action.payload.selected !== null ? action.payload.selected : false, // Ánh xạ selected thành isSelected
+      };
+      const updatedCartItems = state.cart.cartItems.some((item) => item.id === updatedCartItem.id)
+        ? state.cart.cartItems.map((item) => (item.id === updatedCartItem.id ? updatedCartItem : item))
+        : [...state.cart.cartItems, updatedCartItem];
+      return {
+        ...state,
+        cart: {
+          ...state.cart,
+          cartItems: updatedCartItems,
+        },
+        cartSummary: calculateCartSummary(updatedCartItems),
+        cartLoading: false,
+      };
+    case "BUY_NOW_FAILURE":
+      return {
+        ...state,
+        cartLoading: false,
+        cartError: action.payload,
       };
     default:
       return state;

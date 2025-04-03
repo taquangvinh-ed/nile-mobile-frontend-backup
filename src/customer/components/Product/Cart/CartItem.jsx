@@ -10,6 +10,9 @@ const CartItem = ({ item }) => {
   const [quantityProduct, setQuantityProduct] = useState(item.quantity || 1);
   const dispatch = useDispatch();
 
+  console.log("CartItem data:", item);
+  console.log("CartItem isSelected:", item.isSelected);
+
   const increaseQuantity = async () => {
     const newQuantity = quantityProduct + 1;
     setQuantityProduct(newQuantity);
