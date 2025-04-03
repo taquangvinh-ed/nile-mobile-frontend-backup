@@ -4,11 +4,7 @@ import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import { useDispatch } from "react-redux";
-import {
-  updateCartItemSelection,
-  updateCartItemQuantity,
-  removeCartItem,
-} from "../../../../State/Auth/Action";
+import { updateCartItemSelection, updateCartItemQuantity, removeCartItem } from "../../../../State/Auth/Action";
 
 const CartItem = ({ item }) => {
   const [quantityProduct, setQuantityProduct] = useState(item.quantity || 1);
@@ -55,28 +51,14 @@ const CartItem = ({ item }) => {
   return (
     <div className="flex flex-wrap justify-start my-3">
       <div className="flex items-center justify-start py-7 px-5 rounded-xl border shadow-2xl h-auto w-auto">
-        <Checkbox
-          checked={item.isSelected || false}
-          onChange={handleCheckboxChange}
-          sx={{ "& .MuiSvgIcon-root": { fontSize: 28 } }}
-        />
+        <Checkbox checked={item.isSelected || false} onChange={handleCheckboxChange} sx={{ "& .MuiSvgIcon-root": { fontSize: 28 } }} />
         <div className="flex flex-wrap justify-center items-center mx-5">
           <div className="flex justify-center items-center">
-            <img
-              className="w-[5rem] h-[5rem] lg:w-[7rem] lg:h-[7rem]"
-              src={
-                item.variation?.imageURL || "https://via.placeholder.com/150"
-              }
-              alt={item.variation?.name || "Product"}
-            />
+            <img className="w-[5rem] h-[5rem] lg:w-[7rem] lg:h-[7rem]" src={item.variation?.imageURL || "https://via.placeholder.com/150"} alt={item.variation?.name || "Product"} />
           </div>
           <div className="space-y-1 flex flex-col">
-            <p className="font-semibold">
-              {item.variation?.name || "Unknown Product"}
-            </p>
-            <p className="font-semibold">
-              {item.variation?.color || "Unknown Color"}
-            </p>
+            <p className="font-semibold">{item.variation?.name || "Unknown Product"}</p>
+            <p className="font-semibold">{item.variation?.color || "Unknown Color"}</p>
             <p className="opacity-70 text-sm">
               Giá gốc:{" "}
               {(item.variation?.price || 0).toLocaleString("vi-VN", {
@@ -86,16 +68,12 @@ const CartItem = ({ item }) => {
             </p>
             <p className="opacity-70 text-sm">
               Giá khuyến mãi:{" "}
-              {(item.discountPrice || 0).toLocaleString("vi-VN", {
+              {(item.variation?.discountPrice || 0).toLocaleString("vi-VN", {
                 style: "currency",
                 currency: "VND",
               })}
             </p>
-            <p className="text-sm text-red-600">
-              {item.variation?.discountPercent
-                ? `-${item.variation.discountPercent}%`
-                : "0%"}
-            </p>
+            <p className="text-sm text-red-600">{item.variation?.discountPercent ? `-${item.variation.discountPercent}%` : "0%"}</p>
           </div>
         </div>
         <div className="lg:flex lg:items-center lg:space-x-10 p-4 justify-center">
@@ -103,19 +81,14 @@ const CartItem = ({ item }) => {
             <IconButton onClick={decreaseQuantity}>
               <RemoveCircleOutlineIcon />
             </IconButton>
-            <span className="py-1 px-7 border rounded-sm">
-              {quantityProduct}
-            </span>
+            <span className="py-1 px-7 border rounded-sm">{quantityProduct}</span>
             <IconButton onClick={increaseQuantity}>
               <AddCircleOutlineIcon />
             </IconButton>
           </div>
           <div className="flex items-end">
             <Button className="flex justify-center">
-              <DeleteOutlinedIcon
-                onClick={handleRemoveItem}
-                sx={{ color: "RGB(215 47 23)" }}
-              />
+              <DeleteOutlinedIcon onClick={handleRemoveItem} sx={{ color: "RGB(215 47 23)" }} />
             </Button>
           </div>
         </div>
