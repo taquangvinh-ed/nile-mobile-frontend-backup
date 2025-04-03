@@ -14,7 +14,7 @@ const Header = ({ setIsSidebarHidden, isSidebarHidden }) => {
         position: 'sticky',
         top: 0,
         zIndex: 1000,
-        backgroundColor: 'rgba(33, 37, 41, 0.7)',
+        backgroundColor: 'RGBA(33,37,41,0.8)',
         padding: '8px 16px',
         borderRadius: '20px',
       }}

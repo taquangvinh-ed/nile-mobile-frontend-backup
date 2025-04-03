@@ -173,13 +173,13 @@ const CreateProductForm = () => {
 
   return (
     <div className="p-5">
-      <Card sx={{ bgcolor: "#282f36", borderRadius: "10px", color: "#dcdde1", padding: "0px 20px" }}>
+      <Card sx={{ bgcolor: "#212529", borderRadius: "10px", color: "#dcdde1", padding: "0px 20px" }}>
         <style>
           {`
           input:-webkit-autofill,
           input:-webkit-autofill:hover,
           input:-webkit-autofill:focus {
-            -webkit-box-shadow: 0 0 0px 1000px #282f36 inset !important;
+            -webkit-box-shadow: 0 0 0px 1000px #212529 inset !important;
             -webkit-text-fill-color: #fff !important;
           }
         `}
@@ -226,10 +226,11 @@ const CreateProductForm = () => {
                       sx: { color: "#dcdde1" },
                     }}
                     sx={{
+                      "& .MuiInputLabel-root.Mui-focused": { color: "#28a745" },
                       "& .MuiOutlinedInput-root": {
                         "& fieldset": { borderColor: "#7f8fa6" },
-                        "&:hover fieldset": { borderColor: "#ff6c2f" },
-                        "&.Mui-focused fieldset": { borderColor: "#ff6c2f" },
+                        "&:hover fieldset": { borderColor: "#28a745" },
+                        "&.Mui-focused fieldset": { borderColor: "#28a745" },
                       },
                     }}
                   />
@@ -253,10 +254,11 @@ const CreateProductForm = () => {
                     sx: { color: "#dcdde1" },
                   }}
                   sx={{
+                    "& .MuiInputLabel-root.Mui-focused": { color: "#28a745" },
                     "& .MuiOutlinedInput-root": {
                       "& fieldset": { borderColor: "#7f8fa6" },
-                      "&:hover fieldset": { borderColor: "#ff6c2f" },
-                      "&.Mui-focused fieldset": { borderColor: "#ff6c2f" },
+                      "&:hover fieldset": { borderColor: "#28a745" },
+                      "&.Mui-focused fieldset": { borderColor: "#28a745" },
                     },
                   }}
                 />
@@ -294,10 +296,11 @@ const CreateProductForm = () => {
                           sx: { color: "#dcdde1" },
                         }}
                         sx={{
+                          "& .MuiInputLabel-root.Mui-focused": { color: "#28a745" },
                           "& .MuiOutlinedInput-root": {
                             "& fieldset": { borderColor: "#7f8fa6" },
-                            "&:hover fieldset": { borderColor: "#ff6c2f" },
-                            "&.Mui-focused fieldset": { borderColor: "#ff6c2f" },
+                            "&:hover fieldset": { borderColor: "#28a745" },
+                            "&.Mui-focused fieldset": { borderColor: "#28a745" },
                           },
                         }}
                       />
@@ -305,8 +308,8 @@ const CreateProductForm = () => {
                   ))}
                   <Grid item xs={12}>
                     <RadioGroup row value={variation.uploadMethod} onChange={(e) => handleUploadMethodChange(index, e.target.value)} sx={{ color: "#ffffff" }}>
-                      <FormControlLabel value="url" control={<Radio sx={{ color: "#7f8fa6", "&.Mui-checked": { color: "#ff6c2f" } }} />} label="Enter Image URL" />
-                      <FormControlLabel value="upload" control={<Radio sx={{ color: "#7f8fa6", "&.Mui-checked": { color: "#ff6c2f" } }} />} label="Upload Image" />
+                      <FormControlLabel value="url" control={<Radio sx={{ color: "#7f8fa6", "&.Mui-checked": { color: "#17a2b8" } }} />} label="Enter Image URL" />
+                      <FormControlLabel value="upload" control={<Radio sx={{ color: "#7f8fa6", "&.Mui-checked": { color: "#17a2b8" } }} />} label="Upload Image" />
                     </RadioGroup>
                   </Grid>
                   {variation.uploadMethod === "url" && (
@@ -324,10 +327,11 @@ const CreateProductForm = () => {
                           sx: { color: "#dcdde1" },
                         }}
                         sx={{
+                          "& .MuiInputLabel-root.Mui-focused": { color: "#28a745" },
                           "& .MuiOutlinedInput-root": {
                             "& fieldset": { borderColor: "#7f8fa6" },
-                            "&:hover fieldset": { borderColor: "#ff6c2f" },
-                            "&.Mui-focused fieldset": { borderColor: "#ff6c2f" },
+                            "&:hover fieldset": { borderColor: "#28a745" },
+                            "&.Mui-focused fieldset": { borderColor: "#28a745" },
                           },
                         }}
                       />
@@ -340,9 +344,9 @@ const CreateProductForm = () => {
                         component="label"
                         startIcon={<CloudUploadIcon />}
                         sx={{
-                          bgcolor: "#ff6c2f",
+                          bgcolor: "#17a2b8",
                           color: "#ffffff",
-                          "&:hover": { bgcolor: "#e84118" },
+                          "&:hover": { bgcolor: "#138496" },
                         }}
                       >
                         Upload Image
@@ -367,8 +371,8 @@ const CreateProductForm = () => {
                       onClick={() => removeVariation(index)}
                       disabled={productData.variations.length === 1}
                       sx={{
-                        color: "#ff6c2f",
-                        "&:hover": { color: "#e84118" },
+                        color: "#dc3545",
+                        "&:hover": { color: "#c82333" },
                       }}
                     >
                       <RemoveCircleOutlineIcon />
@@ -382,9 +386,9 @@ const CreateProductForm = () => {
                   startIcon={<AddCircleOutlineIcon />}
                   onClick={addVariation}
                   sx={{
-                    color: "#ff6c2f",
-                    borderColor: "#ff6c2f",
-                    "&:hover": { bgcolor: "#ff6c2f", color: "#ffffff" },
+                    color: "#4CAF50",
+                    borderColor: "#45A049",
+                    "&:hover": { bgcolor: "#45A049", color: "#ffffff" },
                   }}
                 >
                   Add Variation
@@ -397,9 +401,9 @@ const CreateProductForm = () => {
                   variant="contained"
                   color="primary"
                   sx={{
-                    bgcolor: "#ff6c2f",
+                    bgcolor: "#28a745",
                     color: "#ffffff",
-                    "&:hover": { bgcolor: "#e84118" },
+                    "&:hover": { bgcolor: "#218838" },
                   }}
                 >
                   Create Product

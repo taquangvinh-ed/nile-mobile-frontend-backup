@@ -76,10 +76,10 @@ const FilterProducts = ({ onFilterChange }) => {
       container
       alignItems="center"
       sx={{
-        marginBottom: 2,
-        bgcolor: "#293038",
+        bgcolor: "#212529",
         padding: 2,
-        borderRadius: 3,
+        borderBottom: "1px solid #3a4752",
+        borderRadius: "10px 10px 0px 0px",
       }}
     >
       {/* Categories Label */}

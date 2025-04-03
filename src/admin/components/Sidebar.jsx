@@ -58,7 +58,7 @@ const Sidebar = ({ navigate }) => {
         overflow: "auto",
         display: "flex",
         flexDirection: "column",
-        bgcolor: "#262d34",
+        bgcolor: "#212529",
         borderRight: "1px solid black",
         color: "gray",
         height: "100%",
@@ -71,7 +71,7 @@ const Sidebar = ({ navigate }) => {
           alignItems: "center",
           justifyContent: "center",
           padding: "16px",
-          bgcolor: "#262d34",
+          bgcolor: "#212529",
           color: "white"
         }}
       >

@@ -104,7 +104,7 @@ const Orders = () => {
   };
 
   return (
-    <Box sx={{ padding: 3, backgroundColor: "#282f36" }}>
+    <Box sx={{ padding: 2, backgroundColor: "#212529" }}>
       {" "}
       {/* Màu nền tổng thể */}
       <Grid container spacing={3}>

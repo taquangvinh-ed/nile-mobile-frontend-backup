@@ -44,7 +44,7 @@ const Achivement = () => {
   };
 
   return (
-    <Card sx={{ position: "relative", bgcolor: "#282f36", color: "white", borderRadius: 5 }}>
+    <Card sx={{ position: "relative", bgcolor: "#212529", color: "white", borderRadius: 5 }}>
       <CardContent>
         <Typography variant="h6" sx={{ letterSpacing: ".25px" }}>
           Nile Mobile Store

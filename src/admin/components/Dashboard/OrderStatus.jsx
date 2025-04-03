@@ -44,7 +44,7 @@ const OrderStatus = () => {
   };
 
   return (
-    <Card sx={{ bgcolor: "#282f36", color: "white", padding: 2, height: '100%', borderRadius:5}}>
+    <Card sx={{ bgcolor: "#212529", color: "white", padding: 2, height: '100%', borderRadius:5}}>
       <Typography variant="h6" gutterBottom>
         Order Status
       </Typography>

@@ -71,8 +71,8 @@ const BrandsPage = () => {
 
   return (
     <div className="p-5">
-      <TableContainer component={Paper} sx={{ bgcolor: "#1e293b", borderRadius: "15px" }}>
-        <Table sx={{ minWidth: 650, bgcolor: "#293038" }} size="small" aria-label="brands table">
+      <TableContainer component={Paper} sx={{ bgcolor: "#212529", borderRadius: "15px" }}>
+        <Table sx={{ minWidth: 650, bgcolor: "#212529", '& .MuiTableCell-root': { borderBottom: '1px solid #3a4752' }  }} size="small" aria-label="brands table">
           <TableHead>
             <TableRow>
               <TableCell sx={{ color: "#94a3b8", fontWeight: "bold" }}>Logo</TableCell>
@@ -86,7 +86,7 @@ const BrandsPage = () => {
               <TableRow
                 key={index}
                 sx={{
-                  "&:hover": { backgroundColor: "#334155" },
+                  "&:hover": { backgroundColor: "#2c3034" },
                 }}
               >
                 <TableCell>

@@ -30,8 +30,8 @@ const ToolbarVariations = ({ productId, variations, setVariations, selectedVaria
     <Grid
       container
       sx={{
-        bgcolor: "#282f36",
-        padding: "16px 75px",
+        bgcolor: "#212529",
+        padding: "10px 75px",
         borderRadius: "0px 0px 15px 15px",
         justifyContent: "space-between",
       }}

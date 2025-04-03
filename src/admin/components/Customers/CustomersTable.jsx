@@ -46,15 +46,15 @@ const CustomersTable = () => {
 
   return (
     <div className="p-5">
-      <TableContainer component={Paper} sx={{ bgcolor: "#1e293b", borderRadius: "15px" }}>
-        <Table sx={{ minWidth: 650, bgcolor: "#293038" }} size="small" aria-label="a dense table">
+      <TableContainer component={Paper} sx={{ bgcolor: "#212529", borderRadius: "15px" }}>
+        <Table sx={{ minWidth: 650, bgcolor: "#212529", '& .MuiTableCell-root': { borderBottom: '1px solid #3a4752' } }} size="small" aria-label="a dense table">
           <TableHead>
             <TableRow>
               <TableCell align="center" sx={{ color: "#94a3b8", width: "5%" }}>
                 UID
               </TableCell>
-              <TableCell sx={{ color: "#94a3b8", width: "25%" }}>Name</TableCell>
-              <TableCell sx={{ color: "#94a3b8", width: "25%" }}>Email</TableCell>
+              <TableCell sx={{ color: "#94a3b8", width: "20%" }}>Name</TableCell>
+              <TableCell sx={{ color: "#94a3b8", width: "30%" }}>Email</TableCell>
               <TableCell sx={{ color: "#94a3b8", width: "15%" }}>Phone Number</TableCell>
               <TableCell align="center" sx={{ color: "#94a3b8", width: "15%" }}>
                 Created At
@@ -67,7 +67,7 @@ const CustomersTable = () => {
           <TableBody>
             {displayedUsers.length > 0 ? (
               displayedUsers.map((user) => (
-                <TableRow key={user.userId} sx={{ "&:hover": { backgroundColor: "#334155" } }}>
+                <TableRow key={user.userId} sx={{ "&:hover": { backgroundColor: "#2c3034" } }}>
                   <TableCell align="center" sx={{ color: "#e2e8f0" }}>
                     {user.userId}
                   </TableCell>
