@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Card, CardContent, Typography, Box, CircularProgress } from "@mui/material";
+import Person2OutlinedIcon from '@mui/icons-material/Person2Outlined';
+import LocalPhoneOutlinedIcon from '@mui/icons-material/LocalPhoneOutlined';
 
 const Addresses = () => {
   const { userId } = useParams(); // Lấy userId từ URL
@@ -63,10 +65,15 @@ const Addresses = () => {
               key={address.addressId}
               sx={{
                 position: "relative",
-                backgroundColor: "#2F363F", // Nền tối
-                color: "#e2e8f0", // Màu chữ sáng
+                backgroundColor: "#2F363F",
+                color: "#e2e8f0",
                 borderRadius: "10px",
                 boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+                transition: "transform 0.2s, box-shadow 0.2s",
+                "&:hover": {
+                  transform: "scale(1.02)",
+                  boxShadow: "0 6px 12px rgba(0, 0, 0, 0.3)",
+                },
               }}
             >
               {/* Dòng chữ "Default" */}
@@ -76,8 +83,8 @@ const Addresses = () => {
                     position: "absolute",
                     top: 8,
                     right: 8,
-                    backgroundColor: "#4caf50", // Màu xanh lá cho "Default"
-                    color: "#ffffff", // Màu chữ trắng
+                    backgroundColor: "#4caf50",
+                    color: "#ffffff",
                     padding: "2px 8px",
                     borderRadius: "10px",
                     fontSize: "12px",
@@ -89,58 +96,66 @@ const Addresses = () => {
               )}
               <CardContent>
                 <Typography
-                  variant="subtitle1"
+                  variant="body2"
                   sx={{
-                    fontWeight: "bold",
                     marginBottom: 1,
-                    color: "#ffffff", // Màu chữ trắng
+                    color: "#ffffff",
                   }}
                 >
-                  Full Name: {address.lastName} {address.firstName}
+                  {address.addressLine}
                 </Typography>
                 <Typography
                   variant="body2"
                   sx={{
                     marginBottom: 1,
-                    color: "#d1d5db", // Màu chữ xám nhạt
+                    color: "#ffffff",
                   }}
                 >
-                  <strong>Address Detail:</strong> {address.addressLine}
+                  {address.ward}
                 </Typography>
                 <Typography
                   variant="body2"
                   sx={{
                     marginBottom: 1,
-                    color: "#d1d5db",
+                    color: "#ffffff",
                   }}
                 >
-                  <strong>Ward:</strong> {address.ward}
+                  {address.district}
                 </Typography>
                 <Typography
                   variant="body2"
                   sx={{
                     marginBottom: 1,
-                    color: "#d1d5db",
+                    color: "#ffffff",
                   }}
                 >
-                  <strong>District:</strong> {address.district}
+                  {address.province}
                 </Typography>
+                {/* Full Name */}
                 <Typography
                   variant="body2"
                   sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    marginTop: 2,
                     marginBottom: 1,
-                    color: "#d1d5db",
+                    color: "#94a3b8"
                   }}
                 >
-                  <strong>Province:</strong> {address.province}
+                  <Person2OutlinedIcon sx={{marginRight: "5px"}} fontSize="small"/>
+                  {address.lastName} {address.firstName}
                 </Typography>
+                {/* Phone Number */}
                 <Typography
                   variant="body2"
                   sx={{
-                    color: "#d1d5db",
+                    display: "flex",
+                    alignItems: "center",
+                    color: "#94a3b8"
                   }}
                 >
-                  <strong>Phone Number:</strong> {address.phoneNumber}
+                  <LocalPhoneOutlinedIcon sx={{marginRight: "5px"}} fontSize="small"/>
+                  {address.phoneNumber}
                 </Typography>
               </CardContent>
             </Card>
