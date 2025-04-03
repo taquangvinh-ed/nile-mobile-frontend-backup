@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
-import ProductCardFilter from "../../customer/components/Product/ProductCardFilter"; // Đường dẫn đến component của bạn
 import { CircularProgress, Typography, Pagination } from "@mui/material";
+import ProductCardSearch from "./ProductCardSearch";
 
 const SearchPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [products, setProducts] = useState([]);
+  const [variations, setVariations] = useState([]); // Lưu danh sách variations
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
@@ -27,14 +27,28 @@ const SearchPage = () => {
           pageSize: 10,
         },
       });
-  
+
       const { content, totalPages } = response.data;
-      setProducts(content || []);
+
+      // Phẳng hóa danh sách variations từ tất cả sản phẩm
+      const allVariations = content.flatMap(product =>
+        product.variations.map(variation => ({
+          ...variation,
+          product: {
+            id: product.id,
+            name: product.name,
+            screenSize: product.screenSize,
+            batteryCapacity: product.batteryCapacity,
+          },
+        }))
+      );
+
+      setVariations(allVariations || []);
       setTotalPages(totalPages || 1);
     } catch (err) {
       console.error("Error fetching products:", err);
       setError("Không thể tải sản phẩm. Vui lòng thử lại sau.");
-      setProducts([]);
+      setVariations([]);
     } finally {
       setLoading(false);
     }
@@ -44,7 +58,7 @@ const SearchPage = () => {
     if (query) {
       fetchProducts(query, page);
     } else {
-      setProducts([]);
+      setVariations([]);
     }
   }, [query, page]);
 
@@ -75,17 +89,21 @@ const SearchPage = () => {
         </Typography>
       )}
 
-      {/* Hiển thị danh sách sản phẩm */}
-      {!loading && !error && products.length === 0 && (
+      {/* Hiển thị danh sách variations */}
+      {!loading && !error && variations.length === 0 && (
         <Typography variant="body1" className="text-center my-8">
           Không tìm thấy sản phẩm nào phù hợp với từ khóa "{query}".
         </Typography>
       )}
 
-      {!loading && !error && products.length > 0 && (
+      {!loading && !error && variations.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {products.map((product) => (
-            <ProductCardFilter key={product.id} product={product} />
+          {variations.map((variation, index) => (
+            <ProductCardSearch
+              key={`${variation.variationId}-${index}`} // Đảm bảo key duy nhất
+              variation={variation} // Truyền variation
+              product={variation.product} // Truyền thông tin sản phẩm
+            />
           ))}
         </div>
       )}
