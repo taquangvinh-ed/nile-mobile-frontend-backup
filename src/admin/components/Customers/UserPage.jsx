@@ -4,6 +4,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import { useParams } from "react-router-dom";
 import Addresses from "./Addresses";
 import Orders from "./Orders";
+import Cart from "./Cart";
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import PaymentIcon from '@mui/icons-material/Payment';
@@ -57,8 +58,8 @@ const UserPage = () => {
         return <Addresses />;
       case "Orders":
         return <Orders />;
-      case "Wishlist":
-        return <div>Wishlist content goes here...</div>;
+      case "Cart":
+        return <Cart />;
       case "Payment Methods":
         return <div>Payment Methods content goes here...</div>;
       case "Reviews":
