@@ -207,10 +207,10 @@ const OrderSummary = () => {
                   Số lượng: {item.quantity}
                 </Typography>
                 <Typography variant="body2" color="textSecondary">
-                  Giá: {(item.subtotal || 0).toLocaleString()} VNĐ
+                  Giá: {(item.subtotal / item.quantity || 0).toLocaleString()} VNĐ
                 </Typography>
               </Box>
-              <Typography variant="body1">{(item.subtotal * item.quantity).toLocaleString()} VNĐ</Typography>
+              <Typography variant="body1">{item.subtotal.toLocaleString()} VNĐ</Typography>
             </Box>
           ))
         )}
