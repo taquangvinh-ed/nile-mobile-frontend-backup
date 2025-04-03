@@ -6,7 +6,8 @@ import Header from './components/Header';
 import CreateProductForm from './components/Products/CreateProductForm';
 import ListProducts from './components/Products/ListProducts';
 import OrdersTable from './components/OrdersTable';
-import CustomersTable from './components/CustomersTable';
+import CustomersTable from './components/Customers/CustomersTable';
+import UserPage from './components/Customers/UserPage';
 import DashboardMenu from './components/Dashboard/DashboardMenu';
 import BrandsPage from './components/BrandsPage';
 import VariationsPage from './components/Variations/VariationsPage';
@@ -56,7 +57,7 @@ const Admin = () => {
         sx={{
           marginLeft: isSidebarHidden ? '0' : '15%',
           width: isSidebarHidden ? '100%' : '85%',
-          background: '#22282e',
+          background: '#1e1f22',
           height: '100vh',
           overflowY: 'auto',
           padding: '16px',
@@ -75,6 +76,7 @@ const Admin = () => {
           <Route path="/orders" element={<OrdersTable />} />
           <Route path="/customers" element={<CustomersTable />} />
           <Route path="/product/:productId/variations" element={<VariationsPage />} />
+          <Route path="/customers/user/:userId" element={<UserPage />} />
         </Routes>
       </Box>
     </div>

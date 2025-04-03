@@ -1,18 +1,10 @@
-import {
-  Pagination,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-} from "@mui/material";
+import { Pagination, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-import BlockIcon from '@mui/icons-material/Block';
+import BlockIcon from "@mui/icons-material/Block";
 import Tooltip from "@mui/material/Tooltip";
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate from react-router-dom
 
 const CustomersTable = () => {
   const [users, setUsers] = useState([]);
@@ -22,14 +14,20 @@ const CustomersTable = () => {
     setPage(value);
   };
 
+  const navigate = useNavigate(); // Khởi tạo useNavigate
+
+  const handleViewDetails = (userId) => {
+    navigate(`/admin/customers/user/${userId}`); // Điều hướng đến UserPage với userId
+  };
+
   useEffect(() => {
     fetch("http://localhost:8081/api/user/get-all-users", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-        },
-      })
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+      },
+    })
       .then((response) => response.json())
       .then((data) => {
         if (Array.isArray(data)) {
@@ -52,27 +50,38 @@ const CustomersTable = () => {
         <Table sx={{ minWidth: 650, bgcolor: "#293038" }} size="small" aria-label="a dense table">
           <TableHead>
             <TableRow>
-              <TableCell align="center" sx={{color:"#94a3b8", width: "5%"}}>UID</TableCell>
-              <TableCell sx={{color:"#94a3b8", width: "25%"}}>Name</TableCell>
-              <TableCell sx={{color:"#94a3b8", width: "25%"}}>Email</TableCell>
-              <TableCell sx={{color:"#94a3b8", width: "15%"}}>Phone Number</TableCell>
-              <TableCell align="center" sx={{color:"#94a3b8", width: "15%"}}>Created At</TableCell>
-              <TableCell align="center" sx={{ color: "#94a3b8", width: "15%" }}>Action</TableCell>
+              <TableCell align="center" sx={{ color: "#94a3b8", width: "5%" }}>
+                UID
+              </TableCell>
+              <TableCell sx={{ color: "#94a3b8", width: "25%" }}>Name</TableCell>
+              <TableCell sx={{ color: "#94a3b8", width: "25%" }}>Email</TableCell>
+              <TableCell sx={{ color: "#94a3b8", width: "15%" }}>Phone Number</TableCell>
+              <TableCell align="center" sx={{ color: "#94a3b8", width: "15%" }}>
+                Created At
+              </TableCell>
+              <TableCell align="center" sx={{ color: "#94a3b8", width: "15%" }}>
+                Action
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {displayedUsers.length > 0 ? (
               displayedUsers.map((user) => (
                 <TableRow key={user.userId} sx={{ "&:hover": { backgroundColor: "#334155" } }}>
-                  <TableCell align="center" sx={{color:"#e2e8f0"}}>{user.userId}</TableCell>
-                  <TableCell sx={{color:"#e2e8f0"}}>{`${user.lastName} ${user.firstName}`}</TableCell>
-                  <TableCell sx={{color:"#e2e8f0"}}>{user.email}</TableCell>
-                  <TableCell sx={{color:"#e2e8f0"}}>{user.phoneNumber}</TableCell>
-                  <TableCell align="center" sx={{color:"#e2e8f0"}}>{user.createdDateAt}</TableCell>
+                  <TableCell align="center" sx={{ color: "#e2e8f0" }}>
+                    {user.userId}
+                  </TableCell>
+                  <TableCell sx={{ color: "#e2e8f0" }}>{`${user.lastName} ${user.firstName}`}</TableCell>
+                  <TableCell sx={{ color: "#e2e8f0" }}>{user.email}</TableCell>
+                  <TableCell sx={{ color: "#e2e8f0" }}>{user.phoneNumber}</TableCell>
+                  <TableCell align="center" sx={{ color: "#e2e8f0" }}>
+                    {user.createdDateAt}
+                  </TableCell>
                   <TableCell sx={{ color: "#e2e8f0" }}>
                     <div style={{ display: "flex", justifyContent: "center", gap: "10px" }}>
                       <Tooltip title="View Details" arrow>
                         <IconButton
+                          onClick={() => handleViewDetails(user.userId)}
                           sx={{
                             bgcolor: "#475569",
                             color: "#ffffff",
@@ -107,7 +116,7 @@ const CustomersTable = () => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={6} align="center" sx={{color:"#94a3b8"}}>
+                <TableCell colSpan={6} align="center" sx={{ color: "#94a3b8" }}>
                   No users found
                 </TableCell>
               </TableRow>
@@ -115,7 +124,7 @@ const CustomersTable = () => {
           </TableBody>
         </Table>
       </TableContainer>
-      <div className="flex justify-center mt-4" >
+      <div className="flex justify-center mt-4">
         <Pagination
           count={Math.ceil(users.length / rowsPerPage)}
           page={page}
