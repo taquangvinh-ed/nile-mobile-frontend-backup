@@ -6,9 +6,8 @@ const ImageCard = ({ variations, selectedVariationIndex }) => {
   return (
     <Card
       sx={{
-        width: "300px",
-        height: "300px",
-        padding: "16px",
+        width: "275px",
+        height: "275px",
         borderRadius: "15px",
         backgroundColor: "#282f36",
         display: "flex",
@@ -32,7 +31,6 @@ const ImageCard = ({ variations, selectedVariationIndex }) => {
       ) : (
         <div style={{ color: "#e2e8f0", textAlign: "center", fontWeight: "bold" }}>
             <ImageNotSupportedIcon sx={{ fontSize: 250 }} />
-            No Image Available
         </div>
       )}
     </Card>

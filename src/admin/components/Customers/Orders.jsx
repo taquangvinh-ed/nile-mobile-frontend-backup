@@ -159,7 +159,7 @@ const Orders = () => {
                       }}
                     />
                     <Typography variant="body2" sx={{ marginTop: 1, color: "inherit" }}>
-                      {order.orderDetails.length} items
+                      {order.orderDetails.length} {order.orderDetails.length === 1 ? "item" : "items"}
                     </Typography>
                     <Typography variant="h6" sx={{ fontWeight: "bold", marginTop: 1, color: "inherit" }}>
                       {order.totalPrice.toLocaleString("vi-VN", {
@@ -236,7 +236,7 @@ const Orders = () => {
                               {item.variationName}
                             </Typography>
                             <Typography variant="body2" sx={{ color: "#6b7280" }}>
-                              ID: {item.variationId} &nbsp; Qty: {item.quantity}
+                              ID: {item.variationId} &nbsp; Quantity: {item.quantity}
                             </Typography>
                           </Box>
                         </Box>

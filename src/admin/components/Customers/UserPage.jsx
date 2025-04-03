@@ -11,13 +11,15 @@ import PaymentIcon from '@mui/icons-material/Payment';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import SettingsIcon from '@mui/icons-material/Settings';
 import ListAltIcon from '@mui/icons-material/ListAlt';
+import HomeIcon from '@mui/icons-material/Home';
+import General from "./General";
 
 const UserPage = () => {
   const { userId } = useParams();
   const [userName, setUserName] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedContent, setSelectedContent] = useState("Orders"); // State để quản lý nội dung hiển thị
+  const [selectedContent, setSelectedContent] = useState("General");
 
   useEffect(() => {
     fetch(`http://localhost:8081/api/user/${userId}`, {
@@ -54,6 +56,8 @@ const UserPage = () => {
   // Hàm để render nội dung dựa trên nút được chọn
   const renderContent = () => {
     switch (selectedContent) {
+      case "General":
+        return <General />;
       case "Addresses":
         return <Addresses />;
       case "Orders":
@@ -100,6 +104,7 @@ const UserPage = () => {
               }}
             >
               {[
+                { label: "General", value: "General", icon: <HomeIcon /> },
                 { label: "Orders", value: "Orders", icon: <ListAltIcon /> },
                 { label: "Cart", value: "Cart", icon: <ShoppingCartIcon /> },
                 { label: "Payment Methods", value: "Payment Methods", icon: <PaymentIcon /> },
