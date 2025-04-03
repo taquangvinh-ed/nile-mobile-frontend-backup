@@ -29,9 +29,11 @@ const getStatusTextColor = (status) => {
     case "CONFIRMED":
       return "#FB8C00"; // Màu cam
     case "PROCESSING":
-      return "#D32F2F"; // Màu đỏ
+      return "#BB2CD9"; // Màu đỏ
     case "SHIPPED":
+      return "#1976D2"; // Màu xanh dương đậm
     case "DELIVERED":
+      return "#1287A5"; // Màu xanh dương nhạt
     case "COMPLETE":
       return "#388E3C"; // Màu xanh lá
     case "CANCELED":
