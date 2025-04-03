@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Box, Typography, Button, Card, CardContent, Grid, Avatar, Chip, Collapse } from "@mui/material";
+import { Box, Typography, Button, Card, CardContent, Grid, Avatar, Chip, Collapse, Pagination } from "@mui/material"; // Import Pagination
 import { format } from "date-fns";
 
 const getStatusBackgroundColor = (status) => {
@@ -12,7 +12,9 @@ const getStatusBackgroundColor = (status) => {
     case "PROCESSING":
       return "#FFEBEE"; // Màu đỏ nhạt
     case "SHIPPED":
+      return "#E1F5FE"; // Màu xanh dương nhạt
     case "DELIVERED":
+      return "#E8F5E9"; // Màu xanh lá nhạt
     case "COMPLETE":
       return "#E8F5E9"; // Màu xanh lá nhạt
     case "CANCELED":
@@ -31,9 +33,9 @@ const getStatusTextColor = (status) => {
     case "PROCESSING":
       return "#BB2CD9"; // Màu đỏ
     case "SHIPPED":
-      return "#1976D2"; // Màu xanh dương đậm
+      return "#0288D1"; // Màu xanh dương đậm
     case "DELIVERED":
-      return "#1287A5"; // Màu xanh dương nhạt
+      return "#388E3C"; // Màu xanh lá
     case "COMPLETE":
       return "#388E3C"; // Màu xanh lá
     case "CANCELED":
@@ -49,6 +51,8 @@ const Orders = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [expandedOrderId, setExpandedOrderId] = useState(null); // State để quản lý trạng thái mở/đóng
+  const [currentPage, setCurrentPage] = useState(1); // State để quản lý trang hiện tại
+  const ordersPerPage = 5; // Số lượng orders trên mỗi trang
 
   useEffect(() => {
     fetch(`http://localhost:8081/api/admin/orders/user/id/${userId}`, {
@@ -90,10 +94,21 @@ const Orders = () => {
     setExpandedOrderId(expandedOrderId === orderId ? null : orderId);
   };
 
+  // Tính toán các orders hiển thị trên trang hiện tại
+  const indexOfLastOrder = currentPage * ordersPerPage;
+  const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
+  const currentOrders = orders.slice(indexOfFirstOrder, indexOfLastOrder);
+
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+  };
+
   return (
-    <Box sx={{ padding: 3, backgroundColor: "#282f36" }}> {/* Màu nền tổng thể */}
+    <Box sx={{ padding: 3, backgroundColor: "#282f36" }}>
+      {" "}
+      {/* Màu nền tổng thể */}
       <Grid container spacing={3}>
-        {orders.map((order) => (
+        {currentOrders.map((order) => (
           <Grid item xs={12} key={order.orderId}>
             <Card
               sx={{
@@ -214,11 +229,7 @@ const Orders = () => {
                       >
                         {/* Hình ảnh sản phẩm */}
                         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                          <Avatar
-                            src={item.imageURL || "https://via.placeholder.com/50"}
-                            alt={item.variationName}
-                            sx={{ width: 50, height: 50 }}
-                          />
+                          <Avatar src={item.imageURL || "https://via.placeholder.com/50"} alt={item.variationName} sx={{ width: 50, height: 50 }} />
                           {/* Thông tin sản phẩm */}
                           <Box>
                             <Typography variant="body2" sx={{ fontWeight: "bold" }}>
@@ -231,7 +242,7 @@ const Orders = () => {
                         </Box>
                         {/* Giá sản phẩm */}
                         <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-                          {item.subtotal.toLocaleString("vi-VN", {
+                          {item.totalDiscountPrice.toLocaleString("vi-VN", {
                             style: "currency",
                             currency: "VND",
                           })}
@@ -248,6 +259,25 @@ const Orders = () => {
           </Grid>
         ))}
       </Grid>
+      {/* Pagination */}
+      <div className="flex justify-center mt-4">
+        <Pagination
+          count={Math.ceil(orders.length / ordersPerPage)}
+          page={currentPage}
+          onChange={handlePageChange}
+          color="primary"
+          shape="rounded"
+          sx={{
+            "& .MuiPaginationItem-root": {
+              color: "#94a3b8",
+            },
+            "& .Mui-selected": {
+              color: "white",
+              backgroundColor: "#1976d2",
+            },
+          }}
+        />
+      </div>
     </Box>
   );
 };

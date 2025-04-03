@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Box, Typography, Card, CardContent, Grid, Avatar } from "@mui/material";
+import { Box, Typography, Card, CardContent, Grid, Avatar, Pagination } from "@mui/material";
 
 const Cart = () => {
   const { userId } = useParams(); // Lấy userId từ URL
   const [cart, setCart] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1); // State để quản lý trang hiện tại
+  const itemsPerPage = 5; // Số lượng cartItems trên mỗi trang
 
   useEffect(() => {
     fetch(`http://localhost:8081/api/admin/carts/user/id/${userId}`, {
@@ -44,8 +46,17 @@ const Cart = () => {
     return <Typography sx={{ color: "#94a3b8", textAlign: "center" }}>No cart found for this user.</Typography>;
   }
 
+  // Tính toán các cartItems hiển thị trên trang hiện tại
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = cart.cartItems.slice(indexOfFirstItem, indexOfLastItem);
+
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+  };
+
   return (
-    <Box sx={{ padding: 2}}>
+    <Box sx={{ padding: 2 }}>
       <Card
         sx={{
           borderRadius: "10px",
@@ -90,7 +101,7 @@ const Cart = () => {
       </Card>
 
       <Grid container spacing={2}>
-        {cart.cartItems.map((item) => (
+        {currentItems.map((item) => (
           <Grid item xs={12} key={item.id}>
             <Card
               sx={{
@@ -157,6 +168,26 @@ const Cart = () => {
           </Grid>
         ))}
       </Grid>
+
+      {/* Pagination */}
+      <Box sx={{ display: "flex", justifyContent: "center", marginTop: 3 }}>
+        <Pagination
+          count={Math.ceil(cart.cartItems.length / itemsPerPage)}
+          page={currentPage}
+          onChange={handlePageChange}
+          color="primary"
+          shape="rounded"
+          sx={{
+            "& .MuiPaginationItem-root": {
+              color: "#94a3b8",
+            },
+            "& .Mui-selected": {
+              color: "white",
+              backgroundColor: "#1976d2",
+            },
+          }}
+        />
+      </Box>
     </Box>
   );
 };
