@@ -76,7 +76,7 @@ const UserPage = () => {
   };
 
   return (
-    <Grid container spacing={3} sx={{ padding: 3 }}>
+    <Grid container spacing={3} sx={{ padding: 2 }}>
       {/* User Info Section */}
       <Grid item xs={12} md={3}>
         <Card sx={{ backgroundColor: "#212529", borderRadius: "10px", color: "#e2e8f0" }}>
