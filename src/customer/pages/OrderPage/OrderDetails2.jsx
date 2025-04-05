@@ -62,7 +62,7 @@ const OrderDetails2 = () => {
       {/* Tiêu đề và nút quay lại */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center">
-          <button onClick={() => navigate("/account/orders")} className="mr-4 p-2 bg-gray-200 rounded-full hover:bg-gray-300 transition">
+          <button onClick={() => navigate("/account/order")} className="mr-4 p-2 bg-gray-200 rounded-full hover:bg-gray-300 transition">
             <ArrowLeftIcon className="w-6 h-6 text-gray-700" />
           </button>
           <h1 className="text-3xl font-bold text-gray-800">Chi tiết đơn hàng #{order.id}</h1>
