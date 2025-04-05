@@ -7,7 +7,7 @@ const OrderCard = ({ order }) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    // navigate(`/account/order/${order.id}`);
+    navigate(`/account/order/${order.id}`);
   };
 
   // Định dạng ngày giao hàng dự kiến (giao hàng sau 7 ngày từ ngày đặt hàng)
@@ -29,15 +29,7 @@ const OrderCard = ({ order }) => {
   });
 
   // Định dạng ngày đặt hàng (orderDate) để hiển thị khi đơn hàng đã giao
-  const orderDate = new Date(
-    order.orderDate[0],
-    order.orderDate[1] - 1,
-    order.orderDate[2],
-    order.orderDate[3],
-    order.orderDate[4],
-    order.orderDate[5],
-    order.orderDate[6] / 1000000
-  );
+  const orderDate = new Date(order.orderDate[0], order.orderDate[1] - 1, order.orderDate[2], order.orderDate[3], order.orderDate[4], order.orderDate[5], order.orderDate[6] / 1000000);
   const formattedOrderDate = orderDate.toLocaleDateString("vi-VN", {
     weekday: "long",
     day: "2-digit",
@@ -62,21 +54,11 @@ const OrderCard = ({ order }) => {
           {order.orderDetails && order.orderDetails.length > 0 ? (
             order.orderDetails.map((detail, index) => (
               <div key={index} className="flex w-auto">
-                <img
-                  className="w-[7rem] h-[7rem] object-cover"
-                  src={detail.imageURL || "https://via.placeholder.com/150"}
-                  alt={`Product Image ${index + 1}`}
-                />
+                <img className="w-[7rem] h-[7rem] object-cover" src={detail.imageURL || "https://via.placeholder.com/150"} alt={`Product Image ${index + 1}`} />
                 <div className="flex-grow ml-4">
-                  <div className="font-semibold text-lg">
-                    {detail.variationName || "Unknown Product"}
-                  </div>
-                  <div className="opacity-50 text-md font-semibold">
-                    Số lượng: {detail.quantity}
-                  </div>
-                  <div className="text-md font-semibold">
-                    Giá: {detail.subtotal.toLocaleString("vi-VN")} VNĐ
-                  </div>
+                  <div className="font-semibold text-lg">{detail.variationName || "Unknown Product"}</div>
+                  <div className="opacity-50 text-md font-semibold">Số lượng: {detail.quantity}</div>
+                  <div className="text-md font-semibold">Giá: {detail.subtotal.toLocaleString("vi-VN")} VNĐ</div>
                 </div>
               </div>
             ))
@@ -97,13 +79,7 @@ const OrderCard = ({ order }) => {
             <ProductPrice
               originalPrice={order.totalPrice.toLocaleString("vi-VN")}
               discountPrice={order.totalDiscountPrice.toLocaleString("vi-VN")}
-              savings={
-                order.totalPrice > 0
-                  ? Math.round(
-                      ((order.totalPrice - order.totalDiscountPrice) / order.totalPrice) * 100
-                    )
-                  : 0
-              }
+              savings={order.totalPrice > 0 ? Math.round(((order.totalPrice - order.totalDiscountPrice) / order.totalPrice) * 100) : 0}
             />
           </div>
           <div className="flex flex-wrap items-center max-w-[15rem]">
