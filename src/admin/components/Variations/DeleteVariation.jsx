@@ -69,10 +69,10 @@ const DeleteVariation = ({ variationId, onDeleteSuccess }) => {
     <Card sx={{ bgcolor: "#282f36", borderRadius: "10px" }}>
       <Button
         sx={{
-          bgcolor: "#ff6c2f",
+          bgcolor: "#FF3031",
           borderRadius: "10px",
           color: "#fff",
-          "&:hover": { bgcolor: "#e84118" },
+          "&:hover": { bgcolor: "#B83227" },
         }}
         variant="contained"
         onClick={handleOpenDialog}
@@ -99,7 +99,7 @@ const DeleteVariation = ({ variationId, onDeleteSuccess }) => {
           id="alert-dialog-title"
           sx={{
             bgcolor: "#2f3640",
-            color: "#ff6c2f",
+            color: "#FF3031",
             fontWeight: "bold",
           }}
         >
@@ -131,8 +131,8 @@ const DeleteVariation = ({ variationId, onDeleteSuccess }) => {
             onClick={handleDelete}
             sx={{
               color: "#fff",
-              bgcolor: "#ff6c2f",
-              "&:hover": { bgcolor: "#e84118" },
+              bgcolor: "#FF3031",
+              "&:hover": { bgcolor: "#B83227" },
             }}
             autoFocus
           >

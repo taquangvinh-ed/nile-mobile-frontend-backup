@@ -29,7 +29,7 @@ const SpecificationsCard = ({ productId }) => {
   }, [productId]);
 
   return (
-    <Card sx={{ padding: "16px", borderRadius: "15px 15px 0px 0px", backgroundColor: "#282f36", color: "#e2e8f0" }}>
+    <Card sx={{ padding: "16px", borderRadius: "15px 15px 0px 0px", backgroundColor: "#212529", color: "#e2e8f0" }}>
       {product ? (
         <>
           <Typography variant="h5" sx={{ marginBottom: "16px"}}>

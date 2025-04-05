@@ -76,10 +76,10 @@ const UserPage = () => {
   };
 
   return (
-    <Grid container spacing={3} sx={{ padding: 3 }}>
+    <Grid container spacing={3} sx={{ padding: 2 }}>
       {/* User Info Section */}
       <Grid item xs={12} md={3}>
-        <Card sx={{ backgroundColor: "#282f36", borderRadius: "10px", color: "#e2e8f0" }}>
+        <Card sx={{ backgroundColor: "#212529", borderRadius: "10px", color: "#e2e8f0" }}>
           <CardContent sx={{ textAlign: "center" }}>
             <Avatar
               sx={{
@@ -126,7 +126,7 @@ const UserPage = () => {
                       backgroundColor: selectedContent === action.value ? "#1565c0" : "#475569",
                     },
                   }}
-                  onClick={() => setSelectedContent(action.value)} // Cập nhật nội dung khi nhấn nút
+                  onClick={() => setSelectedContent(action.value)}
                 >
                   {action.label}
                 </Button>
@@ -138,7 +138,7 @@ const UserPage = () => {
 
       {/* Dynamic Content Section */}
       <Grid item xs={12} md={9}>
-        <Card sx={{ backgroundColor: "#282f36", borderRadius: "10px", padding: 2 }}>
+        <Card sx={{ backgroundColor: "#212529", borderRadius: "10px", padding: 2 }}>
           <CardContent>
             <Typography variant="h6" sx={{ marginBottom: 2, color: "#e2e8f0", fontWeight: "bold" }}>
               {selectedContent}

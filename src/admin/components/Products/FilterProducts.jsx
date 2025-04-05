@@ -76,10 +76,10 @@ const FilterProducts = ({ onFilterChange }) => {
       container
       alignItems="center"
       sx={{
-        marginBottom: 2,
-        bgcolor: "#293038",
+        bgcolor: "#212529",
         padding: 2,
-        borderRadius: 3,
+        borderBottom: "1px solid #3a4752",
+        borderRadius: "10px 10px 0px 0px",
       }}
     >
       {/* Categories Label */}
@@ -87,7 +87,7 @@ const FilterProducts = ({ onFilterChange }) => {
         <Typography
           variant="subtitle1"
           sx={{
-            color: "#d3d7dc",
+            color: "#F8F9FA",
             fontWeight: "bold",
           }}
         >
@@ -100,7 +100,8 @@ const FilterProducts = ({ onFilterChange }) => {
           fullWidth
           size="small"
           sx={{
-            bgcolor: "#3a4752",
+            bgcolor: "#343A40",
+            border: "1px solid #495057",
             borderRadius: 3,
             "& .MuiOutlinedInput-notchedOutline": {
               border: "none",
@@ -114,7 +115,8 @@ const FilterProducts = ({ onFilterChange }) => {
             MenuProps={{
               PaperProps: {
                 sx: {
-                  bgcolor: "#3a4752",
+                  bgcolor: "#343A40",
+                  marginTop: 0.5,
                   color: "#d3d7dc",
                   borderRadius: 3,
                   boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.3)",
@@ -128,9 +130,28 @@ const FilterProducts = ({ onFilterChange }) => {
               },
             }}
           >
-            <MenuItem value="all" sx={{ color: "#d3d7dc" }}>All Brands</MenuItem>
+            <MenuItem
+              value="all"
+              sx={{
+                color: "#d3d7dc",
+                "&:hover": { bgcolor: "#495057" }, // Màu khi hover vào
+                "&.Mui-selected": { bgcolor: "#6C757D", color: "#fff" }, // Màu khi được chọn
+                "&.Mui-selected:hover": { bgcolor: "#6C757D " }, // Màu khi đã chọn và hover vào
+              }}
+            >
+              All Brands
+            </MenuItem>
             {brands.map((brand) => (
-              <MenuItem key={brand.categoryId} value={brand.categoryName} sx={{ color: "#d3d7dc" }}>
+              <MenuItem
+                key={brand.categoryId}
+                value={brand.categoryName}
+                sx={{
+                  color: "#d3d7dc",
+                  "&:hover": { bgcolor: "#495057" }, // Màu khi hover vào
+                  "&.Mui-selected": { bgcolor: "#6C757D", color: "#fff" }, // Màu khi được chọn
+                  "&.Mui-selected:hover": { bgcolor: "#6C757D " }, // Màu khi đã chọn và hover vào
+                }}
+              >
                 {brand.categoryName}
               </MenuItem>
             ))}
@@ -144,7 +165,8 @@ const FilterProducts = ({ onFilterChange }) => {
           fullWidth
           size="small"
           sx={{
-            bgcolor: "#3a4752",
+            bgcolor: "#343A40",
+            border: "1px solid #495057",
             borderRadius: 3,
             "& .MuiOutlinedInput-notchedOutline": {
               border: "none",
@@ -158,8 +180,9 @@ const FilterProducts = ({ onFilterChange }) => {
             MenuProps={{
               PaperProps: {
                 sx: {
-                  bgcolor: "#3a4752",
+                  bgcolor: "#343A40",
                   color: "#d3d7dc",
+                  marginTop: 0.5,
                   borderRadius: 3,
                   boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.3)",
                 },
@@ -172,9 +195,28 @@ const FilterProducts = ({ onFilterChange }) => {
               },
             }}
           >
-            <MenuItem value="all" sx={{ color: "#d3d7dc" }}>All Series</MenuItem>
+            <MenuItem
+              value="all"
+              sx={{
+                color: "#d3d7dc",
+                "&:hover": { bgcolor: "#495057" }, // Màu khi hover vào
+                "&.Mui-selected": { bgcolor: "#6C757D", color: "#fff" }, // Màu khi được chọn
+                "&.Mui-selected:hover": { bgcolor: "#6C757D " }, // Màu khi đã chọn và hover vào
+              }}
+            >
+              All Series
+            </MenuItem>
             {series.map((serie) => (
-              <MenuItem key={serie.categoryId} value={serie.categoryName} sx={{ color: "#d3d7dc" }}>
+              <MenuItem
+                key={serie.categoryId}
+                value={serie.categoryName}
+                sx={{
+                  color: "#d3d7dc",
+                  "&:hover": { bgcolor: "#495057" }, // Màu khi hover vào
+                  "&.Mui-selected": { bgcolor: "#6C757D", color: "#fff" }, // Màu khi được chọn
+                  "&.Mui-selected:hover": { bgcolor: "#6C757D " }, // Màu khi đã chọn và hover vào
+                }}
+              >
                 {serie.categoryName}
               </MenuItem>
             ))}

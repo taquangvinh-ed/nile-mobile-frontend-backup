@@ -14,7 +14,7 @@ const getStatusBackgroundColor = (status) => {
     case "SHIPPED":
       return "#E1F5FE"; // Màu xanh dương nhạt
     case "DELIVERED":
-      return "#E8F5E9"; // Màu xanh lá nhạt
+      return "#E0F7FA"; // Màu xanh lá nhạt
     case "COMPLETE":
       return "#E8F5E9"; // Màu xanh lá nhạt
     case "CANCELED":
@@ -35,8 +35,8 @@ const getStatusTextColor = (status) => {
     case "SHIPPED":
       return "#0288D1"; // Màu xanh dương đậm
     case "DELIVERED":
-      return "#388E3C"; // Màu xanh lá
-    case "COMPLETE":
+      return "#00838F"; // Màu xanh lá
+    case "COMPLETED":
       return "#388E3C"; // Màu xanh lá
     case "CANCELED":
       return "#C2185B"; // Màu hồng đậm
@@ -104,7 +104,7 @@ const Orders = () => {
   };
 
   return (
-    <Box sx={{ padding: 3, backgroundColor: "#282f36" }}>
+    <Box sx={{ padding: 2, backgroundColor: "#212529" }}>
       {" "}
       {/* Màu nền tổng thể */}
       <Grid container spacing={3}>

@@ -35,10 +35,11 @@ const Admin = () => {
           position: isSidebarHidden ? 'absolute' : 'fixed',
           top: 0,
           left: 0,
+          borderRight: '1px solid #3a4752',
           width: isSidebarHidden ? '0' : '15%', 
           height: '100vh',
           overflow: 'hidden',
-          backgroundColor: '#262d34',
+          backgroundColor: '#212529',
           transition: 'width 0.3s, position 0.3s',
         }}
       >
@@ -57,7 +58,7 @@ const Admin = () => {
         sx={{
           marginLeft: isSidebarHidden ? '0' : '15%',
           width: isSidebarHidden ? '100%' : '85%',
-          background: '#1e1f22',
+          background: '#181c1f',
           height: '100vh',
           overflowY: 'auto',
           padding: '16px',

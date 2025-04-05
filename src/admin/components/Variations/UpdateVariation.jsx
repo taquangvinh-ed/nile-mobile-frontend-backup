@@ -192,7 +192,7 @@ const UpdateVariation = ({ variationId, currentVariation, onUpdateSuccess }) => 
           }
         `}
       </style>
-      <Button sx={{ bgcolor: "#ff6c2f", borderRadius: "10px", "&:hover": { bgcolor: "#e84118" } }} variant="contained" color="primary" onClick={() => setOpen(true)} disabled={!variationId}>
+      <Button sx={{ bgcolor: "#2196F3", borderRadius: "10px", "&:hover": { bgcolor: "#1976D2" } }} variant="contained" color="primary" onClick={() => setOpen(true)} disabled={!variationId}>
         <EditIcon sx={{marginRight: "5px"}}/>
         Edit
       </Button>
@@ -213,7 +213,7 @@ const UpdateVariation = ({ variationId, currentVariation, onUpdateSuccess }) => 
         <DialogTitle
           sx={{
             bgcolor: "#2f3640",
-            color: "#ff6c2f",
+            color: "#2196F3",
             fontWeight: "bold",
           }}
         >
@@ -230,6 +230,14 @@ const UpdateVariation = ({ variationId, currentVariation, onUpdateSuccess }) => 
               fullWidth
               value={variation[field] || ""} // Hiển thị giá trị hiện tại
               onChange={handleInputChange}
+              sx={{
+                "& .MuiInputLabel-root.Mui-focused": { color: "#2196F3" },
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": { borderColor: "#7f8fa6" },
+                  "&:hover fieldset": { borderColor: "#2196F3" },
+                  "&.Mui-focused fieldset": { borderColor: "#2196F3" },
+                },
+              }}
               InputProps={{
                 sx: { color: "#fff" },
                 inputProps: ["price", "discountPercent", "discountPrice", "stockQuantity"].includes(field)
@@ -249,8 +257,8 @@ const UpdateVariation = ({ variationId, currentVariation, onUpdateSuccess }) => 
             />
           ))}
           <RadioGroup row value={uploadMethod} onChange={(e) => setUploadMethod(e.target.value)} sx={{ mt: 2 }}>
-            <FormControlLabel value="upload" control={<Radio />} label="Upload Image" />
-            <FormControlLabel value="url" control={<Radio />} label="Enter Image URL" />
+            <FormControlLabel value="upload" control={<Radio sx={{ color: "#7f8fa6", "&.Mui-checked": { color: "#17a2b8" } }}/>} label="Upload Image" />
+            <FormControlLabel value="url" control={<Radio sx={{ color: "#7f8fa6", "&.Mui-checked": { color: "#17a2b8" } }}/>} label="Enter Image URL" />
           </RadioGroup>
           {uploadMethod === "upload" && (
             <div>
@@ -259,8 +267,8 @@ const UpdateVariation = ({ variationId, currentVariation, onUpdateSuccess }) => 
                 component="label"
                 startIcon={<CloudUploadIcon />}
                 sx={{
-                  bgcolor: "#ff6c2f",
-                  "&:hover": { bgcolor: "#e84118" },
+                  bgcolor: "#17a2b8",
+                  "&:hover": { bgcolor: "#138496" },
                   mt: 2,
                 }}
               >
@@ -286,6 +294,14 @@ const UpdateVariation = ({ variationId, currentVariation, onUpdateSuccess }) => 
               fullWidth
               value={imageUrl}
               onChange={handleImageUrlChange}
+              sx={{
+                "& .MuiInputLabel-root.Mui-focused": { color: "#2196F3" },
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": { borderColor: "#7f8fa6" },
+                  "&:hover fieldset": { borderColor: "#2196F3" },
+                  "&.Mui-focused fieldset": { borderColor: "#2196F3" },
+                },
+              }}
               InputProps={{
                 sx: { color: "#fff" },
               }}
@@ -310,12 +326,12 @@ const UpdateVariation = ({ variationId, currentVariation, onUpdateSuccess }) => 
             onClick={handleSubmit}
             sx={{
               color: "#fff",
-              bgcolor: "#ff6c2f",
-              "&:hover": { bgcolor: "#e84118" },
+              bgcolor: "#2196F3",
+              "&:hover": { bgcolor: "#1976D2" },
             }}
             disabled={
-              !isChanged || // Không có thay đổi
-              Object.values(errors).some((error) => error) // Có lỗi trong các trường
+              !isChanged ||
+              Object.values(errors).some((error) => error)
             }
           >
             Submit

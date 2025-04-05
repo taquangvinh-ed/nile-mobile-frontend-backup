@@ -75,8 +75,8 @@ const ListProducts = () => {
       <FilterProducts onFilterChange={handleFilterChange} />
 
       {/* Products Table */}
-      <TableContainer component={Paper} sx={{ bgcolor: "#293038", borderRadius: "10px" }}>
-        <Table sx={{ minWidth: 650, bgcolor: "#293038" }} size="small" aria-label="a dense table">
+      <TableContainer component={Paper} sx={{ bgcolor: "#212529", borderRadius: "0px 0px 10px 10px" }}>
+        <Table sx={{ minWidth: 650, bgcolor: "#212529", '& .MuiTableCell-root': { borderBottom: '1px solid #3a4752' }  }} size="small" aria-label="a dense table">
           <TableHead>
             <TableRow>
               <TableCell sx={{ color: "#94a3b8", width: "5%" }}>ID</TableCell>
@@ -92,7 +92,7 @@ const ListProducts = () => {
           <TableBody>
             {displayedProducts.length > 0 ? (
               displayedProducts.map((product) => (
-                <TableRow key={product.productId} sx={{ "&:hover": { backgroundColor: "#334155" } }}>
+                <TableRow key={product.productId} sx={{ "&:hover": { backgroundColor: "#2c3034" } }}>
                   <TableCell sx={{ color: "#e2e8f0" }}>{product.productId}</TableCell>
                   <TableCell sx={{ color: "#e2e8f0" }}>{product.name}</TableCell>
                   <TableCell sx={{ color: "#e2e8f0" }}>{product.series}</TableCell>

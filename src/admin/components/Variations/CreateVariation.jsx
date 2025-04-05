@@ -188,9 +188,9 @@ const CreateVariation = ({ productId, onCreateSuccess }) => {
       </style>
       <Button
         sx={{
-          bgcolor: "#ff6c2f",
+          bgcolor: "#4CAF50",
           borderRadius: "10px",
-          "&:hover": { bgcolor: "#e84118" },
+          "&:hover": { bgcolor: "#45A049" },
         }}
         variant="contained"
         color="primary"
@@ -216,7 +216,7 @@ const CreateVariation = ({ productId, onCreateSuccess }) => {
         <DialogTitle
           sx={{
             bgcolor: "#2f3640",
-            color: "#ff6c2f",
+            color: "#4CAF50",
             fontWeight: "bold",
           }}
         >
@@ -233,6 +233,14 @@ const CreateVariation = ({ productId, onCreateSuccess }) => {
                 fullWidth
                 value={variation[field]}
                 onChange={handleInputChange}
+                sx={{
+                  "& .MuiInputLabel-root.Mui-focused": { color: "#4CAF50" },
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": { borderColor: "#7f8fa6" },
+                    "&:hover fieldset": { borderColor: "#4CAF50" },
+                    "&.Mui-focused fieldset": { borderColor: "#4CAF50" },
+                  },
+                }}
                 InputProps={{
                   sx: { color: "#fff" },
                   inputProps: field === "discountPercent" || field === "discountPrice" || field.includes("price") || field.includes("Quantity") ? { min: 0 } : {}, // Giới hạn giá trị >= 0
@@ -250,8 +258,8 @@ const CreateVariation = ({ productId, onCreateSuccess }) => {
             </div>
           ))}
           <RadioGroup row value={uploadMethod} onChange={(e) => setUploadMethod(e.target.value)} sx={{ mt: 2 }}>
-            <FormControlLabel value="upload" control={<Radio />} label="Upload Image" />
-            <FormControlLabel value="url" control={<Radio />} label="Enter Image URL" />
+            <FormControlLabel value="upload" control={<Radio sx={{ color: "#7f8fa6", "&.Mui-checked": { color: "#17a2b8" } }}/>} label="Upload Image" />
+            <FormControlLabel value="url" control={<Radio sx={{ color: "#7f8fa6", "&.Mui-checked": { color: "#17a2b8" } }}/>} label="Enter Image URL" />
           </RadioGroup>
           {uploadMethod === "upload" && (
             <div>
@@ -260,8 +268,8 @@ const CreateVariation = ({ productId, onCreateSuccess }) => {
                 component="label"
                 startIcon={<CloudUploadIcon />}
                 sx={{
-                  bgcolor: "#ff6c2f",
-                  "&:hover": { bgcolor: "#e84118" },
+                  bgcolor: "#17a2b8",
+                  "&:hover": { bgcolor: "#138496" },
                   mt: 2,
                 }}
               >
@@ -287,6 +295,14 @@ const CreateVariation = ({ productId, onCreateSuccess }) => {
               fullWidth
               value={imageUrl}
               onChange={handleImageUrlChange}
+              sx={{
+                "& .MuiInputLabel-root.Mui-focused": { color: "#4CAF50" },
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": { borderColor: "#7f8fa6" },
+                  "&:hover fieldset": { borderColor: "#4CAF50" },
+                  "&.Mui-focused fieldset": { borderColor: "#4CAF50" },
+                },
+              }}
               InputProps={{
                 sx: { color: "#fff" },
               }}
@@ -311,8 +327,8 @@ const CreateVariation = ({ productId, onCreateSuccess }) => {
             onClick={handleSubmit}
             sx={{
               color: "#fff",
-              bgcolor: "#ff6c2f",
-              "&:hover": { bgcolor: "#e84118" },
+              bgcolor: "#4CAF50",
+              "&:hover": { bgcolor: "#45A049" },
             }}
           >
             Submit

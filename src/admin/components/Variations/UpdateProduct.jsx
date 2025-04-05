@@ -152,9 +152,9 @@ const UpdateProduct = ({ productId }) => {
     <Card sx={{ bgcolor: "#282f36", borderRadius: "10px" }}>
       <Button
         sx={{
-          bgcolor: "#ff6c2f",
+          bgcolor: "#007BFF",
           borderRadius: "10px",
-          "&:hover": { bgcolor: "#e84118" },
+          "&:hover": { bgcolor: "#0056b3" },
         }}
         variant="contained"
         color="primary"
@@ -178,7 +178,7 @@ const UpdateProduct = ({ productId }) => {
         <DialogTitle
           sx={{
             bgcolor: "#2f3640",
-            color: "#ff6c2f",
+            color: "#007BFF",
             fontWeight: "bold",
           }}
         >
@@ -198,6 +198,14 @@ const UpdateProduct = ({ productId }) => {
                   inputProps={["screenSize", "productWeight", "batteryCapacity"].includes(field) ? { min: 0 } : {}} // Giới hạn giá trị >= 0
                   value={formData[field] || ""}
                   onChange={handleInputChange}
+                  sx={{
+                    "& .MuiInputLabel-root.Mui-focused": { color: "#007BFF" },
+                    "& .MuiOutlinedInput-root": {
+                      "& fieldset": { borderColor: "#7f8fa6" },
+                      "&:hover fieldset": { borderColor: "#007BFF" },
+                      "&.Mui-focused fieldset": { borderColor: "#007BFF" },
+                    },
+                  }}
                   margin="normal"
                   InputProps={{
                     sx: { color: "#fff" },
@@ -227,6 +235,14 @@ const UpdateProduct = ({ productId }) => {
                   inputProps={["screenSize", "productWeight", "batteryCapacity"].includes(field) ? { min: 0 } : {}} // Giới hạn giá trị >= 0
                   value={formData[field] || ""}
                   onChange={handleInputChange}
+                  sx={{
+                    "& .MuiInputLabel-root.Mui-focused": { color: "#007BFF" },
+                    "& .MuiOutlinedInput-root": {
+                      "& fieldset": { borderColor: "#7f8fa6" },
+                      "&:hover fieldset": { borderColor: "#007BFF" },
+                      "&.Mui-focused fieldset": { borderColor: "#007BFF" },
+                    },
+                  }}
                   margin="normal"
                   InputProps={{
                     sx: { color: "#fff" },
@@ -252,6 +268,14 @@ const UpdateProduct = ({ productId }) => {
                 name="description"
                 value={formData.description || ""}
                 onChange={handleInputChange}
+                sx={{
+                  "& .MuiInputLabel-root.Mui-focused": { color: "#007BFF" },
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": { borderColor: "#7f8fa6" },
+                    "&:hover fieldset": { borderColor: "#007BFF" },
+                    "&.Mui-focused fieldset": { borderColor: "#007BFF" },
+                  },
+                }}
                 margin="normal"
                 multiline
                 rows={4}
@@ -282,8 +306,8 @@ const UpdateProduct = ({ productId }) => {
             onClick={handleSubmit}
             sx={{
               color: "#fff",
-              bgcolor: "#ff6c2f",
-              "&:hover": { bgcolor: "#e84118" },
+              bgcolor: "#007BFF",
+              "&:hover": { bgcolor: "#0056b3" },
             }}
             disabled={
               !isChanged || // Không có thay đổi

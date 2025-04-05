@@ -9,7 +9,7 @@ const ImageCard = ({ variations, selectedVariationIndex }) => {
         width: "275px",
         height: "275px",
         borderRadius: "15px",
-        backgroundColor: "#282f36",
+        backgroundColor: "#212529",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
