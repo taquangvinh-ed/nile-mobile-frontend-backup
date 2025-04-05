@@ -15,6 +15,7 @@ import UserProfile from "../customer/pages/UserProfilePage/UserProfile";
 import OrderSummary from "../customer/components/Checkout/OrderSummary";
 import CallbackVNPay from "../customer/pages/CallbackVNPAY/CallbackVNPay";
 import SearchPage from "../customer/pages/SearchPage";
+import OrderDetails2 from "../customer/pages/OrderPage/OrderDetails2";
 const CustomerRouters = () => {
   return (
     <div>
@@ -28,6 +29,7 @@ const CustomerRouters = () => {
         <Route path="/product/:productId" element={<ProductDetails />}></Route>
         <Route path="/checkout" element={<Checkout />}></Route>
         <Route path="/account/order" element={<Order />}></Route>
+        <Route path="/account/order/:id" element={<OrderDetails2 />} />
         <Route path="/account/order/:orderId" element={<OrderDetail />}></Route>
         <Route path="/login" element={<LoginForm />}></Route>
         <Route path="/register" element={<RegisterForm />}></Route>

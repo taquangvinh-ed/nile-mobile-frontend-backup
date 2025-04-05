@@ -16,6 +16,9 @@ import {
   GET_CART_FAILURE,
   GET_CART_REQUEST,
   GET_CART_SUCCESS,
+  GET_ORDERS_FAILURE,
+  GET_ORDERS_REQUEST,
+  GET_ORDERS_SUCCESS,
   GET_PRODUCT_DETAILS_FAILURE,
   GET_PRODUCT_DETAILS_REQUEST,
   GET_PRODUCT_DETAILS_SUCCESS,
@@ -939,3 +942,62 @@ export const updateCartItemSelection = (cartItemId, selected) => async (dispatch
     return { payload: { success: false, error: errorMessage } };
   }
 };
+
+export const getOrdersRequest = () => ({
+  type: GET_ORDERS_REQUEST,
+});
+
+export const getOrdersSuccess = (orders) => ({
+  type: GET_ORDERS_SUCCESS,
+  payload: orders,
+});
+
+export const getOrdersFailure = (error) => ({
+  type: GET_ORDERS_FAILURE,
+  payload: error,
+});
+
+export const getOrders = (status) => async (dispatch) => {
+  dispatch(getOrdersRequest());
+  try {
+    const token = localStorage.getItem("jwt");
+    if (!token) {
+      throw new Error("No JWT token found. Please log in.");
+    }
+
+    const response = await axios.get(`${API_BASE_URL}/api/orders`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: {
+        status: status === "all" ? null : status, // Gửi status nếu không phải "all"
+      },
+    });
+
+    dispatch(getOrdersSuccess(response.data));
+    return { payload: { success: true, orders: response.data } };
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || error.message || "Failed to fetch orders";
+    dispatch(getOrdersFailure(errorMessage));
+    return { payload: { success: false, error: errorMessage } };
+  }
+};
+
+export const GET_ORDER_BY_ID_REQUEST = "GET_ORDER_BY_ID_REQUEST";
+export const GET_ORDER_BY_ID_SUCCESS = "GET_ORDER_BY_ID_SUCCESS";
+export const GET_ORDER_BY_ID_FAILURE = "GET_ORDER_BY_ID_FAILURE";
+
+export const getOrderByIdRequest = () => ({
+  type: GET_ORDER_BY_ID_REQUEST,
+});
+
+export const getOrderByIdSuccess = (order) => ({
+  type: GET_ORDER_BY_ID_SUCCESS,
+  payload: order,
+});
+
+export const getOrderByIdFailure = (error) => ({
+  type: GET_ORDER_BY_ID_FAILURE,
+  payload: error,
+});
+

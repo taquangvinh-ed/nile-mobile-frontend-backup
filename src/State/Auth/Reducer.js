@@ -102,6 +102,9 @@ const initialState = {
   message: "",
   success: false,
   error: null,
+  orders: [],
+  ordersLoading: false,
+  ordersError: null,
 };
 
 const calculateCartSummary = (cartItems) => {
@@ -523,6 +526,28 @@ export const authReducer = (state = initialState, action) => {
         ...state,
         cartLoading: false,
         cartError: action.payload,
+      };
+
+      case "GET_ORDERS_REQUEST":
+      return {
+        ...state,
+        ordersLoading: true,
+        ordersError: null,
+      };
+
+    case "GET_ORDERS_SUCCESS":
+      return {
+        ...state,
+        ordersLoading: false,
+        orders: action.payload,
+        ordersError: null,
+      };
+
+    case "GET_ORDERS_FAILURE":
+      return {
+        ...state,
+        ordersLoading: false,
+        ordersError: action.payload,
       };
     default:
       return state;
