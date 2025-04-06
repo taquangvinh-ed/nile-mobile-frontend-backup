@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
 import AddressCard from "../AddressCard/AddressCard";
-import { Autocomplete, Box, Button, TextField } from "@mui/material";
-import { getUserAddresses, updateAddress, updateShippingAddress } from "../../../State/Auth/Action";
+import { Autocomplete, Box, Button, TextField, CircularProgress, Alert, Snackbar } from "@mui/material";
+import { getUserAddresses, updateAddress, updateShippingAddress, deleteOrder } from "../../../State/Auth/Action";
 
 const ConfirmDeliverAddress = () => {
   const dispatch = useDispatch();
@@ -21,6 +21,12 @@ const ConfirmDeliverAddress = () => {
   const [selectedDistrict, setSelectedDistrict] = useState(null);
   const [selectedWard, setSelectedWard] = useState(null);
   const [selectedAddressId, setSelectedAddressId] = useState(null);
+  const [isCancelling, setIsCancelling] = useState(false); // Trạng thái khi hủy đơn hàng
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
 
   useEffect(() => {
     dispatch(getUserAddresses());
@@ -42,13 +48,21 @@ const ConfirmDeliverAddress = () => {
 
   const handleDeliverHere = () => {
     if (!orderId) {
-      alert("Không tìm thấy ID đơn hàng!");
+      setSnackbar({
+        open: true,
+        message: "Không tìm thấy ID đơn hàng!",
+        severity: "error",
+      });
       return;
     }
 
     const selectedAddress = addresses.find((addr) => addr.addressId === selectedAddressId);
     if (!selectedAddress) {
-      alert("Vui lòng chọn một địa chỉ!");
+      setSnackbar({
+        open: true,
+        message: "Vui lòng chọn một địa chỉ!",
+        severity: "error",
+      });
       return;
     }
 
@@ -56,7 +70,11 @@ const ConfirmDeliverAddress = () => {
       if (result.payload.success) {
         navigate(`/checkout?step=4&orderId=${orderId}`);
       } else {
-        alert("Lỗi khi cập nhật địa chỉ: " + result.payload.error);
+        setSnackbar({
+          open: true,
+          message: "Lỗi khi cập nhật địa chỉ: " + result.payload.error,
+          severity: "error",
+        });
       }
     });
   };
@@ -78,7 +96,11 @@ const ConfirmDeliverAddress = () => {
     try {
       const result = await dispatch(updateAddress(addressData));
       if (result.payload.success) {
-        // Sau khi thêm địa chỉ mới, cập nhật địa chỉ này cho order
+        setSnackbar({
+          open: true,
+          message: "Thêm địa chỉ thành công!",
+          severity: "success",
+        });
         const newAddress = result.payload.address; // Giả định API trả về địa chỉ mới
         if (orderId) {
           dispatch(updateShippingAddress(orderId, newAddress)).then((updateResult) => {
@@ -86,16 +108,67 @@ const ConfirmDeliverAddress = () => {
               setTimeout(() => {
                 navigate(`/checkout?step=4&orderId=${orderId}`);
               }, 1000);
-              //lưu ý chỗ này
             } else {
-              alert("Lỗi khi cập nhật địa chỉ cho đơn hàng: " + updateResult.payload.error);
+              setSnackbar({
+                open: true,
+                message: "Lỗi khi cập nhật địa chỉ cho đơn hàng: " + updateResult.payload.error,
+                severity: "error",
+              });
             }
           });
         }
       }
     } catch (error) {
-      console.error("Failed to add address:", error);
+      setSnackbar({
+        open: true,
+        message: "Lỗi khi thêm địa chỉ: " + error.message,
+        severity: "error",
+      });
     }
+  };
+
+  const handleCancelOrder = async () => {
+    if (!orderId) {
+      setSnackbar({
+        open: true,
+        message: "Không tìm thấy ID đơn hàng để hủy!",
+        severity: "error",
+      });
+      return;
+    }
+
+    if (window.confirm("Bạn có chắc chắn muốn hủy đơn hàng này?")) {
+      setIsCancelling(true);
+      try {
+        const result = await dispatch(deleteOrder(orderId));
+        if (result.success) {
+          setSnackbar({
+            open: true,
+            message: "Đơn hàng đã được hủy thành công!",
+            severity: "success",
+          });
+          setTimeout(() => navigate("/"), 2000); // Chuyển về trang chủ sau 2 giây
+        } else {
+          setSnackbar({
+            open: true,
+            message: "Lỗi khi hủy đơn hàng: " + (result.error || "Không xác định"),
+            severity: "error",
+          });
+        }
+      } catch (error) {
+        setSnackbar({
+          open: true,
+          message: "Lỗi khi hủy đơn hàng: " + error.message,
+          severity: "error",
+        });
+      } finally {
+        setIsCancelling(false);
+      }
+    }
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
   };
 
   return (
@@ -190,7 +263,10 @@ const ConfirmDeliverAddress = () => {
                     <TextField type="number" required id="phoneNumber" name="phoneNumber" label="Số điện thoại" fullWidth autoComplete="phone-number" />
                   </div>
                   <div className="col-span-2 grid grid-cols-1">
-                    <div className="w-full h-full py-4 flex justify-center items-center">
+                    <div className="w-full h-full py-4 flex justify-between items-center">
+                      <Button variant="contained" color="error" onClick={handleCancelOrder} disabled={isCancelling || !orderId} startIcon={isCancelling ? <CircularProgress size={20} /> : null}>
+                        {isCancelling ? "Đang hủy..." : "Hủy đơn hàng"}
+                      </Button>
                       <Button
                         type="submit"
                         variant="contained"
@@ -213,6 +289,13 @@ const ConfirmDeliverAddress = () => {
           </div>
         </div>
       </div>
+
+      {/* Snackbar thông báo */}
+      <Snackbar open={snackbar.open} autoHideDuration={3000} onClose={handleCloseSnackbar}>
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: "100%" }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

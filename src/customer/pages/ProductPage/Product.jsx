@@ -12,7 +12,6 @@ import { filterProductsSimple } from "../../../State/Auth/Action";
 import ProductCardFilter from "../../components/Product/ProductCardFilter";
 import axios from "axios";
 
-// Định nghĩa API base URL cho backend
 const API_BASE_URL = "http://localhost:8081";
 
 const sortOptions = [
