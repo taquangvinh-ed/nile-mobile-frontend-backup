@@ -1,16 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Dialog, DialogBackdrop, DialogPanel, Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { ChevronDownIcon, FunnelIcon, MinusIcon, PlusIcon, Squares2X2Icon } from "@heroicons/react/20/solid";
-import { singleFilters } from "../../components/Product/FilterData"; // Chỉ sử dụng singleFilters
+import { singleFilters } from "../../components/Product/FilterData";
 import { FormControl, FormControlLabel, FormLabel, Radio, RadioGroup } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { filterProductsSimple } from "../../../State/Auth/Action"; // Sử dụng action mới
+import { filterProductsSimple } from "../../../State/Auth/Action";
 import ProductCardFilter from "../../components/Product/ProductCardFilter";
+import axios from "axios";
+
+// Định nghĩa API base URL cho backend
+const API_BASE_URL = "http://localhost:8081";
 
 const sortOptions = [
   { name: "Giá: Từ thấp đến cao", value: "price_asc", current: false },
@@ -30,24 +33,66 @@ export default function Product({ title }) {
   const [products, setProducts] = useState([]);
   const { products: filteredProducts, productsLoading, productsError } = useSelector((state) => state.auth);
 
+  // State để lưu danh mục cấp 3 và lỗi
+  const [thirdLevels, setThirdLevels] = useState([]);
+  const [selectedThirdLevel, setSelectedThirdLevel] = useState(null);
+  const [thirdLevelError, setThirdLevelError] = useState(null);
+
+  // Lấy secondLevel và thirdLevel từ URL
+  const searchParams = new URLSearchParams(location.search);
+  const secondLevel = searchParams.get("secondLevel") || "";
+  const thirdLevelFromUrl = searchParams.get("thirdLevel") || "";
+
+  // Lấy danh mục cấp 3 dựa trên secondLevel
+  useEffect(() => {
+    if (secondLevel) {
+      const fetchThirdLevels = async () => {
+        try {
+          console.log(`Fetching third levels for secondLevel: ${secondLevel}`); // Debug
+          const response = await axios.get(`${API_BASE_URL}/api/product/getThirdLevel?secondLevel=${secondLevel}`);
+          console.log("Third levels response:", response.data); // Debug
+          setThirdLevels(response.data || []);
+          setThirdLevelError(null); // Xóa lỗi nếu API thành công
+        } catch (error) {
+          console.error(`Error fetching third levels for ${secondLevel}:`, error);
+          setThirdLevels([]);
+          setThirdLevelError("Không thể lấy danh mục cấp 3. Vui lòng thử lại sau.");
+        }
+      };
+      fetchThirdLevels();
+    } else {
+      setThirdLevels([]);
+      setThirdLevelError(null);
+      console.log("No secondLevel provided, thirdLevels cleared."); // Debug
+    }
+
+    // Cập nhật selectedThirdLevel từ URL
+    setSelectedThirdLevel(thirdLevelFromUrl);
+  }, [secondLevel, thirdLevelFromUrl]);
+
   // Hàm chuyển đổi giá trị bộ lọc thành tham số API
   const getFilterParams = () => {
     const searchParams = new URLSearchParams(location.search);
     const price = searchParams.get("price") || "";
     const batteryCapacity = searchParams.get("battery_capacity") || "";
     const screenSize = searchParams.get("screen_size") || "";
+    const secondLevel = searchParams.get("secondLevel") || "";
+    const thirdLevel = searchParams.get("thirdLevel") || "";
     const sort = searchParams.get("sort") || "";
     const pageNumber = parseInt(searchParams.get("pageNumber")) || 0;
     const pageSize = parseInt(searchParams.get("pageSize")) || 10;
 
     const filters = {
+      keyword: null,
       minPrice: null,
       maxPrice: null,
       minBattery: null,
       maxBattery: null,
       minScreenSize: null,
       maxScreenSize: null,
-      sort,
+      secondLevel: secondLevel || null,
+      thirdLevel: thirdLevel || null,
+      sort: sort || null,
       pageNumber,
       pageSize,
     };
@@ -159,9 +204,11 @@ export default function Product({ title }) {
   // Gọi API khi tham số URL thay đổi
   useEffect(() => {
     const filters = getFilterParams();
+    console.log("Filter params sent to API:", filters); // Debug
     dispatch(filterProductsSimple(filters)).then((response) => {
       if (response.success) {
         setProducts(response.products);
+        console.log("Filtered products:", response.products); // Debug
       } else {
         console.error("Filter products failed:", response.error);
       }
@@ -184,6 +231,22 @@ export default function Product({ title }) {
     navigate({ search: `?${query}` });
   };
 
+  // Xử lý khi nhấp vào danh mục cấp 3
+  const handleThirdLevelClick = (thirdLevel) => {
+    const searchParams = new URLSearchParams(location.search);
+    if (thirdLevel === selectedThirdLevel) {
+      // Nếu đã chọn danh mục này, bỏ chọn (xóa thirdLevel)
+      searchParams.delete("thirdLevel");
+      setSelectedThirdLevel(null);
+    } else {
+      // Chọn danh mục mới
+      searchParams.set("thirdLevel", thirdLevel);
+      setSelectedThirdLevel(thirdLevel);
+    }
+    const query = searchParams.toString();
+    navigate({ search: `?${query}` });
+  };
+
   // Chuyển đổi dữ liệu sản phẩm để hiển thị
   const flattenedProducts = products.flatMap((product) =>
     product.variations.map((variation) => ({
@@ -192,8 +255,8 @@ export default function Product({ title }) {
     }))
   );
 
-  if (productsLoading) return <div>Đang tải...</div>;
-  if (productsError) return <div>Lỗi: {productsError}</div>;
+  if (productsLoading) return <div className="text-center py-10">Đang tải...</div>;
+  if (productsError) return <div className="text-center py-10 text-red-500">Lỗi: {productsError}</div>;
 
   return (
     <div className="bg-white">
@@ -229,7 +292,7 @@ export default function Product({ title }) {
                       </DisclosureButton>
                     </h3>
                     <DisclosurePanel className="pt-6">
-                      <div className="space-y-6">
+                      <div className="space-y-4">
                         <FormControl>
                           <RadioGroup
                             aria-labelledby={`mobile-${section.id}-label`}
@@ -253,7 +316,7 @@ export default function Product({ title }) {
 
         <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-baseline justify-between border-b border-gray-200 pt-24 pb-6">
-            <h1 className="text-4xl font-bold tracking-tight text-gray-900">{title}</h1>
+            <h1 className="text-4xl font-bold tracking-tight text-gray-900">{title || secondLevel || "Sản phẩm"}</h1>
 
             <div className="flex items-center">
               <Menu as="div" className="relative inline-block text-left">
@@ -294,59 +357,75 @@ export default function Product({ title }) {
             </div>
           </div>
 
-          <section aria-labelledby="products-heading" className="pt-6 pb-24">
+          <section aria-labelledby="products-heading" className="pb-24 pt-6">
             <h2 id="products-heading" className="sr-only">
               Products
             </h2>
 
-            <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-5">
-              <div>
-                <div className="flex justify-between items-center">
-                  <h1 className="text-lg opacity-55 font-bold">Filters</h1>
-                  <FilterAltIcon className="opacity-50" />
-                </div>
-                <form className="hidden lg:block">
-                  {singleFilters.map((section) => (
-                    <Disclosure key={section.id} as="div" className="border-b border-gray-200 py-6">
-                      <h3 className="-my-3 flow-root">
-                        <DisclosureButton className="group flex w-full items-center justify-between bg-white py-3 text-sm text-gray-400 hover:text-gray-500">
-                          <FormLabel sx={{ color: "black" }} className="font-medium text-gray-900" id={`${section.id}-label`}>
-                            {section.name}
-                          </FormLabel>
-                          <span className="ml-6 flex items-center">
-                            <PlusIcon aria-hidden="true" className="size-5 group-data-open:hidden" />
-                            <MinusIcon aria-hidden="true" className="size-5 group-not-data-open:hidden" />
-                          </span>
-                        </DisclosureButton>
-                      </h3>
-                      <DisclosurePanel className="pt-6">
-                        <div className="space-y-4">
-                          <FormControl>
-                            <RadioGroup
-                              aria-labelledby={`${section.id}-label`}
-                              name={section.id}
-                              value={new URLSearchParams(location.search).get(section.id) || ""}
-                              onChange={(e) => handleRadioFilter(e, section.id)}
-                            >
-                              {section.options.map((option, optionIdx) => (
-                                <FormControlLabel key={option.value} value={option.value} control={<Radio />} label={option.label} />
-                              ))}
-                            </RadioGroup>
-                          </FormControl>
-                        </div>
-                      </DisclosurePanel>
-                    </Disclosure>
-                  ))}
-                </form>
-              </div>
+            <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-4">
+              {/* Filters for desktop */}
+              <form className="hidden lg:block">
+                {singleFilters.map((section) => (
+                  <Disclosure key={section.id} as="div" className="border-b border-gray-200 py-6">
+                    <h3 className="-my-3 flow-root">
+                      <DisclosureButton className="group flex w-full items-center justify-between bg-white py-3 text-sm text-gray-400 hover:text-gray-500">
+                        <span className="font-medium text-gray-900">{section.name}</span>
+                        <span className="ml-6 flex items-center">
+                          <PlusIcon aria-hidden="true" className="size-5 group-data-open:hidden" />
+                          <MinusIcon aria-hidden="true" className="size-5 group-not-data-open:hidden" />
+                        </span>
+                      </DisclosureButton>
+                    </h3>
+                    <DisclosurePanel className="pt-6">
+                      <div className="space-y-4">
+                        <FormControl>
+                          <RadioGroup
+                            aria-labelledby={`${section.id}-label`}
+                            name={section.id}
+                            value={new URLSearchParams(location.search).get(section.id) || ""}
+                            onChange={(e) => handleRadioFilter(e, section.id)}
+                          >
+                            {section.options.map((option, optionIdx) => (
+                              <FormControlLabel key={option.value} value={option.value} control={<Radio />} label={option.label} />
+                            ))}
+                          </RadioGroup>
+                        </FormControl>
+                      </div>
+                    </DisclosurePanel>
+                  </Disclosure>
+                ))}
+              </form>
 
-              {/* Product grid */}
-              <div className="lg:col-span-4 w-full border border-black">
-                <div className="flex flex-wrap justify-center bg-white py-1">
+              {/* Product grid and Third Level Filters */}
+              <div className="lg:col-span-3">
+                {/* Hiển thị danh mục cấp 3 */}
+                {thirdLevelError ? (
+                  <div className="mb-6 text-red-500">{thirdLevelError}</div>
+                ) : thirdLevels.length > 0 ? (
+                  <div className="mb-6 flex flex-wrap gap-2">
+                    {thirdLevels.map((thirdLevel) => (
+                      <button
+                        key={thirdLevel}
+                        onClick={() => handleThirdLevelClick(thirdLevel)}
+                        className={classNames(
+                          selectedThirdLevel === thirdLevel ? "bg-indigo-600 text-white" : "bg-gray-200 text-gray-700 hover:bg-gray-300",
+                          "px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                        )}
+                      >
+                        {thirdLevel}
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="mb-6 text-gray-500">{secondLevel ? "Không có danh mục cấp 3 cho danh mục này." : "Vui lòng chọn danh mục cấp 2."}</div>
+                )}
+
+                {/* Product Grid */}
+                <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
                   {flattenedProducts.length > 0 ? (
-                    flattenedProducts.map((item) => <ProductCardFilter key={`${item.id}-${item.variation.ram}-${item.variation.rom}`} product={item} />)
+                    flattenedProducts.map((product, index) => <ProductCardFilter key={index} product={product} variation={product.variation} />)
                   ) : (
-                    <p>Không có sản phẩm nào phù hợp với bộ lọc</p>
+                    <div className="col-span-full text-center text-gray-500">Không tìm thấy sản phẩm nào.</div>
                   )}
                 </div>
               </div>

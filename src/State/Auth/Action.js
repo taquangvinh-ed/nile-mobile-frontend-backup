@@ -843,6 +843,8 @@ export const filterProductsSimple = (filters) => async (dispatch) => {
       maxScreenSize: filters.maxScreenSize,
       minPrice: filters.minPrice,
       maxPrice: filters.maxPrice,
+      secondLevel: filters.secondLevel,
+      thirdLevel: filters.thirdLevel,
       sort: filters.sort,
       pageNumber: filters.pageNumber,
       pageSize: filters.pageSize,
@@ -1000,4 +1002,3 @@ export const getOrderByIdFailure = (error) => ({
   type: GET_ORDER_BY_ID_FAILURE,
   payload: error,
 });
-
