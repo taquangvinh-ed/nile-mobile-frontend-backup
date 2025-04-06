@@ -42,7 +42,7 @@ const CreateProductForm = () => {
     ],
   });
 
-  const [setErrors] = useState({});
+  const [errors, setErrors] = useState({});
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
 
   const handleChange = (e, index = null) => {
