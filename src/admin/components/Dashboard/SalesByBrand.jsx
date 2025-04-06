@@ -27,7 +27,7 @@ const SalesByBrand = () => {
         const brandCounts = {};
         completedOrders.forEach((order) => {
           order.orderDetails.forEach((detail) => {
-            const brand = detail.variationName.split(" ")[0]; // Lấy chữ đầu tiên trong tên variationName
+            const brand = detail.brand;
             brandCounts[brand] = (brandCounts[brand] || 0) + detail.quantity;
           });
         });
@@ -35,10 +35,7 @@ const SalesByBrand = () => {
         // Chuẩn bị dữ liệu cho biểu đồ
         const labels = Object.keys(brandCounts);
         const data = Object.values(brandCounts);
-        const backgroundColors = [
-          "#3498db", "#e74c3c", "#2ecc71", "#f1c40f", "#9b59b6", 
-          "#1abc9c", "#e67e22", "#34495e"
-        ]; // Màu sắc cho tối đa 8 hãng
+        const backgroundColors = ["#3498db", "#e74c3c", "#2ecc71", "#f1c40f", "#9b59b6", "#1abc9c", "#e67e22", "#34495e"]; // Màu sắc cho tối đa 8 hãng
 
         setChartData({
           labels,
@@ -79,9 +76,7 @@ const SalesByBrand = () => {
       <Typography variant="h6" gutterBottom>
         Pie Chart of Sales by Brand
       </Typography>
-      <Box sx={{ position: "relative", height: "300px" }}>
-        {chartData ? <Doughnut data={chartData} options={options} /> : <Typography>Loading...</Typography>}
-      </Box>
+      <Box sx={{ position: "relative", height: "300px" }}>{chartData ? <Doughnut data={chartData} options={options} /> : <Typography>Loading...</Typography>}</Box>
     </Card>
   );
 };
