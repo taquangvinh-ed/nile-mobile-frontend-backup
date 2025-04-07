@@ -7,6 +7,7 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 const SalesByBrand = () => {
   const [chartData, setChartData] = useState(null);
+  const [hasData, setHasData] = useState(true); // Trạng thái kiểm tra dữ liệu
 
   useEffect(() => {
     const fetchData = async () => {
@@ -23,6 +24,11 @@ const SalesByBrand = () => {
         // Lọc các đơn hàng có trạng thái COMPLETED
         const completedOrders = orders.filter((order) => order.status === "COMPLETED");
 
+        if (completedOrders.length === 0) {
+          setHasData(false); // Không có đơn hàng
+          return;
+        }
+
         // Tính tổng số lượng của từng hãng
         const brandCounts = {};
         completedOrders.forEach((order) => {
@@ -31,6 +37,11 @@ const SalesByBrand = () => {
             brandCounts[brand] = (brandCounts[brand] || 0) + detail.quantity;
           });
         });
+
+        if (Object.keys(brandCounts).length === 0) {
+          setHasData(false); // Không có dữ liệu hãng
+          return;
+        }
 
         // Chuẩn bị dữ liệu cho biểu đồ
         const labels = Object.keys(brandCounts);
@@ -49,8 +60,10 @@ const SalesByBrand = () => {
             },
           ],
         });
+        setHasData(true); // Có dữ liệu
       } catch (error) {
         console.error("Error fetching orders:", error);
+        setHasData(false); // Lỗi khi fetch dữ liệu
       }
     };
 
@@ -76,7 +89,17 @@ const SalesByBrand = () => {
       <Typography variant="h6" gutterBottom>
         Pie Chart of Sales by Brand
       </Typography>
-      <Box sx={{ position: "relative", height: "300px" }}>{chartData ? <Doughnut data={chartData} options={options} /> : <Typography>Loading...</Typography>}</Box>
+      <Box sx={{ position: "relative", height: "300px" }}>
+        {hasData ? (
+          chartData ? (
+            <Doughnut data={chartData} options={options} />
+          ) : (
+            <Typography>Loading...</Typography>
+          )
+        ) : (
+          <Typography align="center">No data available to display.</Typography>
+        )}
+      </Box>
     </Card>
   );
 };
