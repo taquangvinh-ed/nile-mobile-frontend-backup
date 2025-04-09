@@ -65,6 +65,7 @@ const Addresses = () => {
               key={address.addressId}
               sx={{
                 position: "relative",
+                padding: 2,
                 backgroundColor: "#2F363F",
                 color: "#e2e8f0",
                 borderRadius: "10px",
