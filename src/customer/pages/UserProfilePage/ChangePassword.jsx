@@ -40,19 +40,19 @@ const ChangePassword = () => {
     };
 
     dispatch(changePassword(changePasswordData)).then((response) => {
-        if (response.success) {
-          setMessage(response.message); // "Password changed successfully"
-        } else {
-          // Kiểm tra nếu response.error là object, lấy message từ object
-          const errorMessage = typeof response.error === "object" ? response.error.message : response.error;
-          setError(errorMessage || "An error occurred");
-        }
-      });
+      if (response.success) {
+        setMessage(response.message); // "Password changed successfully"
+      } else {
+        // Kiểm tra nếu response.error là object, lấy message từ object
+        const errorMessage = typeof response.error === "object" ? response.error.message : response.error;
+        setError(errorMessage || "An error occurred");
+      }
+    });
   };
 
   return (
     <div className="max-w-md mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
-      <h2 className="text-2xl font-bold mb-6 text-center">Change Password</h2>
+      <h2 className="text-2xl font-bold mb-6 text-center">Tạo lại mật khẩu</h2>
       {message && <p className="text-green-500 mb-4">{message}</p>}
       {error && <p className="text-red-500 mb-4">{error}</p>}
       <form onSubmit={handleSubmit}>
@@ -95,10 +95,7 @@ const ChangePassword = () => {
             required
           />
         </div>
-        <button
-          type="submit"
-          className="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition-colors"
-        >
+        <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition-colors">
           Thay đổi mật khẩu
         </button>
       </form>

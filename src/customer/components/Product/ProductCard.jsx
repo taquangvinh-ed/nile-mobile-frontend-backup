@@ -85,11 +85,11 @@ const ProductCard = ({ product }) => {
           <StarRating rating={4.5} />
           <Bookmark />
         </div>
-        <div className="flex justify-center items-center mt-3">
+        {/* <div className="flex justify-center items-center mt-3">
           <button className="text-blue-600 text-[0.9rem]">
             <DifferenceIcon /> So sánh
           </button>
-        </div>
+        </div> */}
       </div>
     </div>
   );
