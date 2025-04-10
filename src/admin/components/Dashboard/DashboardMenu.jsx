@@ -2,7 +2,7 @@ import React from "react";
 import { Grid } from "@mui/material";
 import Achivement from "./Achivement";
 import MonthlyOverview from "./MonthlyOverview";
-import OrderStatus from "./OrderStatus";
+import SalesByBrand from "./SalesByBrand";
 import SalesAndViews from "./SalesAndViews";
 
 const DashboardMenu = () => {
@@ -16,7 +16,7 @@ const DashboardMenu = () => {
                     <MonthlyOverview/>
                 </Grid>
                 <Grid item xs={12} md={4}>
-                    <OrderStatus/>
+                    <SalesByBrand/>
                 </Grid>
                 <Grid item xs={12} md={8}>
                     <SalesAndViews/>

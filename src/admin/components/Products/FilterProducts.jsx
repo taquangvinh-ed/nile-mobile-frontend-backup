@@ -33,29 +33,34 @@ const FilterProducts = ({ onFilterChange }) => {
   // Fetch series based on selected brand
   useEffect(() => {
     if (selectedBrand !== "all") {
-      fetch(`http://localhost:8081/api/admin/category/series/get-all/${selectedBrand}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("jwt")}`,
-        },
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          if (Array.isArray(data)) {
-            setSeries(data);
-          } else {
-            setSeries([]);
-          }
+      const selectedBrandId = brands.find((brand) => brand.categoryName === selectedBrand)?.categoryId;
+      if (selectedBrandId) {
+        fetch(`http://localhost:8081/api/admin/category/series/get-all/${selectedBrandId}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("jwt")}`,
+          },
         })
-        .catch((error) => {
-          console.error("Error fetching series:", error);
-          setSeries([]);
-        });
+          .then((response) => response.json())
+          .then((data) => {
+            if (Array.isArray(data)) {
+              setSeries(data);
+            } else {
+              setSeries([]);
+            }
+          })
+          .catch((error) => {
+            console.error("Error fetching series:", error);
+            setSeries([]);
+          });
+      } else {
+        setSeries([]);
+      }
     } else {
       setSeries([]);
     }
-  }, [selectedBrand]);
+  }, [selectedBrand, brands]);
 
   // Handle brand selection change
   const handleBrandChange = (event) => {
